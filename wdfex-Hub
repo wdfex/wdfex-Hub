@@ -34,26 +34,46 @@ local function getServerURL()
 end
 
 local function httpGet(url)
-    local req = nil
-    if syn and type(syn.request) == "function" then req = syn.request
-    elseif type(http_request) == "function" then req = http_request
-    elseif type(request) == "function" then req = request
-    elseif http and type(http.request) == "function" then req = http.request end
-
-    if req then
+    if type(syn) == "table" and type(syn.request) == "function" then
         local ok, res = pcall(function()
-            return req({ Url = url, Method = "GET" })
+            return syn.request({ Url = url, Method = "GET" })
         end)
-        if ok and res then
-            return res.Body or res.body or ""
+        if ok and res and (res.Body or res.body) then
+            return res.Body or res.body
         end
     end
 
-    local ok, res = pcall(function() return game:HttpGet(url, true) end)
-    if ok and res then return res end
+    if type(http_request) == "function" then
+        local ok, res = pcall(function()
+            return http_request({ Url = url, Method = "GET" })
+        end)
+        if ok and res and (res.Body or res.body) then
+            return res.Body or res.body
+        end
+    end
 
-    ok, res = pcall(function() return game:HttpGet(url) end)
-    if ok and res then return res end
+    if type(request) == "function" then
+        local ok, res = pcall(function()
+            return request({ Url = url, Method = "GET" })
+        end)
+        if ok and res and (res.Body or res.body) then
+            return res.Body or res.body
+        end
+    end
+
+    if type(http) == "table" and type(http.request) == "function" then
+        local ok, res = pcall(function()
+            return http.request({ Url = url, Method = "GET" })
+        end)
+        if ok and res and (res.Body or res.body) then
+            return res.Body or res.body
+        end
+    end
+
+    local ok, res = pcall(function() return game:HttpGet(url) end)
+    if ok and type(res) == "string" and #res > 0 then
+        return res
+    end
 
     return nil
 end
@@ -143,7 +163,7 @@ local function getFingerprint()
     local fpFile = "wdfex_fp.txt"
     local cached = nil
     pcall(function()
-        if readfile and isfile and isfile(fpFile) then
+        if type(readfile) == "function" and type(isfile) == "function" and isfile(fpFile) then
             cached = readfile(fpFile)
         end
     end)
@@ -151,7 +171,9 @@ local function getFingerprint()
     local rand = ""
     for _ = 1, 8 do rand = rand .. string.char(math.random(48, 57)) end
     local fp = localPlayer.Name .. "-" .. localPlayer.UserId .. "-" .. rand .. "MAC"
-    pcall(function() if writefile then writefile(fpFile, fp) end end)
+    pcall(function()
+        if type(writefile) == "function" then writefile(fpFile, fp) end
+    end)
     return fp
 end
 local FP = getFingerprint()
@@ -215,13 +237,8 @@ local function runString(source)
         if ok and type(f) == "function" then func = f end
     end
 
-    if not func and type(loadstring) == "function" then
-        local ok, f = pcall(function() return loadstring(source) end)
-        if ok and type(f) == "function" then func = f end
-    end
-
     if not func then
-        return false, "你的执行器不支持 loadstring 或 load"
+        return false, "执行器不支持 loadstring 或 load"
     end
 
     local ok2, err2 = pcall(func)
@@ -239,8 +256,13 @@ local function loadMainScript()
         if source and #source > 10 then
             local ok, msg = runString(source)
             if ok then
+                print("[wdfex-Hub] 主脚本加载成功")
                 return true
+            else
+                warn("[wdfex-Hub] 主脚本执行失败: " .. tostring(msg))
             end
+        else
+            warn("[wdfex-Hub] 主脚本下载失败: " .. url)
         end
         task.wait(0.5)
     end
@@ -413,7 +435,7 @@ GroupLabel.BackgroundTransparency = 1
 GroupLabel.Position = UDim2.new(0, 45, 0, 8)
 GroupLabel.Size = UDim2.new(0, 200, 0, 16)
 GroupLabel.Font = Enum.Font.GothamBold
-GroupLabel.Text = "点我复制作者QQ"
+GroupLabel.Text = "点击复制作者QQ"
 GroupLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 GroupLabel.TextSize = 11
 GroupLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -792,10 +814,7 @@ VerifyBtn.MouseButton1Click:Connect(function()
             playSound("rbxassetid://62339698", 0.6)
             task.wait(1.5)
             ScreenGui:Destroy()
-            local loaded = loadMainScript()
-            if not loaded then
-                warn("[wdfex-Hub] 主脚本加载失败，请检查执行器是否支持 loadstring")
-            end
+            loadMainScript()
         else
             attempts = attempts + 1
             updateAttemptsDisplay()
