@@ -14,7 +14,7 @@ for i = 1, #username do
     coloredUsername = coloredUsername .. '<font color="' .. gradientColors[colorIndex] .. '">' .. username:sub(i, i) .. '</font>'
 end
 
-local version = "v4.5"
+local version = "v4.6"
 local coloredVersion = ""
 for i = 1, #version do
     local colorIndex = (i - 1) % #gradientColors + 1
@@ -1387,64 +1387,6 @@ function createUI()
                         env.__CAR_SPEED_GUI_CLEANUP()
                     end
                 end)
-            end
-        end
-    })
-
-    -- ==================== 生成车辆 (抓包功能) ====================
-    VehicleTab:Divider({ Text = "生成车辆 (抓包功能)" })
-
-    local selectedSpawnVehicle = "Lincoln LS 2002"
-    local vehicleOptions = {}
-    
-    local function updateVehicleOptions()
-        vehicleOptions = {}
-        local civilianFolder = ReplicatedStorage:FindFirstChild("Stuff") and ReplicatedStorage.Stuff:FindFirstChild("Vehicles") and ReplicatedStorage.Stuff.Vehicles:FindFirstChild("Civilian") and ReplicatedStorage.Stuff.Vehicles.Civilian:FindFirstChild("1")
-        if civilianFolder then
-            for _, v in ipairs(civilianFolder:GetChildren()) do
-                table.insert(vehicleOptions, v.Name)
-            end
-        end
-        if #vehicleOptions == 0 then
-            table.insert(vehicleOptions, "Lincoln LS 2002")
-        end
-    end
-    updateVehicleOptions()
-
-    VehicleTab:Dropdown({
-        Title = "选择要生成的车辆",
-        Values = vehicleOptions,
-        Value = "Lincoln LS 2002",
-        Callback = function(value)
-            selectedSpawnVehicle = value
-        end
-    })
-
-    VehicleTab:Button({
-        Title = "生成车辆",
-        Callback = function()
-            local event = ReplicatedStorage:FindFirstChild("Remote") and ReplicatedStorage.Remote:FindFirstChild("PlayerFunc")
-            local vehiclesFolder = ReplicatedStorage:FindFirstChild("Stuff") and ReplicatedStorage.Stuff:FindFirstChild("Vehicles")
-            local worldFolder = workspace:FindFirstChild("World")
-            
-            if event and vehiclesFolder and worldFolder then
-                local carModel = vehiclesFolder.Civilian["1"]:FindFirstChild(selectedSpawnVehicle)
-                local spawnPart = worldFolder.Interactive["Civilian Spawn"].VehicleSpawns:GetChildren()[7]
-                
-                if carModel and spawnPart then
-                    local success, err = pcall(function()
-                        event:InvokeServer("spawnVehicle", carModel, spawnPart)
-                    end)
-                    if success then
-                        WindUI:Notify({ Title = "车辆生成", Content = "成功生成: " .. selectedSpawnVehicle, Duration = 3 })
-                    else
-                        WindUI:Notify({ Title = "车辆生成失败", Content = "服务器拒绝请求或距离过远", Duration = 3 })
-                    end
-                else
-                    WindUI:Notify({ Title = "车辆生成失败", Content = "未找到车辆模型或生成点", Duration = 3 })
-                end
-            else
-                WindUI:Notify({ Title = "车辆生成失败", Content = "未找到远程事件或车辆路径", Duration = 3 })
             end
         end
     })
