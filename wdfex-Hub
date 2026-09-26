@@ -1,917 +1,5168 @@
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local SoundService = game:GetService("SoundService")
-local TweenService = game:GetService("TweenService")
-local HttpService = game:GetService("HttpService")
-local localPlayer = Players.LocalPlayer
-
-local PRIMARY_DOMAIN = "www.keyt.cn"
-local BACKUP_DOMAIN = "keyt.srwz.net"
-local PING_PATH = "/kami/ping"
-local USER_ID = "wdfex12345"
-local APP_NAME = "a"
-local SIGN_KEY = "ec4ea19c08aaed1cb13ee0dfc6222ed4"
-local LOAD_SCRIPT_URL = "https://raw.githubusercontent.com/wdfex/wdfex-Hub/refs/heads/main/wdfex-Hub2"
-local LOAD_SCRIPT_URL_BACKUP = "https://cdn.jsdelivr.net/gh/wdfex/wdfex-Hub@main/wdfex-Hub2"
-
-local USING_BACKUP = false
-local attempts = 0
-local maxAttempts = 3
-local copyCooldown = false
-local unbindCooldown = false
-local isDragging = false
-local dragStart, frameStart
-local isMobile = UserInputService.TouchEnabled
-local isMouse = UserInputService.MouseEnabled
-
-local function getCurrentDomain()
-    if USING_BACKUP then return BACKUP_DOMAIN end
-    return PRIMARY_DOMAIN
-end
-
-local function getServerURL()
-    return "https://" .. getCurrentDomain() .. "/kami/" .. USER_ID .. "/check.php"
-end
-
-local function httpGet(url)
-    if type(syn) == "table" and type(syn.request) == "function" then
-        local ok, res = pcall(function()
-            return syn.request({ Url = url, Method = "GET" })
-        end)
-        if ok and res and (res.Body or res.body) then
-            return res.Body or res.body
-        end
-    end
-
-    if type(http_request) == "function" then
-        local ok, res = pcall(function()
-            return http_request({ Url = url, Method = "GET" })
-        end)
-        if ok and res and (res.Body or res.body) then
-            return res.Body or res.body
-        end
-    end
-
-    if type(request) == "function" then
-        local ok, res = pcall(function()
-            return request({ Url = url, Method = "GET" })
-        end)
-        if ok and res and (res.Body or res.body) then
-            return res.Body or res.body
-        end
-    end
-
-    if type(http) == "table" and type(http.request) == "function" then
-        local ok, res = pcall(function()
-            return http.request({ Url = url, Method = "GET" })
-        end)
-        if ok and res and (res.Body or res.body) then
-            return res.Body or res.body
-        end
-    end
-
-    local ok, res = pcall(function() return game:HttpGet(url) end)
-    if ok and type(res) == "string" and #res > 0 then
-        return res
-    end
-
-    return nil
-end
-
-local function httpGetWithTimeout(url, timeout)
-    local result = nil
-    local done = false
-    task.spawn(function()
-        result = httpGet(url)
-        done = true
-    end)
-    local startTime = tick()
-    while not done and tick() - startTime < timeout do
-        task.wait(0.1)
-    end
-    if done then return result end
-    return nil
-end
-
-local function probeDomain()
-    local url = "https://" .. PRIMARY_DOMAIN .. PING_PATH
-    local raw = httpGetWithTimeout(url, 5)
-    if raw and string.find(raw, "ok") then
-        return true
-    end
-    USING_BACKUP = true
-    return false
-end
-
-local function extractBiz(raw)
-    if not raw then return "" end
-    local body = raw
-    local signPos = string.find(body, "|sign=")
-    if signPos then body = string.sub(body, 1, signPos - 1) end
-    local lastPipe = nil
-    for i = #body, 1, -1 do
-        if string.sub(body, i, i) == "|" then lastPipe = i; break end
-    end
-    if lastPipe then return string.sub(body, 1, lastPipe - 1) end
-    return body
-end
-
-local function transMsg(code)
-    local map = {
-        already_online = "该卡密已在线",
-        online_limit_reached = "在线设备数已满",
-        activate = "激活成功",
-        valid = "验证通过",
-        permanent = "终身有效",
-        heartbeat = "心跳正常",
-        bypass = "验证已关闭",
-        unbind_ok = "解绑成功",
-        invalid_card = "卡密无效",
-        expired = "卡密已过期",
-        banned = "卡密已被禁用",
-        device_mismatch = "设备不匹配",
-        missing_params = "参数不完整",
-        too_frequent = "请求太频繁，请稍后再试",
-        system_locked = "系统已被管理员锁死",
-    }
-    return map[code] or code
-end
-
-local function formatExpireTime(biz)
-    local parts = {}
-    for p in string.gmatch(biz, "([^|]+)") do
-        table.insert(parts, p)
-    end
-    local days = parts[3] or "0"
-    local mins = parts[4] or "0"
-    local lowerDays = string.lower(tostring(days))
-    if lowerDays == "permanent" or lowerDays == "终身" or tostring(days) == "9999" then
-        return "永久有效"
-    end
-    local totalSeconds = (tonumber(days) or 0) * 86400 + (tonumber(mins) or 0) * 60
-    if totalSeconds <= 0 then return "永久有效" end
-    local expireTime = os.time() + totalSeconds
-    local year = tonumber(os.date("%Y", expireTime))
-    local month = tonumber(os.date("%m", expireTime))
-    local day = tonumber(os.date("%d", expireTime))
-    local hour = tonumber(os.date("%H", expireTime))
-    local minute = tonumber(os.date("%M", expireTime))
-    return year .. "年" .. month .. "月" .. day .. "日 " .. hour .. ":" .. minute
-end
-
-local function getFingerprint()
-    local fpFile = "wdfex_fp.txt"
-    local cached = nil
-    pcall(function()
-        if type(readfile) == "function" and type(isfile) == "function" and isfile(fpFile) then
-            cached = readfile(fpFile)
-        end
-    end)
-    if cached and #cached > 6 then return cached end
-    local rand = ""
-    for _ = 1, 8 do rand = rand .. string.char(math.random(48, 57)) end
-    local fp = localPlayer.Name .. "-" .. localPlayer.UserId .. "-" .. rand .. "MAC"
-    pcall(function()
-        if type(writefile) == "function" then writefile(fpFile, fp) end
-    end)
-    return fp
-end
-local FP = getFingerprint()
-
-local function checkCard(card)
-    local ts = os.time()
-    local url = string.format("%s?card=%s&mac=%s&app=%s&heart=1&t=%d",
-        getServerURL(), HttpService:UrlEncode(card), HttpService:UrlEncode(FP), APP_NAME, ts)
-    local raw = httpGetWithTimeout(url, 10)
-    if not raw then return false, "网络超时或连接失败", nil end
-    local biz = extractBiz(raw)
-    if string.sub(biz, 1, 3) == "ok|" then
-        return true, biz, formatExpireTime(biz)
-    elseif string.sub(biz, 1, 6) == "error|" then
-        local code = string.match(biz, "error|([^|]+)") or "unknown"
-        return false, transMsg(code), nil
-    end
-    return false, "未知响应: " .. biz, nil
-end
-
-local function unbindCard(card)
-    local ts = os.time()
-    local url = string.format("%s?act=unbind&card=%s&mac=%s&app=%s&t=%d",
-        getServerURL(), HttpService:UrlEncode(card), HttpService:UrlEncode(FP), APP_NAME, ts)
-    local raw = httpGetWithTimeout(url, 10)
-    if not raw then return false, "网络超时或连接失败" end
-    local biz = extractBiz(raw)
-    if string.find(biz, "unbind_ok") or string.sub(biz, 1, 3) == "ok|" then
-        return true, "解绑成功"
-    elseif string.sub(biz, 1, 6) == "error|" then
-        local code = string.match(biz, "error|([^|]+)") or "unknown"
-        return false, transMsg(code)
-    end
-    return false, "未知响应: " .. biz
-end
-
-local function getSwitch()
-    local url = string.format("%s?act=get_switch&app=%s&t=%d",
-        getServerURL(), APP_NAME, os.time())
-    local raw = httpGetWithTimeout(url, 5)
-    if not raw then return "CARD_ON" end
-    if string.find(raw, "system_locked") then return "CARD_LOCKED" end
-    if string.find(raw, "CARD_OFF") then return "CARD_OFF" end
-    return "CARD_ON"
-end
-
-local function runString(source)
-    if type(source) ~= "string" or #source < 10 then
-        return false, "源码无效"
-    end
-
-    local func = nil
-
-    if type(loadstring) == "function" then
-        local ok, f = pcall(loadstring, source)
-        if ok and type(f) == "function" then func = f end
-    end
-
-    if not func and type(load) == "function" then
-        local ok, f = pcall(load, source)
-        if ok and type(f) == "function" then func = f end
-    end
-
-    if not func then
-        return false, "执行器不支持 loadstring 或 load"
-    end
-
-    local ok2, err2 = pcall(func)
-    if not ok2 then
-        return false, "执行脚本出错: " .. tostring(err2)
-    end
-
-    return true, "脚本已运行"
-end
-
-local function loadMainScript()
-    local urls = { LOAD_SCRIPT_URL, LOAD_SCRIPT_URL_BACKUP }
-    for _, url in ipairs(urls) do
-        local source = httpGetWithTimeout(url, 15)
-        if source and #source > 10 then
-            local ok, msg = runString(source)
-            if ok then
-                print("[wdfex-Hub] 主脚本加载成功")
-                return true
-            else
-                warn("[wdfex-Hub] 主脚本执行失败: " .. tostring(msg))
-            end
-        else
-            warn("[wdfex-Hub] 主脚本下载失败: " .. url)
-        end
-        task.wait(0.5)
-    end
-    return false
-end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "wdfexKakaAuth"
-ScreenGui.Parent = localPlayer.PlayerGui
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.DisplayOrder = 100
-
-local BackgroundOverlay = Instance.new("Frame")
-BackgroundOverlay.Parent = ScreenGui
-BackgroundOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BackgroundOverlay.BackgroundTransparency = 0.7
-BackgroundOverlay.Size = UDim2.new(1, 0, 1, 0)
-BackgroundOverlay.ZIndex = 1
-
-local MainWin = Instance.new("Frame")
-MainWin.Parent = ScreenGui
-MainWin.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-MainWin.Position = UDim2.new(0.5, -150, 0.5, -190)
-MainWin.Size = UDim2.new(0, 300, 0, 380)
-MainWin.ZIndex = 2
-MainWin.Active = true
-MainWin.Selectable = true
-
-local WinCorner = Instance.new("UICorner")
-WinCorner.Parent = MainWin
-WinCorner.CornerRadius = UDim.new(0, 12)
-
-local WinGlow = Instance.new("UIStroke")
-WinGlow.Parent = MainWin
-WinGlow.Color = Color3.fromRGB(90, 90, 90)
-WinGlow.Thickness = 1.5
-WinGlow.Transparency = 0.7
-
-local TitleBar = Instance.new("Frame")
-TitleBar.Parent = MainWin
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-TitleBar.Position = UDim2.new(0, 0, 0, 0)
-TitleBar.Size = UDim2.new(1, 0, 0, 40)
-TitleBar.ZIndex = 3
-TitleBar.Active = true
-TitleBar.Selectable = true
-
-local TitleBarCorner = Instance.new("UICorner")
-TitleBarCorner.Parent = TitleBar
-TitleBarCorner.CornerRadius = UDim.new(0, 12, 0, 0)
-
-local StatusLight = Instance.new("Frame")
-StatusLight.Parent = TitleBar
-StatusLight.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-StatusLight.Position = UDim2.new(0, 8, 0.5, -4)
-StatusLight.Size = UDim2.new(0, 8, 0, 8)
-StatusLight.ZIndex = 4
-
-local StatusCorner = Instance.new("UICorner")
-StatusCorner.Parent = StatusLight
-StatusCorner.CornerRadius = UDim.new(1, 0)
-
-local StatusText = Instance.new("TextLabel")
-StatusText.Parent = TitleBar
-StatusText.BackgroundTransparency = 1
-StatusText.Position = UDim2.new(0, 20, 0.5, -6)
-StatusText.Size = UDim2.new(0, 80, 0, 12)
-StatusText.Font = Enum.Font.GothamMedium
-StatusText.Text = "未验证"
-StatusText.TextColor3 = Color3.fromRGB(255, 150, 150)
-StatusText.TextSize = 9
-StatusText.TextXAlignment = Enum.TextXAlignment.Left
-StatusText.ZIndex = 4
-
-local TitleAccent = Instance.new("Frame")
-TitleAccent.Parent = TitleBar
-TitleAccent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TitleAccent.Position = UDim2.new(0, 0, 1, -1)
-TitleAccent.Size = UDim2.new(1, 0, 0, 1)
-TitleAccent.ZIndex = 4
-
-local Title = Instance.new("TextLabel")
-Title.Parent = TitleBar
-Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 0, 0, 0)
-Title.Size = UDim2.new(1, 0, 0, 25)
-Title.Font = Enum.Font.GothamBlack
-Title.Text = "wdfex-Hub 卡密验证"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 18
-Title.TextXAlignment = Enum.TextXAlignment.Center
-Title.TextYAlignment = Enum.TextYAlignment.Center
-Title.ZIndex = 4
-
-local SubTitle = Instance.new("TextLabel")
-SubTitle.Parent = TitleBar
-SubTitle.BackgroundTransparency = 1
-SubTitle.Position = UDim2.new(0, 0, 0, 25)
-SubTitle.Size = UDim2.new(1, 0, 0, 12)
-SubTitle.Font = Enum.Font.Gotham
-SubTitle.Text = "卡密通验证系统"
-SubTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-SubTitle.TextSize = 10
-SubTitle.TextXAlignment = Enum.TextXAlignment.Center
-SubTitle.ZIndex = 4
-
-local UIDLabel = Instance.new("TextLabel")
-UIDLabel.Parent = MainWin
-UIDLabel.BackgroundTransparency = 1
-UIDLabel.Position = UDim2.new(0, 12, 0, 45)
-UIDLabel.Size = UDim2.new(1, -24, 0, 16)
-UIDLabel.Font = Enum.Font.Gotham
-UIDLabel.Text = "设备UID: " .. FP
-UIDLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-UIDLabel.TextSize = 10
-UIDLabel.TextXAlignment = Enum.TextXAlignment.Left
-UIDLabel.TextTruncate = Enum.TextTruncate.AtEnd
-UIDLabel.ZIndex = 3
-
-local WarningCard = Instance.new("Frame")
-WarningCard.Parent = MainWin
-WarningCard.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-WarningCard.Position = UDim2.new(0.5, -135, 0, 65)
-WarningCard.Size = UDim2.new(0, 270, 0, 35)
-WarningCard.ZIndex = 3
-
-local WarningCorner = Instance.new("UICorner")
-WarningCorner.Parent = WarningCard
-WarningCorner.CornerRadius = UDim.new(0, 6)
-
-local WarningStroke = Instance.new("UIStroke")
-WarningStroke.Parent = WarningCard
-WarningStroke.Color = Color3.fromRGB(255, 110, 110)
-WarningStroke.Thickness = 1
-WarningStroke.Transparency = 0.2
-
-local WarningText = Instance.new("TextLabel")
-WarningText.Parent = WarningCard
-WarningText.BackgroundTransparency = 1
-WarningText.Position = UDim2.new(0, 12, 0, 0)
-WarningText.Size = UDim2.new(1, -24, 1, 0)
-WarningText.Font = Enum.Font.GothamMedium
-WarningText.Text = "购买卡密请找作者购买"
-WarningText.TextColor3 = Color3.fromRGB(255, 180, 180)
-WarningText.TextSize = 11
-WarningText.TextXAlignment = Enum.TextXAlignment.Left
-WarningText.TextYAlignment = Enum.TextYAlignment.Center
-WarningText.ZIndex = 4
-
-local GroupCard = Instance.new("Frame")
-GroupCard.Parent = MainWin
-GroupCard.BackgroundColor3 = Color3.fromRGB(20, 25, 40)
-GroupCard.Position = UDim2.new(0.5, -135, 0, 105)
-GroupCard.Size = UDim2.new(0, 270, 0, 50)
-GroupCard.ZIndex = 3
-
-local GroupCorner = Instance.new("UICorner")
-GroupCorner.Parent = GroupCard
-GroupCorner.CornerRadius = UDim.new(0, 8)
-
-local GroupGlow = Instance.new("UIStroke")
-GroupGlow.Parent = GroupCard
-GroupGlow.Color = Color3.fromRGB(80, 120, 200)
-GroupGlow.Thickness = 1.5
-GroupGlow.Transparency = 0.3
-
-local GroupLabel = Instance.new("TextLabel")
-GroupLabel.Parent = GroupCard
-GroupLabel.BackgroundTransparency = 1
-GroupLabel.Position = UDim2.new(0, 45, 0, 8)
-GroupLabel.Size = UDim2.new(0, 200, 0, 16)
-GroupLabel.Font = Enum.Font.GothamBold
-GroupLabel.Text = "点击复制作者QQ"
-GroupLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-GroupLabel.TextSize = 11
-GroupLabel.TextXAlignment = Enum.TextXAlignment.Left
-GroupLabel.ZIndex = 4
-
-local GroupNumber = Instance.new("TextLabel")
-GroupNumber.Parent = GroupCard
-GroupNumber.BackgroundTransparency = 1
-GroupNumber.Position = UDim2.new(0, 45, 0, 24)
-GroupNumber.Size = UDim2.new(0, 200, 0, 20)
-GroupNumber.Font = Enum.Font.GothamBlack
-GroupNumber.Text = "1687426335"
-GroupNumber.TextColor3 = Color3.fromRGB(255, 255, 255)
-GroupNumber.TextSize = 18
-GroupNumber.TextXAlignment = Enum.TextXAlignment.Left
-GroupNumber.ZIndex = 4
-
-local CopyButton = Instance.new("TextButton")
-CopyButton.Parent = GroupCard
-CopyButton.BackgroundTransparency = 1
-CopyButton.Size = UDim2.new(1, 0, 1, 0)
-CopyButton.Text = ""
-CopyButton.ZIndex = 5
-CopyButton.AutoButtonColor = false
-
-local WhitelistNote = Instance.new("TextLabel")
-WhitelistNote.Parent = MainWin
-WhitelistNote.BackgroundTransparency = 1
-WhitelistNote.Position = UDim2.new(0, 0, 0, 160)
-WhitelistNote.Size = UDim2.new(1, 0, 0, 16)
-WhitelistNote.Font = Enum.Font.GothamMedium
-WhitelistNote.Text = "卡密售价4元"
-WhitelistNote.TextColor3 = Color3.fromRGB(255, 200, 80)
-WhitelistNote.TextSize = 11
-WhitelistNote.TextXAlignment = Enum.TextXAlignment.Center
-WhitelistNote.ZIndex = 3
-
-local InputContainer = Instance.new("Frame")
-InputContainer.Parent = MainWin
-InputContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-InputContainer.Position = UDim2.new(0.5, -120, 0, 190)
-InputContainer.Size = UDim2.new(0, 240, 0, 36)
-InputContainer.ZIndex = 3
-
-local InputContainerCorner = Instance.new("UICorner")
-InputContainerCorner.Parent = InputContainer
-InputContainerCorner.CornerRadius = UDim.new(0, 8)
-
-local InputContainerStroke = Instance.new("UIStroke")
-InputContainerStroke.Parent = InputContainer
-InputContainerStroke.Color = Color3.fromRGB(50, 50, 50)
-InputContainerStroke.Thickness = 1
-
-local Input = Instance.new("TextBox")
-Input.Parent = InputContainer
-Input.BackgroundTransparency = 1
-Input.Position = UDim2.new(0, 12, 0, 0)
-Input.Size = UDim2.new(1, -24, 1, 0)
-Input.Font = Enum.Font.Gotham
-Input.Text = ""
-Input.TextColor3 = Color3.fromRGB(255, 255, 255)
-Input.TextSize = 13
-Input.PlaceholderText = "请输入卡密..."
-Input.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-Input.ClearTextOnFocus = false
-Input.ZIndex = 4
-
-local ClearInputButton = Instance.new("TextButton")
-ClearInputButton.Parent = InputContainer
-ClearInputButton.BackgroundTransparency = 1
-ClearInputButton.Position = UDim2.new(1, -50, 0.5, -8)
-ClearInputButton.Size = UDim2.new(0, 20, 0, 20)
-ClearInputButton.Font = Enum.Font.GothamBold
-ClearInputButton.Text = "×"
-ClearInputButton.TextColor3 = Color3.fromRGB(120, 120, 120)
-ClearInputButton.TextSize = 12
-ClearInputButton.Visible = false
-ClearInputButton.ZIndex = 4
-
-local VerifyBtn = Instance.new("TextButton")
-VerifyBtn.Parent = MainWin
-VerifyBtn.Position = UDim2.new(0.5, -95, 0, 240)
-VerifyBtn.Size = UDim2.new(0, 190, 0, 36)
-VerifyBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-VerifyBtn.Font = Enum.Font.SourceSansBold
-VerifyBtn.Text = "验证卡密"
-VerifyBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-VerifyBtn.TextSize = 16
-VerifyBtn.TextStrokeTransparency = 1
-VerifyBtn.TextXAlignment = Enum.TextXAlignment.Center
-VerifyBtn.TextYAlignment = Enum.TextYAlignment.Center
-VerifyBtn.BorderSizePixel = 0
-VerifyBtn.AutoButtonColor = false
-VerifyBtn.ZIndex = 3
-
-local VerifyBtnCorner = Instance.new("UICorner")
-VerifyBtnCorner.Parent = VerifyBtn
-VerifyBtnCorner.CornerRadius = UDim.new(0, 8)
-
-local UnbindBtn = Instance.new("TextButton")
-UnbindBtn.Parent = MainWin
-UnbindBtn.Position = UDim2.new(0.5, -95, 0, 284)
-UnbindBtn.Size = UDim2.new(0, 190, 0, 30)
-UnbindBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 60)
-UnbindBtn.Font = Enum.Font.GothamBold
-UnbindBtn.Text = "解绑当前设备"
-UnbindBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-UnbindBtn.TextSize = 13
-UnbindBtn.TextXAlignment = Enum.TextXAlignment.Center
-UnbindBtn.BorderSizePixel = 0
-UnbindBtn.AutoButtonColor = false
-UnbindBtn.ZIndex = 3
-
-local UnbindCorner = Instance.new("UICorner")
-UnbindCorner.Parent = UnbindBtn
-UnbindCorner.CornerRadius = UDim.new(0, 8)
-
-local AttemptsDisplay = Instance.new("TextLabel")
-AttemptsDisplay.Parent = MainWin
-AttemptsDisplay.BackgroundTransparency = 1
-AttemptsDisplay.Position = UDim2.new(0, 0, 1, -38)
-AttemptsDisplay.Size = UDim2.new(1, 0, 0, 14)
-AttemptsDisplay.Font = Enum.Font.GothamMedium
-AttemptsDisplay.Text = string.format("剩余尝试次数: %d/%d", maxAttempts - attempts, maxAttempts)
-AttemptsDisplay.TextColor3 = Color3.fromRGB(180, 180, 180)
-AttemptsDisplay.TextSize = 10
-AttemptsDisplay.TextXAlignment = Enum.TextXAlignment.Center
-AttemptsDisplay.ZIndex = 3
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Parent = MainWin
-CloseBtn.Position = UDim2.new(1, -35, 0, 8)
-CloseBtn.Size = UDim2.new(0, 24, 0, 24)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.Text = "×"
-CloseBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-CloseBtn.TextSize = 18
-CloseBtn.TextXAlignment = Enum.TextXAlignment.Center
-CloseBtn.BorderSizePixel = 0
-CloseBtn.AutoButtonColor = false
-CloseBtn.ZIndex = 10
-
-local CloseBtnCorner = Instance.new("UICorner")
-CloseBtnCorner.Parent = CloseBtn
-CloseBtnCorner.CornerRadius = UDim.new(0, 6)
-
-local Msg = Instance.new("TextLabel")
-Msg.Parent = MainWin
-Msg.BackgroundTransparency = 1
-Msg.Position = UDim2.new(0, 0, 1, -20)
-Msg.Size = UDim2.new(1, 0, 0, 16)
-Msg.Font = Enum.Font.Gotham
-Msg.Text = ""
-Msg.TextColor3 = Color3.fromRGB(150, 150, 150)
-Msg.TextSize = 10
-Msg.TextXAlignment = Enum.TextXAlignment.Center
-Msg.Visible = false
-Msg.ZIndex = 3
-
-local TouchDragArea = Instance.new("TextButton")
-TouchDragArea.Parent = MainWin
-TouchDragArea.BackgroundTransparency = 1
-TouchDragArea.Size = UDim2.new(1, 0, 0, 60)
-TouchDragArea.Text = ""
-TouchDragArea.ZIndex = 5
-TouchDragArea.AutoButtonColor = false
-TouchDragArea.Visible = isMobile
-
-MainWin.Size = UDim2.new(0, 0, 0, 0)
-MainWin.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainWin.BackgroundTransparency = 1
-
-local entranceTween = TweenService:Create(MainWin, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Size = UDim2.new(0, 300, 0, 380),
-    Position = UDim2.new(0.5, -150, 0.5, -190),
-    BackgroundTransparency = 0
-})
-entranceTween:Play()
-
-local function updateAttemptsDisplay()
-    AttemptsDisplay.Text = string.format("剩余尝试次数: %d/%d", maxAttempts - attempts, maxAttempts)
-end
-
-local function playSound(soundId, volume)
-    local sound = Instance.new("Sound")
-    sound.Parent = SoundService
-    sound.SoundId = soundId
-    sound.Volume = volume or 0.5
-    sound:Play()
-    game:GetService("Debris"):AddItem(sound, 1)
-end
-
-local function showMessage(text, color, duration)
-    Msg.Text = text
-    Msg.TextColor3 = color
-    Msg.Visible = true
-    if duration then task.wait(duration); Msg.Visible = false end
-end
-
-local function updateStatus(color, text)
-    StatusLight.BackgroundColor3 = color
-    StatusText.Text = text
-    StatusText.TextColor3 = color
-end
-
-Input.Focused:Connect(function()
-    InputContainerStroke.Color = Color3.fromRGB(255, 255, 255)
-    TweenService:Create(InputContainer, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    }):Play()
-    if #Input.Text > 0 then ClearInputButton.Visible = true end
-end)
-
-Input.FocusLost:Connect(function()
-    InputContainerStroke.Color = Color3.fromRGB(50, 50, 50)
-    TweenService:Create(InputContainer, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    }):Play()
-    ClearInputButton.Visible = false
-end)
-
-Input:GetPropertyChangedSignal("Text"):Connect(function()
-    ClearInputButton.Visible = #Input.Text > 0
-end)
-
-ClearInputButton.MouseEnter:Connect(function()
-    TweenService:Create(ClearInputButton, TweenInfo.new(0.2), {
-        TextColor3 = Color3.fromRGB(255, 255, 255)
-    }):Play()
-end)
-
-ClearInputButton.MouseLeave:Connect(function()
-    TweenService:Create(ClearInputButton, TweenInfo.new(0.2), {
-        TextColor3 = Color3.fromRGB(120, 120, 120)
-    }):Play()
-end)
-
-ClearInputButton.MouseButton1Click:Connect(function()
-    Input.Text = ""
-    Input:CaptureFocus()
-    playSound("rbxassetid://62339698", 0.3)
-end)
-
-VerifyBtn.MouseEnter:Connect(function()
-    TweenService:Create(VerifyBtn, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-    }):Play()
-end)
-
-VerifyBtn.MouseLeave:Connect(function()
-    TweenService:Create(VerifyBtn, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    }):Play()
-end)
-
-VerifyBtn.MouseButton1Down:Connect(function()
-    TweenService:Create(VerifyBtn, TweenInfo.new(0.1), {
-        BackgroundColor3 = Color3.fromRGB(225, 225, 225),
-        Size = UDim2.new(0, 185, 0, 34)
-    }):Play()
-    playSound("rbxassetid://62339698", 0.2)
-end)
-
-VerifyBtn.MouseButton1Up:Connect(function()
-    TweenService:Create(VerifyBtn, TweenInfo.new(0.1), {
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        Size = UDim2.new(0, 190, 0, 36)
-    }):Play()
-end)
-
-CloseBtn.MouseEnter:Connect(function()
-    TweenService:Create(CloseBtn, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(55, 55, 55),
-        TextColor3 = Color3.fromRGB(255, 255, 255)
-    }):Play()
-end)
-
-CloseBtn.MouseLeave:Connect(function()
-    TweenService:Create(CloseBtn, TweenInfo.new(0.2), {
-        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-        TextColor3 = Color3.fromRGB(200, 200, 200)
-    }):Play()
-end)
-
-CopyButton.MouseButton1Click:Connect(function()
-    if copyCooldown then return end
-    copyCooldown = true
-    pcall(function() setclipboard("1687426335") end)
-    showMessage("作者QQ号已复制到剪贴板", Color3.fromRGB(80, 255, 80), 2)
-    task.wait(1)
-    copyCooldown = false
-end)
-
-local function startDrag(input)
-    if (isMouse and input.UserInputType == Enum.UserInputType.MouseButton1) or
-        (isMobile and input.UserInputType == Enum.UserInputType.Touch) then
-        isDragging = true
-        dragStart = input.Position
-        frameStart = MainWin.Position
-    end
-end
-
-local function endDrag()
-    if isDragging then isDragging = false end
-end
-
-if isMobile then
-    TouchDragArea.InputBegan:Connect(startDrag)
-else
-    TitleBar.InputBegan:Connect(startDrag)
-end
-
-UserInputService.InputChanged:Connect(function(input)
-    if isDragging then
-        local delta = input.Position - dragStart
-        local newX = frameStart.X.Offset + delta.X
-        local newY = frameStart.Y.Offset + delta.Y
-        local screenWidth = workspace.CurrentCamera.ViewportSize.X
-        local screenHeight = workspace.CurrentCamera.ViewportSize.Y
-        newX = math.clamp(newX, 0, screenWidth - MainWin.Size.X.Offset)
-        newY = math.clamp(newY, 0, screenHeight - MainWin.Size.Y.Offset)
-        MainWin.Position = UDim2.new(0, newX, 0, newY)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if isDragging and ((isMouse and input.UserInputType == Enum.UserInputType.MouseButton1) or
-        (isMobile and input.UserInputType == Enum.UserInputType.Touch)) then
-        endDrag()
-    end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    playSound("rbxassetid://62339698", 0.3)
-    local exitTween = TweenService:Create(MainWin, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        BackgroundTransparency = 1
-    })
-    exitTween:Play()
-    exitTween.Completed:Wait()
-    ScreenGui:Destroy()
-end)
-
-VerifyBtn.MouseButton1Click:Connect(function()
-    local key = Input.Text
-    if #key == 0 then
-        showMessage("请输入卡密", Color3.fromRGB(255, 180, 80), 1.5)
-        return
-    end
-
-    VerifyBtn.Text = "验证中..."
-    VerifyBtn.AutoButtonColor = false
-
-    task.spawn(function()
-        local switch = getSwitch()
-        if switch == "OFF" then
-            showMessage("验证已关闭，直接进入", Color3.fromRGB(80, 255, 80), 2)
-            task.wait(1)
-            ScreenGui:Destroy()
-            loadMainScript()
-            return
-        elseif switch == "LOCKED" then
-            showMessage("系统已被锁死", Color3.fromRGB(255, 80, 80), 2)
-            VerifyBtn.Text = "验证卡密"
-            return
-        end
-
-        local ok, msg, expireTime = checkCard(key)
-        if ok then
-            updateStatus(Color3.fromRGB(80, 255, 80), "已验证")
-            showMessage("验证成功，到期时间: " .. tostring(expireTime), Color3.fromRGB(80, 255, 80), 2)
-            VerifyBtn.Text = "✓ 成功"
-            VerifyBtn.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
-            playSound("rbxassetid://62339698", 0.6)
-            task.wait(1.5)
-            ScreenGui:Destroy()
-            loadMainScript()
-        else
-            attempts = attempts + 1
-            updateAttemptsDisplay()
-            showMessage("验证失败: " .. tostring(msg), Color3.fromRGB(255, 110, 110), 2)
-            playSound("rbxassetid://62339698", 0.3)
-            if attempts >= maxAttempts then
-                updateStatus(Color3.fromRGB(255, 80, 80), "已锁定")
-                showMessage("尝试次数过多，界面将在3秒后关闭", Color3.fromRGB(255, 80, 80), 3)
-                task.wait(3)
-                ScreenGui:Destroy()
-                return
-            else
-                Input.Text = ""
-            end
-            VerifyBtn.Text = "验证卡密"
-            VerifyBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        end
-    end)
-end)
-
-Input.FocusLost:Connect(function(enterPressed)
-    if enterPressed then VerifyBtn.MouseButton1Click:Fire() end
-end)
-
-UnbindBtn.MouseButton1Click:Connect(function()
-    if unbindCooldown then return end
-    local key = Input.Text
-    if #key == 0 then
-        showMessage("请先输入卡密", Color3.fromRGB(255, 180, 80), 1.5)
-        return
-    end
-    unbindCooldown = true
-    UnbindBtn.Text = "解绑中..."
-    UnbindBtn.BackgroundColor3 = Color3.fromRGB(100, 80, 80)
-    task.spawn(function()
-        local ok, msg = unbindCard(key)
-        if ok then
-            showMessage("解绑成功", Color3.fromRGB(80, 255, 80), 2)
-            Input.Text = ""
-            UnbindBtn.BackgroundColor3 = Color3.fromRGB(80, 180, 100)
-            task.wait(1.5)
-            UnbindBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 60)
-        else
-            showMessage("解绑失败: " .. tostring(msg), Color3.fromRGB(255, 110, 110), 2)
-            UnbindBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 60)
-        end
-        UnbindBtn.Text = "解绑当前设备"
-        unbindCooldown = false
-    end)
-end)
-
-coroutine.wrap(function()
-    while WinGlow.Parent do
-        TweenService:Create(WinGlow, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true), {
-            Transparency = 0.8
-        }):Play()
-        task.wait(2)
-    end
-end)()
-
-coroutine.wrap(function()
-    while StatusLight.Parent do
-        TweenService:Create(StatusLight, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true), {
-            BackgroundTransparency = 0.3
-        }):Play()
-        task.wait(1)
-    end
-end)()
-
-if isMobile then
-    local function onTextFieldFocused()
-        TweenService:Create(MainWin, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-            Position = UDim2.new(0.5, -150, 0, 50)
-        }):Play()
-    end
-    local function onTextFieldFocusLost()
-        TweenService:Create(MainWin, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-            Position = UDim2.new(0.5, -150, 0.5, -190)
-        }):Play()
-    end
-    Input.Focused:Connect(onTextFieldFocused)
-    Input.FocusLost:Connect(onTextFieldFocusLost)
-    local lastTapTime = 0
-    local doubleTapThreshold = 0.3
-    TouchDragArea.MouseButton1Click:Connect(function()
-        local currentTime = tick()
-        if currentTime - lastTapTime < doubleTapThreshold then
-            CloseBtn.MouseButton1Click:Fire()
-        end
-        lastTapTime = currentTime
-    end)
-end
-
-probeDomain()
-updateAttemptsDisplay()
-updateStatus(Color3.fromRGB(255, 100, 100), "未验证")
-
-print("[wdfex-Hub] 卡密验证 UI 已加载")
-print("[wdfex-Hub] 应用: " .. APP_NAME .. " | 用户: " .. USER_ID)
-print("[wdfex-Hub] 加载脚本: " .. LOAD_SCRIPT_URL)
+--[[
+███████╗██╗   ██╗██╗██╗         █████╗ ██╗  ██╗███████╗
+██╔════╝██║   ██║██║██║        ██╔══██╗╚██╗██╔╝██╔════╝
+█████╗  ██║   ██║██║██║        ███████║ ╚███╔╝ █████╗
+██╔══╝  ╚██╗ ██╔╝██║██║        ██╔══██║ ██╔██╗ ██╔══╝
+███████╗ ╚████╔╝ ██║███████╗   ██║  ██║██╔╝ ██╗███████╗
+╚══════╝  ╚═══╝  ╚═╝╚══════╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+
+        STUDIOS V2 OBFUSCATOR By MAX
+        https://eaxe.net
+
+        Sponsored by
+        https://BloxDen.com
+--]]
+
+return (function(...)
+	local A = {
+			"zBA,o:DL",
+			"zDuM56(PVC",
+			"z%EQ;?",
+			"z1aa<1E#",
+			"z(ho9_R&+Q>`A#]X",
+			"zEgH3GQo>Q\\(`0b8",
+			"z-hAaS16ck7`[F`/",
+			"z1LbMTQO#giPDTV+`C+`c",
+			"z+4^]td%DhZNW3\"E+sun20I\\:kf1>,J+pBl",
+			"zRcgYkqTV",
+			"zPaDAoDL",
+			"z(206=",
+			"z16&ZYqNKX4tfXjp",
+			"z1e,ZGbPZMJb&",
+			"zR&R\\HDIXX",
+			"zEES@@akpF-PskqS_!F",
+			"zThg0>rar!@Jrh*r",
+			"z($U(J",
+			"z`/W/Dqmh/sR9;K1b]",
+			"z+!MkAgu396<?tNo\\!6c7rb.",
+			"zThg0>rar2oj]ik*",
+			"z`q86_",
+			"z1bU(]RQ-mCtBS5KL_",
+			"zP\"s&#b4p.^aq",
+			"zQO#giPt$M,bk.?+",
+			"zB7Lp/@!mu8@!!IuqS<p+DIZMIqmfeu",
+			"zThg0>rar75I!7,D",
+			"z\\!6c7rb_%TIpWi_+!dI]&G6b*Oh",
+			"z$@",
+			"z1>j([1e;6;to94\\",
+			"zt[6I\\b\'",
+			"zPbThhDuM4#PM6L*",
+			"zR3n3?`Ca",
+			"z`q8bnD:6J^DL",
+			"z>P`1o<!-\"]HT<A",
+			"z(hb.2P]4\'41hL:Q/Fn",
+			"z1aa<1",
+			"zRtsSY$TEOa(G:\'GQL",
+			"z-q)hH",
+			"znqVjiDj]pcP02A;\\GXModc?AMI!0eD-&Z",
+			"z`d^Q.%66$Z`dBHuQOG",
+			"z+>#4BO(arm?O4V)-&Z",
+			"z/P>CMRf7MX`UIg9)\"",
+			"zeWh%&t[9+LDOf%]`D_llq4Bl6@FmN5eU,q9D6",
+			"z/a9NsR&rJS_!+ea@A",
+			"zbG9kQalg*P-6[D6R::",
+			"z+G+-/d)_R-SKbtT",
+			"zRrOI[-st4(/#bpdq@",
+			"z/c[i*(GoYEn3.g+",
+			"z\\X+1nr@2BSj]7A@+2buBj^5GG?)U4GTs>IErM,Q$A#.fB<-Cp!\\G%#.K\"j",
+			"z)-6=#q,imKEYO)9",
+			"z(XU2[Dmp#H`C+`c",
+			"ze9N].n7BU",
+			"zq*+t4$,]mV_@3\'_",
+			"zPhrK-bU",
+			"z@V\"i[bX]",
+			"z1L(^",
+			"zP.h`%bk#",
+			"z+!Mk&0Rt&*f1.dE\\XVa",
+			"z(XU2[D6",
+			"zRW6<mD6",
+			"zR&Rp&@=p",
+			"z)koJ]D_l/W1>X[hEpY",
+			"z+4&KR=\'<",
+			"zDB)I+",
+			"z",
+			"zRWB)XRUIqTbX8o=ai//",
+			"z_X1_eQuebW`/3Zc%q",
+			"zQO3",
+			"z\\p\"%*d3p4-0Uhl`+.1E*=W`l8O\"",
+			"z`nj*\'(>GD*DY&<`qi<",
+			"z(gGdC%,SAntf5.O",
+			"zR/PDnqRComb4!>Kai/n,",
+			"z`tn-e",
+			"z1>j([(X^C\'aNo4!t(08.t16o9t9k",
+			"zai/?l@A",
+			"zt(g97t%JJ\\bX$q.b4i",
+			"zRno^ODOa0\"L/du2`=sH",
+			"zB[?gMt(<",
+			"zt7d%+",
+			"z/)",
+			"zBZ&Uk`]Msh%pHiS$YY",
+			"zR&KVLPaG",
+			"zBZC`7DIo36_GBN4RHQ",
+			"znqVjiDj]pcP02A;\\5odn<!ef!",
+			"zL/ac9BK.B9)l)E_)h",
+			"z\\5YM",
+			"z+>#4)AXRlPkL",
+			"z1e,ZGb`c>2`C+`c",
+			"zlL",
+			"z+G+-/d)_$VJrh*r",
+			"zb88?[q@",
+			"zPbT#nb8BF9",
+			"z1>j([)SfaDad",
+			"z+!0i@?,m4(NUmZ,\\p\"%*d3=",
+			"z-A",
+			"zDOb5$@pI",
+			"zRrE8ADOt",
+			"z1G&6Y@6O!/(20<Y",
+			"z)K>@NaX37fL3b;",
+			"zqTQ.#aYH@2to9a5",
+			"zThg0>rarYTSKbtTZC/ftNoRW-Oq(ggTFkG1>)",
+			"z)+D@Hb2#",
+			"z\\!n]jK.qn&?O4/C+.1%",
+			"z$m`;mq2g",
+			"zQ)D[^B7L!",
+			"znqVjiDj]pcP02A;\\!6c7rb_(D?)4L[>q%\'j\\5f<A,<$ELd\"",
+			"z1G&fYtfXO",
+			"z1LbMTQO#giPq;ShDL",
+			"zRnoaH",
+			"ze]@",
+			"z`tr(9`fh4lt?V!Tj]ik*Thg0>raK",
+			"z$IWbpaX+E1D<C_k",
+			"zR&R5=aYB03D6",
+			"z-s&+2L%b4.Q_c4l",
+			"zB%aBSbkh^iL]8W",
+			"z+ajQ>Nfh&b?O`\'h\\N7h4k(Wic",
+			"zRcNPd@!R*",
+			"zaN7pmlu\'#ALB\\hLPQ",
+			"z+>Cm",
+			"z/D_r$bGr>D/=j2kQ6",
+			"zQ:(o&@G8V\"qY1_\"DOI",
+			"zqK:UQP]+9e",
+			"z%iFK,D:U;\'DBdp=Dj#%",
+			"zq^@g+qRp)P/s!#1EYU",
+			"zLi",
+			"z$m`;mq2SPnbk#",
+			"z$*:H6t[;d)qK.",
+			"ztA62#",
+			"zRj/j1UfVb",
+			"zqTp^]aY-",
+			"z+G+-/d)_-5<?tJ=+!frdj+=",
+			"zPaqR>",
+			"zDub06t1(",
+			"z($Lcun#pb11M]:IR?",
+			"z_lHIo-@4^\\RQ0=c11",
+			"z)T`l7DS%?dPbTCS1LC",
+			"z(2Fi&D:c3=q\"",
+			"z\\!6c7rb__>Odf,7",
+			"zeWh%&t[9+fb4I1cD$c2o@GC1&P;GV*t^h6&e/N+**J`8[PUNo=",
+			"z)T`l7DS%?dPbTCSRro4Laq",
+			"z)5,6",
+			"zQOC/LPQ",
+			"zb2X",
+			"zRUWH/B1(Ne$Nd<@/O",
+			"z%iFK!DOa%\"q\"",
+			"z)T`l7DS%?dPbTCS",
+			"z)T`l7DSjgrDOt",
+			"zB[?gMt(:M,DQeEF",
+			"ze3L",
+			"z(XUX;t7D:4bgDeMaY.",
+			"zqTQ;F@!M",
+			"z6ck",
+			"zbG[(P`AFfBQo*U?",
+			"zP\"hl6t7\'",
+			"z@>SF6t(dJuPQ",
+			"zBA_p&Psk+",
+			"z16&ZYq@",
+			"ztmM3!1\"Yp0B;JhO",
+			"z@Ms*X`D%ZT(6a%N@[",
+			"z\\N7h4k(Wic\\!UZ*=W`>+?O`\'h\\Gjl#,mupLHe;ou",
+			"zQO#giPtF<St(&",
+			"zBA-$p",
+			"ze;%",
+			"z`#,bt)$WgZ$X;U]R-",
+			"z(k4c8@a_IF-#6ln11",
+			"zThg0>rarX@&gR2LTFkN",
+			"zb2\\M",
+			"z\\!6c7rb_lk&g:W\"+`@5Z<!>",
+			"zR/PDnqRComb4!02t(08.t16o9t9k",
+			"z%5Zqjbg`",
+			"z+!MkJ&CbhmAoeBU+4L$*d:\'FJ=.FdN\\!`,VNm+@]<T",
+			"ztOpY8QiE!\"t9_Ln%d",
+			"zb$XlM-#<6QaL3B@",
+			"zDIpK8tm$!<$g1gNDI^?.t<g&,D,tr6tTUscEEV\'K",
+			"zP\"s\'*b5es",
+			"zDZ!eZ",
+			"z+8!LlHs`4fSKbtT",
+			"z`3+MFQ+_L6Dm`j>PO",
+			"zqScj^PakXiPQ",
+			"z@`B%htm\"WZ%4=l/",
+			"zmcVEmq-Fs[)R@\'9",
+			"zPbmOF",
+			"z%iFK,D:U;\'DBdpgb29U*Eq",
+			"zE6-q]@a3=5E\\E\"\'/)",
+			"zPbmR]",
+			"z+4&KR=\'Jc\",1%s&",
+			"z)X<Vrq+$6n),8\"KD,S",
+			"zR&B;MDOaHADQeEe",
+			"z+G+-/d)_-?&$QK+-&Z",
+			"zQO#O+t(dIp",
+			"zR&Rp&@A",
+			"z1au<[@!6Ll",
+			"zBA_p&PC5NZPQ",
+			"z(6sCAQSIQpb84?c_b<",
+			"z`tr(9`fN9$E!m",
+			"zDOb5$@pO)nUtRWl8$",
+			"z16\'bGPhrK8D:\'3F",
+			"z`tr(9`r(4=tRuWJq@",
+			"z+LY2\"d%=_u&g:W\"TFeGdJY>",
+			"zP.fJ",
+			"zPd(%0@>-SFaYTVI",
+			"z%iFK!DObY",
+			"z1>j([Rn7h",
+			"zb88S3",
+			"z`C]-WD6",
+			"zeWh%=t16^DeWsb,t%,`LP;G/B@FmN5enRc;@!VL;eU,q9D6",
+			"z_XYd>(h7LNaldC`)-(",
+			"zRj/j1UfPRM)E(m",
+			"z-ql0*_l^G*$+?/<EpY",
+			"z$\\B3s(!Rf1DZJY(t:W",
+			"zL\'\\3Bb@I",
+			"zPsgLFaYHicbpp&9",
+			"z1>j([RUIqTbX6",
+			"zRj/j1UfVe=",
+			"zakpTPBmlp[1dP\';",
+			"z->!#5$X(H/PD6GPPO",
+			"z1>u\'ja,^0h@[",
+			"z1>j([",
+			"z(2)!ft[\'e5aY-",
+			"zt%SaZ`C]gs",
+			"z+e_Df=f)E),1%s&",
+			"zqK:UQU&g0cPM6A)",
+			"z)RrhubbL;n)-U4?",
+			"zUJ4,GDBd\'",
+			"z%iabYPbm&_",
+			"z(20<Y",
+			"zR/PDn",
+			"zP&-\"W/dF;.qk/%*",
+			"z`/J?QR%U.-DY\'QB)h",
+			"zBfK^:",
+			"zqK:UQP]+9e@VVl@qmh4WP0XgBDOb%;bggLeP/7FDbs5.bDZU-U`tr(9`fh4lt<(GmDuXf/DIO>\\$mre-bbe-@DZU-/Q)kD9",
+			"zb!0Pt1`+(dE?t_b%d",
+			"z%,>-HDOI",
+			"z_6Z-YQ\\p1Eb`]s`",
+			"zq*mJ5",
+			"z$Xb;,EGo9PE`u",
+			"zL(Z53@`^HE_$;Z*1A",
+			"z(XU2[D*0(",
+			"zB(pRG",
+			"zUJ4f=bU",
+			"zbl3F*qTBK\\@>.!7b$]",
+			"zqTR52Dj8)KD,k>hPM%",
+			"z%?0V",
+			"z\\5f<HAXRlPkL",
+			"zDBdo\'t7q3VqT2e3Pa:c",
+			"z(5?HG/@^QEqm,U,%#",
+			"zBm=BJ`/\'S^D\\=BG",
+			"z@G$RmDO,7",
+			"z\\!6c7rb_lk&gO#r+>#C",
+			"zQ<3CTPh\\dib2M5O(\'",
+			"z1>j([R&Rp&@=p",
+			"z@V\\)CPhcuBq+$BJ$lGIDELtUI_\'",
+			"z1sgMG)K9LQ/dddm_]",
+			"zB[?gMt(:n4t%SF",
+			"zD*F>l/D[TYqig8G$@",
+			"zbXr",
+			"zQ)D[^(2)\'^q+sd",
+			"zP.Eo",
+			"z1>j([/tWG(qmfKcbg`",
+			"z@>11^ad",
+			"ztl",
+			"z`tr(9`H`FClohnH",
+			"z+LY2\"d%=_u&g:W\"+L%?DS`(+&Ieqip+6Tm",
+			"z),=]gBBB",
+			"zThg0>rarX@&gR2LTFkStd:\'WaHe;aP+2@fgg[3",
+			"zThg0>rarX_&$QK+-&Z",
+			"z1ao6_@!m\"h",
+			"z`q=R\"aN7pmlZQ!",
+			"z+!frdj+2Wt?OL6$TC<h",
+			"zP\"7<#Ln`LmPt8[r/Fm",
+			"z/hEfXakBh?BIg8S%q",
+			"z+!Mk&0Rt&*f1.dE\\XVa+lYI",
+			"z)T`l7D<U&b`Ca",
+			"zBZWD",
+			"z+!frdj+M[DRuTP",
+			"zi5!_O+su6=,S9",
+			"zb4Z3",
+			"zRJV7jP\",CMb2;o_",
+			"z`f\"(2LU>-9@G)(`tl",
+			"ztBmqr%,/?<Q<\\Ed",
+			"zB[?gMt(:nNaY.",
+			"zDu%S/)-]P5a,&PaR(B",
+			"z%4H2",
+			"z\\5f<H<MC[;Ig",
+			"z)T`l7DS%?dPbTCSR\'I)2",
+			"z%2\\T61a5+eR&<<s",
+			"zt[La>P\"MnQDL",
+			"z+pBkK=&+EOj]ik*+!MkJ,Q##V:@<gA+pBkK=&!",
+			"z(LC56akq3gROltgBg",
+			"z1>j([/HU+1qmfKcbg`",
+			"z1L(Z@b4HO7DL",
+			"z+.,Z2",
+			"zR93_D@#(.DbPR$PQL",
+			"zDYp+n/DYJ4$+3.(/@V",
+			"zP.fYgD:+p\\b2;KuD6",
+			"z1>j([(20<Y",
+			"zPbTmq@GO@s",
+			"z6\'3",
+			"z)<C5J",
+			"zDj#$8@GlG",
+			"zB7LptDOb98t7n",
+			"ztJ_oWPh7",
+			"z)-S#p%8d<k-4*:m/s_",
+			"z1!(29b8?",
+			"ztR^:]PrkhDqNe65",
+			"zt(as;blE9c1\"Aa*tX",
+			"zn3?jqDj3",
+			"ztjJ8TDI+",
+			"zM\\%",
+			"zbX$q.b4^$+qT8I>U&g0pt7dPV",
+			"zQO#giPtasJDI+",
+			"z\\YLL-=W<m;j&g37",
+			"z\\GdccdoH\'p:\"^Qq+6G)/K.1%Te3krOD6",
+			"z`cbF+q+o/2_6=)M(&",
+			"zRco0da5YOG@G#VC",
+			"zR3PNcPaX%",
+			"z/O",
+			"z\\!6c7rb_lFr_^*s_;FPb",
+			"zL(Ra&PnpO$b5>u@mT",
+			"z`DY,(Phr<cDL",
+			"z`d8Dl%2n7_L1P-F",
+			"zP]I=9QTF]Q`=XdM",
+			"z%iFK!",
+			"z/s6XG",
+			"z(!mD9B1bSP$YUC0",
+			"zR&^@iD:\'OAt(OI[tl",
+			"zqm,s;t7r",
+			"z1LbMTQI7",
+			"z@6u&EPQ",
+			"z$Tdg^t^9KdRj@4\'E#",
+			"zRro/q@\"UjoPDLpbb2;o_",
+			"zai1\"^P.h`%bk#",
+			"z@Gl&iDZ!F^",
+			"z)T`l7DSjgPtfXjp",
+			"zB%aBSbkhtS@GlV#qTt+",
+			"zUJ4`j",
+		};
+	for B, d in ipairs({ { 1, 337 }, { 1, 167 }, { 168, 337 } }) do
+		while d[1] < d[2] do
+			A[d[1]], A[d[2]], d[1], d[2] = A[d[2]], A[d[1]], d[1] + 1, d[2] - 1;
+		end;
+	end;
+	local function B(B)
+		return A[B + 27927];
+	end;
+	do
+		local B = string.char;
+		local d = math.floor;
+		local H = string.sub;
+		local W = table.insert;
+		local F = table.concat;
+		local Q = {
+				["9"] = 82,
+				p = 67,
+				q = 33,
+				l = 14,
+				["]"] = 2,
+				["2"] = 68,
+				["#"] = 5,
+				["\\"] = 73,
+				f = 53,
+				["="] = 59,
+				i = 72,
+				["@"] = 36,
+				["%"] = 25,
+				d = 60,
+				["$"] = 15,
+				X = 69,
+				N = 43,
+				["*"] = 19,
+				["["] = 81,
+				["^"] = 76,
+				K = 48,
+				A = 54,
+				R = 21,
+				G = 65,
+				H = 58,
+				Q = 23,
+				["."] = 9,
+				["4"] = 40,
+				[")"] = 24,
+				k = 41,
+				o = 79,
+				T = 75,
+				r = 56,
+				Y = 71,
+				S = 46,
+				["\'"] = 84,
+				I = 49,
+				["3"] = 1,
+				O = 51,
+				["-"] = 18,
+				D = 32,
+				J = 55,
+				_ = 17,
+				["\""] = 63,
+				["&"] = 57,
+				M = 62,
+				s = 7,
+				a = 34,
+				["("] = 26,
+				["`"] = 38,
+				["<"] = 47,
+				["!"] = 66,
+				g = 42,
+				[";"] = 0,
+				F = 6,
+				V = 64,
+				W = 3,
+				L = 39,
+				t = 31,
+				["/"] = 28,
+				b = 35,
+				B = 22,
+				[">"] = 10,
+				n = 29,
+				m = 20,
+				["6"] = 11,
+				[":"] = 50,
+				Z = 77,
+				E = 16,
+				["1"] = 27,
+				C = 4,
+				h = 8,
+				["?"] = 45,
+				["8"] = 13,
+				c = 83,
+				e = 12,
+				j = 52,
+				U = 30,
+				["0"] = 61,
+				[","] = 44,
+				u = 78,
+				["+"] = 74,
+				["5"] = 70,
+				P = 37,
+				["7"] = 80,
+			};
+		local p = string.len;
+		local M = type;
+		local m = {
+				E = 12,
+				C = 38,
+				W = 47,
+				B = 9,
+				c = 39,
+				Q = 32,
+				g = 40,
+				z = 57,
+				K = 7,
+				T = 44,
+				k = 36,
+				m = 63,
+				O = 45,
+				V = 17,
+				["7"] = 33,
+				["/"] = 5,
+				["2"] = 19,
+				j = 8,
+				S = 60,
+				A = 10,
+				U = 20,
+				["1"] = 49,
+				b = 31,
+				G = 54,
+				y = 43,
+				s = 23,
+				d = 1,
+				X = 29,
+				["9"] = 13,
+				x = 52,
+				N = 27,
+				l = 50,
+				["0"] = 24,
+				J = 51,
+				Y = 48,
+				w = 37,
+				i = 3,
+				H = 15,
+				M = 18,
+				p = 56,
+				e = 16,
+				["4"] = 30,
+				o = 35,
+				D = 61,
+				["+"] = 0,
+				Z = 62,
+				v = 59,
+				["3"] = 55,
+				f = 22,
+				["5"] = 25,
+				u = 42,
+				n = 46,
+				["8"] = 28,
+				h = 41,
+				r = 2,
+				["6"] = 4,
+				q = 26,
+				F = 6,
+				P = 34,
+				t = 58,
+				R = 11,
+				a = 14,
+				L = 53,
+				I = 21,
+			};
+		local n = A;
+		for A = 1, #n, 1 do
+			local G = n[A];
+			if M(G) == "string" then
+				local M = H(G, 1, 1);
+				if M == "_" then
+					G = H(G, 2);
+					local Q = p(G);
+					local M = {};
+					local P = 1;
+					local q = 0;
+					local s = 0;
+					while P <= Q do
+						local A = H(G, P, P);
+						local F = m[A];
+						if F then
+							q = q + F * (64 ^ ((3 - s)));
+							s = s + 1;
+							if s == 4 then
+								s = 0;
+								local A = d(q / 65536);
+								local H = d((q % 65536) / 256);
+								local F = q % 256;
+								W(M, B(A, H, F));
+								q = 0;
+							end;
+						elseif A == "=" then
+							W(M, B(d(q / 65536)));
+							if P >= Q or H(G, P + 1, P + 1) ~= "=" then
+								W(M, B(d((q % 65536) / 256)));
+							end;
+							break;
+						end;
+						P = P + 1;
+					end;
+					n[A] = F(M);
+				elseif M == "z" then
+					G = H(G, 2);
+					local M = p(G);
+					local m = {};
+					local P = 1;
+					while P <= M do
+						local A = (M - P) + 1;
+						local F = A >= 5 and 5 or A;
+						local p = 0;
+						local n = F > 1;
+						for A = 0, 4, 1 do
+							local B;
+							if A < F then
+								local d = H(G, P + A, P + A);
+								B = Q[d];
+								if not B then
+									n = false;
+									break;
+								end;
+							else
+								B = 84;
+							end;
+							p = p * 85 + B;
+						end;
+						if n then
+							local A = d(p / 16777216) % 256;
+							local H = d(p / 65536) % 256;
+							local Q = d(p / 256) % 256;
+							local M = p % 256;
+							if F == 5 then
+								W(m, B(A, H, Q, M));
+							elseif F == 4 then
+								W(m, B(A, H, Q));
+							elseif F == 3 then
+								W(m, B(A, H));
+							elseif F == 2 then
+								W(m, B(A));
+							end;
+						end;
+						P = P + F;
+					end;
+					n[A] = F(m);
+				end;
+			end;
+		end;
+	end;
+	return (function(F, A, W, Q, p, H, M, m, Y, c, X, E, l, q, n, P, d, y, o, s, r, w, G, z)
+		d, Y, P, E, z, w, G, r, n, o, y, q, c, X, m, l, s = function(d, W, F, Q)
+				local kC, tC, PC, IC, vC, BC, UC, f, aC, zC, HC, JC, LC, N, S, yC, CC, XC, nC, n, VC, sC, OC, Ba, rC, Wa, C, wC, NC, M, FC, QC, E, xC, k, I, fC, GC, WC, u, D, L, MC, da, t, AC, q, RC, T, Ha, P, lC, cC, KC, ZC, e, b, eC, DC, g, gC, oC, uC, Fa, Aa, V, dC, i, s, J, bC, YC, iC, Qa, j, qC, a, TC, pC, R, EC, mC, jC, hC, O, v, U, h, K, Z, SC, x;
+				while d do
+					if 7298387 > d then
+						if 3611573 > d then
+							if d > 2145787 then
+								if d < 2962656 then
+									if d > 2519495 then
+										if 2884722 > d then
+											if 2710541 > d then
+												d = m[F[2]];
+												t = B(-27857);
+												n = m[F[1]];
+												s = B(-27746);
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												s = 2;
+												e = A[t];
+												M, t = B(-27677), B(-27644);
+												D = e[t];
+												e = B(-27748);
+												E = D[e];
+												g = B(-27857);
+												t = A[g];
+												g, M = B(-27761), d[M];
+												e = t[g];
+												t = B(-27617);
+												D = e[t];
+												e, t = 0, 133048 ~= 5145071;
+												q = P(s, E, D, e, t);
+												s, E = B(-27899), .8;
+												P = { [s] = E };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												n = B(-27627);
+												M = A[n];
+												n = B(-27686);
+												d = M[n];
+												n = 2;
+												M = d(n);
+												d = 14398387;
+											elseif 2863237 > d then
+												P, q = W[2], B(-27906);
+												M = A[q];
+												q = B(-27819);
+												d = M[q];
+												q, n = B(-27700), W[1];
+												M = d(q);
+												d, q = B(-27926), M;
+												M = m[F[1]];
+												q[d] = M;
+												M, d, E = n, B(-27858), .5;
+												n = nil;
+												q[d] = M;
+												d = B(-27792);
+												s, M = d, P or E;
+												E = B(-27750);
+												q[d] = M;
+												M, P = B(-27773), nil;
+												M = q[M];
+												M = M(q);
+												s = B(-27861);
+												M = A[s];
+												s, d = B(-27795), A[B(-27887)];
+												s = M[s];
+												s = s(M, E);
+												E, M = 1, B(-27780);
+												M = s[M];
+												M = M(s, q, E);
+												M, q = {}, nil;
+											else
+												e = B(-27702);
+												D = A[e];
+												e = B(-27838);
+												M = D[e];
+												e, t = 1, 6;
+												D = M(E, e, t);
+												M = B(-27663);
+												d = D == M;
+												d = d and 16481369 or 15584050;
+											end;
+										else
+											if 2899226 > d then
+												d, E = 11599211 >= 2885597, B(-27698);
+												P = c(5693470, {});
+												D, e = 255, 80;
+												m[F[1]] = d;
+												n = B(-27836);
+												M = A[n];
+												n = M(P);
+												M = m[F[2]];
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												E, P = 80, B(-27599);
+												s = q(E, D, e);
+												q = 2;
+												n = M(P, s, q);
+												P = B(-27627);
+												n = A[P];
+												d, P = A[B(-27719)], B(-27686);
+												M = n[P];
+												P = 1;
+												n = M(P);
+												M = 2352658 > 12496200;
+												m[F[1]] = M;
+												M = {};
+											elseif 2923377 > d then
+												d = m[F[1]];
+												s = B(-27746);
+												n = m[F[2]];
+												e = B(-27698);
+												q = A[s];
+												Z, s = 34, B(-27819);
+												P = q[s];
+												g, s = 225, .1;
+												q = P(s);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												M, s, e, t = B(-27677), B(-27687), 225, 225;
+												D = E(e, t, g);
+												E, g = B(-27870), B(-27756);
+												t = A[g];
+												g = B(-27819);
+												e = t[g];
+												M, U, v, g = d[M], 0, 185, 0;
+												t = e(g, v, U, Z);
+												P = { [s] = D, [E] = t };
+												M = M(d, n, q, P);
+												d, P, n = B(-27773), .2, B(-27844);
+												d = M[d];
+												d = d(M);
+												d = m[F[3]];
+												M = d(n, P);
+												d, M = A[B(-27624)], {};
+											else
+												E = B(-27836);
+												s = A[E];
+												e = o(6292929, { P, n });
+												t = { s(e) };
+												e, E = d, t[1];
+												d, s, D = E and 9141686 or 11834682, E, t[2];
+											end;
+										end;
+									else
+										if d < 2348292 then
+											if 2240211 > d then
+												d = B(-27630);
+												M = { d };
+												d = A[B(-27810)];
+											elseif d < 2305170 then
+												d = m[F[3]];
+												E = B(-27698);
+												s = A[E];
+												D, P, E = 180, B(-27740), B(-27758);
+												q = s[E];
+												e, E = 80, 255;
+												s = q(E, D, e);
+												q = 1.5;
+												M = d(P, s, q);
+												d, M = A[B(-27744)], {};
+											elseif 2320224 > d then
+												M = m[F[8]];
+												t = B(-27698);
+												e = A[t];
+												g, v, t = 80, 80, B(-27758);
+												D = e[t];
+												t = 255;
+												e = D(t, g, v);
+												D, U, v = B(-27812), 80, 80;
+												E = M(e, D);
+												M = m[F[2]];
+												g = B(-27698);
+												t = A[g];
+												D, g = B(-27710), B(-27758);
+												e = t[g];
+												g = 255;
+												t = e(g, v, U);
+												e = 3;
+												E = M(D, t, e);
+												D = B(-27627);
+												E = A[D];
+												D = B(-27686);
+												M = E[D];
+												D = 3;
+												E = M(D);
+												E = B(-27642);
+												M = m[F[3]];
+												E = M[E];
+												E = E(M);
+												M, d = {}, A[B(-27712)];
+											else
+												M = B(-27652);
+												d = m[F[1]];
+												s = m[F[2]];
+												E = B(-27878);
+												q = s[E];
+												P = #q;
+												q = 0;
+												n = P > q;
+												d[M] = n;
+												M, d = {}, A[B(-27706)];
+											end;
+										else
+											if d < 2373607 then
+												d = m[F[1]];
+												d = d and 7288904 or 11921728;
+											elseif 2428247 > d then
+												P, q = n, B(-27702);
+												M = A[q];
+												q = B(-27920);
+												d = M[q];
+												q = B(-27885);
+												M = d(P, q);
+												q = M;
+												d = q and 15127018 or 14477792;
+											else
+												d, M = A[B(-27864)], { M };
+											end;
+										end;
+									end;
+								else
+									if d > 3278575 then
+										if d < 3424819 then
+											if d < 3317893 then
+												M = B(-27637);
+												P = m[F[1]];
+												q = m[F[2]];
+												n = P .. q;
+												d = M .. n;
+												P, n = 5, d;
+												d = m[F[3]];
+												M = d(n, P);
+												P = M;
+												d, M = P and 13243625 or 5281721, P;
+											elseif 3344932 > d then
+												d = m[F[2]];
+												n = m[F[1]];
+												M, s, t, g = B(-27677), B(-27746), B(-27857), B(-27857);
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												s = 1;
+												e = A[t];
+												t = B(-27644);
+												D = e[t];
+												e = B(-27748);
+												E = D[e];
+												t = A[g];
+												g = B(-27761);
+												e = t[g];
+												t = B(-27617);
+												D = e[t];
+												t, e = 9818884 ~= 7696026, 0;
+												q = P(s, E, D, e, t);
+												E, M, s = .3, d[M], B(-27590);
+												P = { [s] = E };
+												M = M(d, n, q, P);
+												d, n = B(-27773), B(-27627);
+												d = M[d];
+												d = d(M);
+												M = A[n];
+												n = B(-27686);
+												d = M[n];
+												n = 1;
+												M = d(n);
+												d = 10839060;
+											else
+												P, M = 9424569 ~= 2670903, B(-27861);
+												d = A[M];
+												n = m[F[1]];
+												q = B(-27654);
+												q = d[q];
+												M = { q(d, n, P) };
+												d, M = A[B(-27625)], { H(M) };
+											end;
+										else
+											if d < 3514262 then
+												d = m[F[3]];
+												s, D = B(-27907), B(-27799);
+												E = A[D];
+												D = E(n);
+												q = s .. D;
+												e, t, D = 110, 110, B(-27698);
+												E = A[D];
+												D = B(-27758);
+												s = E[D];
+												D = 255;
+												E = s(D, e, t);
+												s = 2;
+												M = d(q, E, s);
+												d = m[F[5]];
+												E, e, M = B(-27698), 60, B(-27687);
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												E, D = 180, 50;
+												s = q(E, D, e);
+												d[M] = s;
+												d = 11316075;
+											elseif 3531683 > d then
+												E, d = t, g;
+												d = 581931;
+											else
+												P = .3;
+												d = m[F[1]];
+												s, n = B(-27746), B(-27844);
+												M = d(n, P);
+												t = B(-27857);
+												d = m[F[2]];
+												n = m[F[3]];
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												e = A[t];
+												s, t, g = .3, B(-27644), B(-27857);
+												D = e[t];
+												e = B(-27869);
+												E = D[e];
+												U = .5;
+												t = A[g];
+												M, v, g = B(-27677), 0, B(-27761);
+												M = d[M];
+												e = t[g];
+												t = B(-27691);
+												D = e[t];
+												q = P(s, E, D);
+												t, g, e, s = 0, 0, B(-27756), B(-27870);
+												D = A[e];
+												e = B(-27819);
+												E = D[e];
+												e = 0;
+												D = E(e, t, g, v);
+												g, E, v = B(-27756), B(-27871), 0;
+												t = A[g];
+												g = B(-27819);
+												e = t[g];
+												g, Z = .5, 0;
+												t = e(g, v, U, Z);
+												g, e = 1, B(-27590);
+												P = { [s] = D, [E] = t, [e] = g };
+												M = M(d, n, q, P);
+												n = M;
+												M, d = B(-27646), B(-27773);
+												d = n[d];
+												d = d(n);
+												d = n[M];
+												n, M = nil, B(-27772);
+												M = d[M];
+												M = M(d);
+												M = B(-27642);
+												d = m[F[4]];
+												M = d[M];
+												M = M(d);
+												M, d = {}, A[B(-27916)];
+											end;
+										end;
+									else
+										if d > 3105846 then
+											if 3127862 > d then
+												t, s = not e, s + D;
+												M = s <= E;
+												M = t and M;
+												t = s >= E;
+												t = e and t;
+												M = t or M;
+												t = 8771721;
+												d = M and t;
+												M = 5672814;
+												d = d or M;
+											elseif 3202412 > d then
+												M = B(-27911);
+												d = A[M];
+												M = d();
+												P = m[F[1]];
+												n = M;
+												M = n - P;
+												P = m[F[2]];
+												d = M < P;
+												d = d and 6658511 or 5974982;
+											else
+												q, M, n, d, P = nil, {}, nil, A[B(-27816)], nil;
+											end;
+										else
+											if 2989974 > d then
+												M, d = {}, A[B(-27741)];
+											elseif d < 3037625 then
+												n = W[1];
+												d = n and 510005 or 5802163;
+											elseif d < 3086915 then
+												d = m[F[1]];
+												s, v = B(-27746), 50;
+												n = m[F[2]];
+												q = A[s];
+												s, t = B(-27819), B(-27857);
+												P = q[s];
+												s = .3;
+												e = A[t];
+												t = B(-27644);
+												D = e[t];
+												t, e = -150, B(-27742);
+												E = D[e];
+												M = B(-27677);
+												q = P(s, E);
+												g, e = 0, B(-27756);
+												D = A[e];
+												e, s = B(-27819), B(-27871);
+												E = D[e];
+												M, e = d[M], .5;
+												D = E(e, t, g, v);
+												P = { [s] = D };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27697)], {};
+											else
+												d = P;
+												d, M = 1537050, n;
+											end;
+										end;
+									end;
+								end;
+							else
+								if 1123535 > d then
+									if 584085 > d then
+										if d < 413237 then
+											if d < 85239 then
+												d = m[P];
+												M = { d };
+												d = A[B(-27902)];
+											elseif d < 208088 then
+												M, d = {}, A[B(-27714)];
+											elseif d < 314070 then
+												s = E(q, s);
+												d = s and 5964255 or 15203173;
+											else
+												t = B(-27651);
+												e = n[t];
+												U = B(-27857);
+												v = A[U];
+												U = B(-27651);
+												g = v[U];
+												v = B(-27613);
+												t = g[v];
+												D = e == t;
+												s, d = D, 5199770;
+											end;
+										else
+											if d < 532383 then
+												M = m[F[1]];
+												P = B(-27619);
+												d = M[P];
+												M = B(-27866);
+												M = d[M];
+												M = M(d);
+												d = 5802163;
+											elseif 568346 > d then
+												d = M and 1638010 or 6412988;
+											else
+												d = e;
+												d = E and 10681784 or 8593351;
+											end;
+										end;
+									else
+										if 915682 > d then
+											if 709802 > d then
+												d, M = A[B(-27782)], { P };
+											elseif 839590 > d then
+												d = M and 65973 or 12695133;
+											else
+												d = M and 11653879 or 6033674;
+											end;
+										else
+											if d < 1003451 then
+												n = W[1];
+												d = m[F[1]];
+												d = d and 4039179 or 4901807;
+											elseif 1028922 > d then
+												s, M, e = B(-27655), B(-27637), B(-27632);
+												P = m[F[1]];
+												q = P();
+												D = m[F[2]];
+												E = D .. e;
+												P = s .. E;
+												n = q .. P;
+												d = M .. n;
+												M = { d };
+												d = A[B(-27817)];
+											else
+												s, P, M, n, d, q = nil, nil, {}, nil, A[B(-27717)], nil;
+											end;
+										end;
+									end;
+								else
+									if d < 1598415 then
+										if 1360108 > d then
+											if 1216580 > d then
+												E, d, D = B(-27878), 7257403, B(-27694);
+												M = m[F[13]];
+												M[E] = D;
+											elseif d < 1237491 then
+												E = m[P];
+												s = #E;
+												d, E = 833365, 6;
+												q = s > E;
+												M = q;
+											elseif 1298975 > d then
+												M = B(-27763);
+												d = A[M];
+												n = m[F[1]];
+												M = d(n);
+												d = 13249868;
+												m[F[2]] = M;
+											else
+												d = m[F[1]];
+												M, q, s = B(-27905), B(-27698), 255;
+												P = A[q];
+												q, E = B(-27758), 255;
+												n = P[q];
+												q = 255;
+												P = n(q, s, E);
+												d[M] = P;
+												e, s = B(-27698), B(-27746);
+												d = m[F[2]];
+												n = m[F[3]];
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												s = .2;
+												q = P(s);
+												t, s, M = 30, B(-27687), B(-27677);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e, M, g = 30, d[M], 30;
+												D = E(e, t, g);
+												P = { [s] = D };
+												M = M(d, n, q, P);
+												d, q = B(-27773), B(-27878);
+												d = M[d];
+												d = d(M);
+												P = m[F[4]];
+												n = P[q];
+												M = #n;
+												n = 0;
+												d = M > n;
+												d = d and 1698800 or 104506;
+											end;
+										else
+											if d < 1455859 then
+												d = m[F[8]];
+												e = B(-27698);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e, g, t = 80, 80, 255;
+												D = E(e, t, g);
+												E = B(-27852);
+												M = d(D, E);
+												t = B(-27799);
+												d = m[F[2]];
+												D = B(-27658);
+												e = A[t];
+												t = e(q);
+												v = 80;
+												E = D .. t;
+												t = B(-27698);
+												e = A[t];
+												t = B(-27758);
+												D = e[t];
+												t, g = 80, 255;
+												e = D(t, g, v);
+												D = 2;
+												M = d(E, e, D);
+												M = B(-27878);
+												d = m[F[5]];
+												E, g = B(-27820), 80;
+												d[M] = E;
+												e, t, M = B(-27698), 255, B(-27687);
+												d = m[F[5]];
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e = 80;
+												D = E(e, t, g);
+												d[M] = D;
+												D = .6;
+												d = m[F[9]];
+												E = B(-27844);
+												M = d(E, D);
+												E = B(-27627);
+												M = A[E];
+												E = B(-27686);
+												d = M[E];
+												E = 1.5;
+												M = d(E);
+												d = m[F[3]];
+												M = B(-27642);
+												M = d[M];
+												M = M(d);
+												d = m[F[4]];
+												M = d();
+												d = 1036490;
+											elseif d < 1547935 then
+												d = M and 1252403 or 13249868;
+											else
+												M, d = {}, A[B(-27689)];
+											end;
+										end;
+									else
+										if d < 1906174 then
+											if 1668405 > d then
+												D = B(-27627);
+												M = A[D];
+												D = B(-27686);
+												d = M[D];
+												D = .1;
+												M = d(D);
+												d = 9430336;
+											elseif 1799964 > d then
+												n, M = 4144113 ~= 1747772, B(-27652);
+												d = m[F[5]];
+												d[M] = n;
+												d = 104506;
+											else
+												g = 255;
+												d = m[F[1]];
+												t = 255;
+												n = m[F[2]];
+												s = B(-27746);
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												e, s = B(-27698), .1;
+												q = P(s);
+												s = B(-27687);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e = 255;
+												D = E(e, t, g);
+												E, g, M = B(-27870), B(-27756), B(-27677);
+												t = A[g];
+												U, g, v = 0, B(-27819), 190;
+												e = t[g];
+												g, Z = 0, 36;
+												t = e(g, v, U, Z);
+												P, M = { [s] = D, [E] = t }, d[M];
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27615)], {};
+											end;
+										else
+											if 1918736 > d then
+												d = m[F[1]];
+												n = m[F[2]];
+												s = B(-27746);
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												e, s, M = B(-27698), .2, B(-27677);
+												q = P(s);
+												s = B(-27845);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												t, g, e = 255, 255, 255;
+												D = E(e, t, g);
+												P, M = { [s] = D }, d[M];
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27814)], {};
+											elseif d < 2020378 then
+												d = m[F[1]];
+												n = m[F[2]];
+												M = d(n);
+												d = 14264845 ~= 5110982;
+												m[F[3]] = M;
+												M = {};
+												m[F[4]] = d;
+												d = A[B(-27846)];
+											else
+												d = E;
+												E, s = nil, d;
+												d = 11619520;
+											end;
+										end;
+									end;
+								end;
+							end;
+						else
+							if d < 5627156 then
+								if d > 4863590 then
+									if d < 5149119 then
+										if d < 5036732 then
+											if d < 4882891 then
+												d = 7980727 ~= 14233168;
+												m[F[4]] = d;
+												M, d = 4308323 >= 10648844, A[B(-27755)];
+												M = { M };
+											elseif 4897028 > d then
+												s, d = nil, A[B(-27867)];
+												M = { s };
+											elseif 4961027 > d then
+												d, M, n = A[B(-27775)], {}, nil;
+											else
+												d = m[F[1]];
+												d = d and 13431020 or 15059248;
+											end;
+										else
+											if d < 5066956 then
+												M, d = n, 2472408;
+											elseif d < 5099777 then
+												q = B(-27702);
+												M = A[q];
+												q = B(-27920);
+												d = M[q];
+												q = B(-27882);
+												M = d(P, q);
+												d = M and 13109161 or 2177072;
+											else
+												U = B(-27696);
+												v = D == U;
+												t, g = v, d;
+												d = v and 3528310 or 3688090;
+											end;
+										end;
+									else
+										if d > 5328066 then
+											if 5446966 > d then
+												d = m[F[1]];
+												M = d();
+												n = M;
+												M = B(-27813);
+												d = n == M;
+												d = d and 8163398 or 3789051;
+											elseif d < 5550509 then
+												d, s = 3098989, B(-27629);
+												q = A[s];
+												E = m[F[1]];
+												s = q(E);
+												n = s;
+											else
+												M = B(-27726);
+												d = A[M];
+												d = d and 5839011 or 1558820;
+											end;
+										else
+											if d < 5189574 then
+												U = B(-27631);
+												v = D[U];
+												U = B(-27694);
+												t = v or U;
+												s, g = t, d;
+												d = 14515386;
+											elseif d < 5240745 then
+												d = E;
+												d, P = s and 10543773 or 7991754, s;
+											else
+												d = M and 4064795 or 4873532;
+											end;
+										end;
+									end;
+								else
+									if d > 4432827 then
+										if d > 4725510 then
+											if d < 4815039 then
+												d = q;
+												d, M = 13388614, P;
+											elseif 4840042 > d then
+												M = B(-27878);
+												d = m[F[1]];
+												q, n, P = W[3], W[1], W[2];
+												s = n;
+												d[M] = s;
+												d = m[F[1]];
+												s, M = P, B(-27845);
+												d[M] = s;
+												M, s = B(-27652), 6884147 > 5461329;
+												d = m[F[1]];
+												d[M] = s;
+												d = q and 15612756 or 3261804;
+											else
+												d = m[F[1]];
+												d = d and 7719402 or 2897471;
+											end;
+										else
+											if 4485304 > d then
+												D = B(-27702);
+												E = A[D];
+												D, t = B(-27838), 1;
+												d = E[D];
+												e = s - t;
+												D = 1;
+												E = { d(P, D, e) };
+												M, d = { H(E) }, A[B(-27793)];
+											elseif 4592450 > d then
+												q, e, n, P = B(-27702), B(-27805), W[1], B(-27840);
+												M = A[P];
+												P = B(-27914);
+												d = M[P];
+												M = d();
+												P = M;
+												M = A[q];
+												q = B(-27626);
+												d = M[q];
+												s = m[F[1]];
+												q = B(-27620);
+												E = s();
+												D = B(-27805);
+												s = m[F[2]];
+												D = s[D];
+												D = D(s, n);
+												s = m[F[2]];
+												e = s[e];
+												t = m[F[3]];
+												e = e(s, t);
+												s = m[F[4]];
+												M = d(q, E, D, e, s, P);
+												s = 10;
+												d = m[F[5]];
+												q = M;
+												M = d(q, s);
+												s = M;
+												d = not s;
+												d = d and 5872536 or 13836139;
+											else
+												d = B(-27888);
+												M = { d };
+												d = A[B(-27791)];
+											end;
+										end;
+									else
+										if 4051987 > d then
+											if 3738570 > d then
+												Z = B(-27799);
+												U = A[Z];
+												d = 3528310;
+												Z = U(q);
+												U = B(-27721);
+												v = Z == U;
+												t = v;
+											elseif 3905145 > d then
+												M = B(-27832);
+												d = n == M;
+												d = d and 6475545 or 9409042;
+											elseif 4030209 > d then
+												d = m[F[1]];
+												v, U, s = 200, 200, B(-27746);
+												n = m[F[2]];
+												q = A[s];
+												e, s, t = B(-27698), B(-27819), 35;
+												P = q[s];
+												s, g = .2, 35;
+												q = P(s);
+												s = B(-27687);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e, M = 35, B(-27677);
+												D = E(e, t, g);
+												M, E, g = d[M], B(-27845), B(-27698);
+												t = A[g];
+												g = B(-27758);
+												e = t[g];
+												g = 200;
+												t = e(g, v, U);
+												P = { [s] = D, [E] = t };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												M, d = {}, A[B(-27924)];
+											else
+												P = B(-27871);
+												M = n[P];
+												P = m[F[2]];
+												d = M - P;
+												P, E = d, B(-27679);
+												s = m[F[3]];
+												e = B(-27776);
+												q = s[E];
+												a, s = B(-27870), B(-27863);
+												M = q[s];
+												D, s = B(-27779), B(-27679);
+												q = P[s];
+												d = M + q;
+												E = m[F[3]];
+												t, q = B(-27776), d;
+												s = E[D];
+												E = B(-27863);
+												M = s[E];
+												E = B(-27779);
+												s = P[E];
+												d = M + s;
+												s = d;
+												D = A[e];
+												e = B(-27770);
+												E = D[e];
+												D = B(-27661);
+												M = E[D];
+												E, P = B(-27679), nil;
+												d = M[E];
+												e = A[t];
+												E, t = d, B(-27770);
+												D = e[t];
+												e, J = B(-27661), B(-27870);
+												M = D[e];
+												D = B(-27779);
+												d = M[D];
+												e, D = B(-27892), d;
+												M = A[e];
+												e = B(-27729);
+												d = M[e];
+												Z = m[F[4]];
+												e = 0;
+												U = Z[a];
+												Z = B(-27679);
+												v = U[Z];
+												U = B(-27863);
+												g = v[U];
+												t = E - g;
+												E = nil;
+												M = d(q, e, t);
+												t, q = B(-27892), M;
+												e = A[t];
+												t = B(-27729);
+												d = e[t];
+												t = 0;
+												a = m[F[4]];
+												Z = a[J];
+												a = B(-27779);
+												U = Z[a];
+												Z = B(-27863);
+												v = U[Z];
+												g = D - v;
+												e = d(s, t, g);
+												U, t, s = B(-27756), B(-27871), e;
+												d = m[F[4]];
+												v = A[U];
+												U, Z = B(-27819), 0;
+												g = v[U];
+												U = 0;
+												v = g(U, q, Z, s);
+												q = nil;
+												d[t] = v;
+												d, D, s = 4901807, nil, nil;
+											end;
+										else
+											if 4227513 > d then
+												d = 414111 < 10333136;
+												M = { d };
+												d = A[B(-27711)];
+											elseif d < 4411401 then
+												q = B(-27896);
+												M = A[q];
+												q = B(-27848);
+												d = M[q];
+												m[P] = d;
+												d = 15362569;
+											else
+												d = X(3074841, { E, MC });
+												da = B(-27603);
+												M = m[OC];
+												Ha = G();
+												CC = d;
+												d = r(11900742, { E, MC });
+												Ba = d;
+												d = M[da];
+												M = B(-27745);
+												M, da = d[M], B(-27903);
+												M = M(d, CC);
+												M = m[OC];
+												d = M[da];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, Ba);
+												da = G();
+												CC, d = nil, 0;
+												m[da] = d;
+												d, M = .3, B(-27619);
+												Wa = o(3143020, { da, Ha, jC });
+												m[Ha] = d;
+												da = z(da);
+												d = fC[M];
+												Ha = z(Ha);
+												M = B(-27745);
+												M, Ba = d[M], nil;
+												M = M(d, Wa);
+												d = 6400453;
+											end;
+										end;
+									end;
+								end;
+							else
+								if d < 6250283 then
+									if 5969618 > d then
+										if d < 5820587 then
+											if d < 5683142 then
+												E = B(-27757);
+												s = m[F[1]];
+												U = B(-27618);
+												M = s[E];
+												t = m[F[1]];
+												E, g = B(-27670), B(-27768);
+												e = t[g];
+												g = B(-27670);
+												v = q .. U;
+												t = g .. v;
+												D = e .. t;
+												s = E .. D;
+												d = M .. s;
+												s = G();
+												E = o(5581499, { n, s });
+												M = B(-27836);
+												m[s] = d;
+												d = A[M];
+												M = d(E);
+												d = m[s];
+												M = { d };
+												d = A[B(-27862)];
+											elseif 5744089 > d then
+												M = B(-27884);
+												d = A[M];
+												n = B(-27860);
+												M = d(n);
+												M, d = {}, A[B(-27600)];
+											elseif d < 5798436 then
+												M = m[F[1]];
+												n = B(-27878);
+												d = M[n];
+												n = G();
+												m[n] = d;
+												P = m[n];
+												M = #P;
+												P = 0;
+												d = M == P;
+												d = d and 8701789 or 14611953;
+											else
+												M, d, n = {}, A[B(-27676)], nil;
+											end;
+										else
+											if d < 5855773 then
+												M = B(-27726);
+												d = A[M];
+												n = m[F[1]];
+												P = m[F[2]];
+												M = d(n, P);
+												d = 1558820;
+											elseif d < 5918395 then
+												d, M = 6153525 < 728509, B(-27751);
+												M = { d, M };
+												d = A[B(-27594)];
+											else
+												t = B(-27749);
+												e = A[t];
+												t, D = B(-27608), s;
+												d = e[t];
+												e = d(P, D);
+												D, d = nil, 311671;
+											end;
+										end;
+									else
+										if d > 6156229 then
+											if 6209689 > d then
+												M, d = P, q;
+												d = P and 13388614 or 14489626;
+											elseif 6226849 > d then
+												s = B(-27746);
+												d = m[F[1]];
+												n = m[F[2]];
+												g = 245;
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												s = .2;
+												q = P(s);
+												e, t = B(-27698), 245;
+												D = A[e];
+												s, e = B(-27687), B(-27758);
+												E = D[e];
+												M, e = B(-27677), 245;
+												D = E(e, t, g);
+												M, P = d[M], { [s] = D };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27912)], {};
+											else
+												P = B(-27763);
+												n = A[P];
+												d, M = n and 11987226 or 1537050, n;
+											end;
+										else
+											if 6004328 > d then
+												d = n;
+												m[F[1]] = d;
+												d, M, n = A[B(-27807)], {}, nil;
+											elseif 6069501 > d then
+												M, n, d = {}, nil, A[B(-27889)];
+											else
+												n, M, d = nil, {}, A[B(-27873)];
+											end;
+										end;
+									end;
+								else
+									if d < 6567028 then
+										if 6352223 > d then
+											if 6276022 > d then
+												d = 14398387;
+											elseif 6298461 > d then
+												P, E = B(-27703), B(-27822);
+												d = m[F[1]];
+												q = m[F[2]];
+												s = B(-27657);
+												n = { [P] = q, [s] = E };
+												M = { d(n) };
+												M, d = { H(M) }, A[B(-27766)];
+											else
+												d, D, E = 9125119, nil, nil;
+											end;
+										else
+											if 6406720 > d then
+												V = z(V);
+												VC = z(VC);
+												da = B(-27698);
+												OC = z(OC);
+												qC = z(qC);
+												d = i();
+												XC = nil;
+												d = m[KC];
+												S = z(S);
+												lC = nil;
+												M = d();
+												HC = z(HC);
+												d = m[uC];
+												RC = z(RC);
+												Ba = A[da];
+												da, Ha, wC, oC = B(-27758), 100, nil, nil;
+												x = z(x);
+												R = z(R);
+												pC, Wa = nil, 100;
+												t = z(t);
+												g = z(g);
+												jC = z(jC);
+												s = z(s);
+												k = z(k);
+												fC, PC, LC = nil, nil, nil;
+												CC = Ba[da];
+												nC = z(nC);
+												JC = z(JC);
+												h = z(h);
+												Fa = B(-27725);
+												f = z(f);
+												QC = z(QC);
+												da, IC, gC, vC = 255, nil, nil, nil;
+												Ba = CC(da, Ha, Wa);
+												CC = B(-27672);
+												M = d(Ba, CC);
+												SC, YC, cC, M = nil, nil, nil, B(-27767);
+												zC = z(zC);
+												D = z(D);
+												d = A[M];
+												GC = nil;
+												KC = z(KC);
+												Ba, mC, UC, yC, TC = B(-27675), nil, nil, nil, nil;
+												E = z(E);
+												rC = nil;
+												MC = z(MC);
+												CC = B(-27653);
+												M = d(CC);
+												BC = z(BC);
+												M, eC = B(-27767), nil;
+												K = z(K);
+												d = A[M];
+												C = z(C);
+												Ha = m[Z];
+												Qa = m[U];
+												AC = nil;
+												Z = z(Z);
+												T = z(T);
+												Wa = Fa .. Qa;
+												U = z(U);
+												DC = nil;
+												u = z(u);
+												FC = z(FC);
+												q, sC = nil, nil;
+												j = z(j);
+												b = z(b);
+												da = Ha .. Wa;
+												hC = z(hC);
+												CC = Ba .. da;
+												Ba = B(-27720);
+												kC = z(kC);
+												O = z(O);
+												v = z(v);
+												L = z(L);
+												NC = nil;
+												dC = z(dC);
+												M = d(CC);
+												aC = nil;
+												e = z(e);
+												I = z(I);
+												i, EC, M = nil, nil, B(-27767);
+												iC = z(iC);
+												d = A[M];
+												da = m[J];
+												P = nil;
+												uC = z(uC);
+												tC = nil;
+												xC = z(xC);
+												ZC = z(ZC);
+												Aa = z(Aa);
+												CC = Ba .. da;
+												bC = z(bC);
+												WC = z(WC);
+												a = nil;
+												M = d(CC);
+												J = z(J);
+												M, d = {}, A[B(-27647)];
+												N = z(N);
+											elseif d < 6444266 then
+												d = m[s];
+												d = d and 13128295 or 7397612;
+											else
+												P, D, e, E = B(-27897), 80, 80, B(-27698);
+												d = m[F[2]];
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												E = 255;
+												s = q(E, D, e);
+												q = 2;
+												M = d(P, s, q);
+												d = m[F[5]];
+												P, M = B(-27739), B(-27878);
+												d[M] = P;
+												d, M = A[B(-27777)], {};
+											end;
+										end;
+									else
+										if d > 7171587 then
+											if 7251526 > d then
+												s = B(-27848);
+												q = A[s];
+												m[P] = q;
+												d = 15362569;
+											elseif d < 7273153 then
+												M = m[F[5]];
+												E, D, t = B(-27878), B(-27739), B(-27698);
+												M[E] = D;
+												E, v = B(-27687), 255;
+												M = m[F[5]];
+												e = A[t];
+												t = B(-27758);
+												D = e[t];
+												t, g = 255, 255;
+												e = D(t, g, v);
+												M[E] = e;
+												d = 1036490;
+											else
+												d = 848556 < 462518;
+												m[F[1]] = d;
+												d = 11921728;
+											end;
+										else
+											if 6770079 > d then
+												P = B(-27619);
+												M = m[F[3]];
+												d = M[P];
+												M = B(-27866);
+												M = d[M];
+												M = M(d);
+												d = 5974982;
+											elseif 6989586 > d then
+												M, d = { D }, A[B(-27606)];
+											else
+												e, d, M = B(-27718), A[B(-27774)], 15207349 <= 11833894;
+												D = e .. E;
+												e = nil;
+												M = { M, D, e };
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+					else
+						if d > 12005635 then
+							if d < 14307094 then
+								if d < 13330183 then
+									if 12949747 > d then
+										if 12497162 > d then
+											if d < 12028755 then
+												q, n, e, D, P = B(-27702), W[1], B(-27805), B(-27805), B(-27840);
+												M = A[P];
+												P = B(-27914);
+												d = M[P];
+												M = d();
+												P = M;
+												M = A[q];
+												q = B(-27626);
+												d = M[q];
+												q = B(-27890);
+												s = m[F[1]];
+												E = s();
+												s = m[F[2]];
+												D = s[D];
+												D = D(s, n);
+												s = m[F[2]];
+												e = s[e];
+												t = m[F[3]];
+												e = e(s, t);
+												s = m[F[4]];
+												M = d(q, E, D, e, s, P);
+												s = 10;
+												d = m[F[5]];
+												q = M;
+												M = d(q, s);
+												s = M;
+												d = not s;
+												d = d and 13334731 or 9921128;
+											elseif d < 12082401 then
+												n = B(-27702);
+												M = A[n];
+												n = B(-27626);
+												d = M[n];
+												P = m[F[1]];
+												q = P();
+												D = B(-27840);
+												P = m[F[2]];
+												E = A[D];
+												D, n = B(-27914), B(-27716);
+												s = E[D];
+												E = { s() };
+												M = d(n, q, P, H(E));
+												n, P = M, 5;
+												d = m[F[3]];
+												M = d(n, P);
+												P = M;
+												d = not P;
+												d = d and 7307871 or 9040693;
+											elseif 12265159 > d then
+												d = m[F[1]];
+												d = d and 13675687 or 11793394;
+											else
+												M = B(-27836);
+												d = A[M];
+												n = r(8100933, { F[1] });
+												M = d(n);
+												d, M = A[B(-27909)], {};
+											end;
+										else
+											if 12645238 > d then
+												s, d = B(-27871), 9295109 > 4708234;
+												m[F[3]] = d;
+												d, P = 6105329, B(-27871);
+												M = n[P];
+												m[F[4]] = M;
+												q = m[F[5]];
+												P = q[s];
+												m[F[6]] = P;
+											elseif d < 12742733 then
+												d = B(-27694);
+												q, s, M = d, 8, 1;
+												d, E = 3112704, s;
+												s = 1;
+												D = s;
+												s = 0;
+												e = D < s;
+												s = M - D;
+											else
+												n = G();
+												d = B(-27834);
+												m[n] = d;
+												P = G();
+												d = nil;
+												m[P] = d;
+												q = y(6241451, { n, P });
+												M = B(-27836);
+												d = A[M];
+												M = d(q);
+												q = m[P];
+												d, M = q and 1222580 or 833365, q;
+											end;
+										end;
+									else
+										if d > 13237828 then
+											if d < 13246746 then
+												E = B(-27702);
+												s = A[E];
+												d, E = 5281721, B(-27920);
+												q = s[E];
+												E = B(-27616);
+												s = q(P, E);
+												M = s;
+											elseif 13287752 > d then
+												M, d = {}, A[B(-27886)];
+											else
+												g, d = B(-27911), 554762;
+												t = A[g];
+												g = t();
+												e = g - E;
+												D = e < P;
+												M = D;
+											end;
+										else
+											if d < 13118728 then
+												d = B(-27882);
+												M = { d };
+												d = A[B(-27825)];
+											elseif 13180163 > d then
+												d = m[q];
+												M = { d };
+												d = A[B(-27849)];
+											else
+												n, d, q = W[1], {}, B(-27702);
+												M = A[q];
+												E, q, P = B(-27707), B(-27769), d;
+												d = M[q];
+												D = { d(n, E) };
+												q, s, M = D[2], D[3], D[1];
+												E, d = M, 311671;
+											end;
+										end;
+									end;
+								else
+									if 13791801 > d then
+										if d < 13573272 then
+											if 13361672 > d then
+												M, E, d = B(-27751), nil, 8551792 > 9547762;
+												M = { d, M, E };
+												d = A[B(-27841)];
+											elseif 13409817 > d then
+												d = M and 12595343 or 6105329;
+											elseif d < 13450939 then
+												M, d = {}, A[B(-27737)];
+											else
+												n, I, O, a, U, x, P, u, D, Z, i, N, f, E, e, s, j, k, V, h, R, J, M, t, S, q, T, v, g, b, K = W[1], B(-27621), B(-27736), B(-27794), B(-27917), B(-27659), B(-27665), B(-27833), B(-27919), B(-27784), B(-27801), B(-27851), B(-27855), B(-27876), B(-27891), B(-27690), B(-27591), B(-27788), B(-27827), B(-27713), B(-27925), B(-27593), B(-27683), B(-27733), B(-27847), B(-27786), B(-27656), B(-27910), B(-27604), B(-27796), B(-27728);
+												d = {
+														[M] = P,
+														[q] = s,
+														[E] = D,
+														[e] = t,
+														[g] = v,
+														[U] = Z,
+														[a] = J,
+														[O] = h,
+														[x] = I,
+														[b] = S,
+														[k] = j,
+														[N] = V,
+														[f] = T,
+														[K] = R,
+														[i] = u,
+													};
+												P = d;
+												q = P[n];
+												M, d = q, q and 2472408 or 5053216;
+											end;
+										else
+											if 13709159 > d then
+												d = m[F[2]];
+												M = { d };
+												d = A[B(-27881)];
+											elseif d < 13756891 then
+												E, d, P, q = B(-27698), 7929504 > 6916639, B(-27878), B(-27669);
+												m[F[1]] = d;
+												M = m[F[4]];
+												M[P] = q;
+												P = B(-27687);
+												M = m[F[4]];
+												d = A[B(-27915)];
+												s = A[E];
+												E, D = B(-27758), 80;
+												q = s[E];
+												E, e = 100, 80;
+												s = q(E, D, e);
+												q = B(-27627);
+												M[P] = s;
+												P = A[q];
+												q = B(-27705);
+												M = P[q];
+												q = r(11407346, {
+														F[5],
+														n,
+														F[3],
+														F[2],
+														F[4],
+														F[1],
+													});
+												n = z(n);
+												P = M(q);
+												M = {};
+											else
+												q, E = d, d;
+												D = m[F[2]];
+												d, s = D and 316470 or 5199770, D;
+											end;
+										end;
+									else
+										if d > 13921492 then
+											if 14101120 > d then
+												g, d = B(-27702), 9671880;
+												t = A[g];
+												g = B(-27838);
+												e = t[g];
+												v, g = 3, 1;
+												t = e(E, g, v);
+												e = B(-27592);
+												D = t == e;
+												M = D;
+											elseif d < 14205616 then
+												Z = B(-27702);
+												U = A[Z];
+												E, Z = D, B(-27838);
+												v = U[Z];
+												U = v(P, E, E);
+												v = B(-27634);
+												d = U == v;
+												d = d and 2114503 or 10628322;
+											else
+												CC = l(985549, {
+														S,
+														k,
+														j,
+														MC,
+													});
+												M = B(-27735);
+												d = q[M];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, CC);
+												M = B(-27785);
+												CC = o(11278052, {
+														S,
+														V,
+														N,
+														Aa,
+													});
+												d = q[M];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, CC);
+												M = m[jC];
+												CC = B(-27619);
+												d = M[CC];
+												CC = o(3535057, {
+														RC,
+														E,
+														MC,
+														QC,
+													});
+												M = B(-27745);
+												M = d[M];
+												M = M(d, CC);
+												M = m[xC];
+												CC = B(-27619);
+												d = M[CC];
+												CC = c(5794709, {
+														OC,
+														iC,
+														xC,
+														WC,
+														QC,
+														FC,
+														dC,
+														uC,
+														RC,
+														h,
+														KC,
+														x,
+													});
+												M = B(-27745);
+												M = d[M];
+												M = M(d, CC);
+												CC = B(-27903);
+												M = m[OC];
+												d = M[CC];
+												CC = y(3000410, { xC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, CC);
+												CC = B(-27619);
+												M = m[bC];
+												d = M[CC];
+												M = B(-27745);
+												CC = X(5020248, {
+														b,
+														OC,
+														iC,
+														bC,
+														HC,
+													});
+												M = d[M];
+												M = M(d, CC);
+												CC = B(-27809);
+												M = A[CC];
+												CC = B(-27738);
+												d = M[CC];
+												CC = o(6259115, { nC, E });
+												M = d(CC);
+												d = M();
+												CC = B(-27809);
+												M = A[CC];
+												CC = B(-27738);
+												d = M[CC];
+												CC = Y(8995088, { qC, E });
+												M = d(CC);
+												d = M();
+												d = m[N];
+												d = d and 4432571 or 6400453;
+											end;
+										else
+											if 13824295 > d then
+												e = B(-27702);
+												D = A[e];
+												e = B(-27838);
+												M = D[e];
+												e, t = 1, 6;
+												D = M(E, e, t);
+												M = B(-27663);
+												d = D == M;
+												d = d and 11309074 or 7097525;
+											elseif 13836156 > d then
+												d = m[F[6]];
+												M = d(s);
+												E, t = M, B(-27702);
+												e = A[t];
+												t = B(-27920);
+												D = e[t];
+												t = B(-27736);
+												e = D(E, t);
+												d, M = e and 9671880 or 14006810, e;
+											else
+												d = M and 4390231 or 16569778;
+											end;
+										end;
+									end;
+								end;
+							else
+								if d > 15282871 then
+									if d < 15891791 then
+										if 15598403 > d then
+											if d < 15463739 then
+												s = m[P];
+												d = s and 2945774 or 9125119;
+											elseif 15574479 > d then
+												P, d = s, E;
+												d = 10543773;
+											else
+												e, M, d = B(-27718), 12589530 >= 12848801, A[B(-27771)];
+												D = e .. E;
+												M = { M, D };
+											end;
+										else
+											if d < 15699747 then
+												s = B(-27627);
+												M = A[s];
+												s = B(-27686);
+												d = M[s];
+												M = d(q);
+												M = B(-27652);
+												d = m[F[1]];
+												s = 2535625 > 15305746;
+												d[M] = s;
+												d = 3261804;
+											elseif 15803808 > d then
+												s, v, U = B(-27746), 255, 255;
+												d = m[F[1]];
+												n = m[F[2]];
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												g, s = 55, .2;
+												q = P(s);
+												e, s, t = B(-27698), B(-27687), 55;
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e = 55;
+												D = E(e, t, g);
+												E, g, M = B(-27845), B(-27698), B(-27677);
+												M = d[M];
+												t = A[g];
+												g = B(-27758);
+												e = t[g];
+												g = 255;
+												t = e(g, v, U);
+												P = { [s] = D, [E] = t };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27850)], {};
+											else
+												E, e = 1, B(-27830);
+												M = m[F[10]];
+												d = M + E;
+												v = 110;
+												m[F[10]] = d;
+												M = m[F[11]];
+												U = 110;
+												E = M();
+												M = m[F[2]];
+												g = B(-27799);
+												t = A[g];
+												g = t(P);
+												D = e .. g;
+												g = B(-27698);
+												t = A[g];
+												g = B(-27758);
+												e = t[g];
+												g = 255;
+												t = e(g, v, U);
+												e = 2;
+												E = M(D, t, e);
+												D = B(-27844);
+												M = m[F[9]];
+												e = .3;
+												E = M(D, e);
+												E = m[F[10]];
+												D = m[F[12]];
+												M = E >= D;
+												d = M and 2306991 or 1210581;
+											end;
+										end;
+									else
+										if d < 16429586 then
+											if 16151907 > d then
+												g = B(-27650);
+												t = D[g];
+												e = d;
+												d, s = t and 14515386 or 5179379, t;
+											elseif 16359456 > d then
+												g, D = B(-27857), B(-27651);
+												E = n[D];
+												t = A[g];
+												d, g = 4803644, B(-27651);
+												e = t[g];
+												t = B(-27602);
+												D = e[t];
+												s = E == D;
+												P = s;
+											else
+												d = m[F[1]];
+												s = B(-27746);
+												n = m[F[2]];
+												g = 120;
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												e, s = B(-27698), .2;
+												q = P(s);
+												D = A[e];
+												e, s = B(-27758), B(-27845);
+												E = D[e];
+												t, e = 120, 120;
+												D = E(e, t, g);
+												M, P = B(-27677), { [s] = D };
+												M = d[M];
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												d, M = A[B(-27895)], {};
+											end;
+										else
+											if d < 16525573 then
+												d, t = A[B(-27754)], B(-27702);
+												e = A[t];
+												t = B(-27668);
+												D = e[t];
+												t = B(-27900);
+												e = D(E, t);
+												D = B(-27921);
+												M = e or D;
+												D = M;
+												e = m[F[7]];
+												M = 14748872 <= 7605167;
+												t = { e(D) };
+												M = { M, H(t) };
+											elseif 16586941 > d then
+												q = B(-27874);
+												M = A[q];
+												d = M and 14759507 or 15072764;
+											else
+												P, n = B(-27894), W;
+												f = G();
+												b = G();
+												R = G();
+												M = B(-27861);
+												d = A[M];
+												V = G();
+												M, GC, q = B(-27795), 0, B(-27752);
+												O = G();
+												M = d[M];
+												M = M(d, P);
+												j = G();
+												P = M;
+												S = G();
+												M = B(-27861);
+												d = A[M];
+												M = B(-27795);
+												M = d[M];
+												M = M(d, q);
+												q, s, da = M, B(-27708), 380;
+												L = G();
+												M, E = B(-27861), B(-27671);
+												Z = G();
+												BC = G();
+												d = A[M];
+												M = B(-27795);
+												K = G();
+												v = G();
+												FC = G();
+												g = G();
+												M = d[M];
+												M = M(d, s);
+												J = G();
+												D = B(-27839);
+												s = G();
+												QC, lC = B(-27906), 45;
+												m[s] = M;
+												M = B(-27861);
+												d = A[M];
+												M = B(-27795);
+												M = d[M];
+												h = G();
+												M = M(d, E);
+												u = G();
+												E = G();
+												k = G();
+												m[E] = M;
+												M = B(-27861);
+												U = G();
+												dC = G();
+												e = G();
+												N = G();
+												d = A[M];
+												HC = G();
+												t = G();
+												M = B(-27795);
+												M = d[M];
+												T = G();
+												M = M(d, D);
+												D = G();
+												m[D] = M;
+												M, sC = B(-27660), -190;
+												d = P[M];
+												m[e] = d;
+												d = B(-27828);
+												x = G();
+												m[t] = d;
+												M, d = nil, B(-27641);
+												m[g] = d;
+												PC, d = 0, B(-27633);
+												I = G();
+												m[v] = d;
+												d = B(-27901);
+												m[U] = d;
+												d = B(-27835);
+												m[Z] = d;
+												d = B(-27922);
+												a = d;
+												C = G();
+												d, mC = B(-27865), B(-27614);
+												m[J] = d;
+												d = 399225 > 7266827;
+												m[O] = d;
+												d = 0;
+												m[h] = d;
+												d = 3;
+												m[x] = d;
+												d = 316118 > 10933499;
+												m[I] = d;
+												d = 12969077 < 5248881;
+												m[b] = d;
+												d = 11587982 < 1406862;
+												m[S] = d;
+												d = nil;
+												m[k] = d;
+												m[j] = M;
+												M = B(-27747);
+												d = q[M];
+												M = B(-27762);
+												m[N] = d;
+												d = q[M];
+												m[V] = d;
+												d = c(12131336, { O, g, t });
+												m[f] = d;
+												d = r(1021354, { f, U });
+												m[T] = d;
+												zC = 90;
+												d = X(10121913, {});
+												m[K] = d;
+												d = y(14744493, { K });
+												m[R] = d;
+												d = c(3295346, {
+														t,
+														v,
+														R,
+														O,
+													});
+												i = d;
+												d = c(7893869, {});
+												m[u] = d;
+												d = c(13470858, {});
+												m[L] = d;
+												ZC, bC = 0, 50;
+												d = y(13232031, {});
+												pC = B(-27898);
+												m[C] = d;
+												d = X(12790334, { e });
+												AC = d;
+												d = AC();
+												m[BC] = d;
+												d = X(12024044, {
+														T,
+														D,
+														BC,
+														Z,
+														R,
+														u,
+														C,
+														L,
+													});
+												WC = G();
+												m[dC] = d;
+												d = X(4537524, {
+														T,
+														D,
+														BC,
+														Z,
+														R,
+														u,
+														L,
+													});
+												m[HC] = d;
+												d = r(12033467, { T, Z, R });
+												m[WC] = d;
+												d = o(12398982, { J });
+												m[FC] = d;
+												wC = 0;
+												M = A[QC];
+												QC = B(-27819);
+												d = M[QC];
+												QC, nC = B(-27622), 0;
+												M = d(QC);
+												QC = G();
+												m[QC] = M;
+												d = m[QC];
+												M, rC = B(-27757), 100;
+												d[M] = pC;
+												d = m[QC];
+												M = B(-27926);
+												MC = m[e];
+												pC = MC[mC];
+												d[M] = pC;
+												pC = 8645359 >= 2353040;
+												d = m[QC];
+												M = B(-27638);
+												d[M] = pC;
+												pC, M = 100, B(-27781);
+												d = m[QC];
+												d[M] = pC;
+												pC, UC = B(-27906), 200;
+												M = A[pC];
+												pC = B(-27819);
+												d = M[pC];
+												mC, pC = B(-27698), B(-27759);
+												M = d(pC);
+												pC = M;
+												M = m[QC];
+												d = B(-27926);
+												pC[d] = M;
+												MC = A[mC];
+												d, mC, yC = B(-27687), B(-27758), -6;
+												M = MC[mC];
+												mC = 0;
+												MC = M(mC, nC, GC);
+												mC = B(-27756);
+												pC[d] = MC;
+												M, d, GC = .7, B(-27590), 1;
+												pC[d] = M;
+												MC = A[mC];
+												qC, d, mC = 15, B(-27870), B(-27819);
+												M = MC[mC];
+												nC, mC = 0, 1;
+												MC = M(mC, nC, GC, PC);
+												pC[d] = MC;
+												d, M = B(-27789), 1;
+												pC[d] = M;
+												MC = B(-27906);
+												M = A[MC];
+												MC, GC = B(-27819), B(-27698);
+												d = M[MC];
+												MC = B(-27759);
+												M = d(MC);
+												XC = .5;
+												MC = G();
+												m[MC] = M;
+												PC, M = 15, B(-27926);
+												d = m[MC];
+												mC = m[QC];
+												d[M] = mC;
+												d = m[MC];
+												SC, M = 0, B(-27687);
+												nC = A[GC];
+												vC, GC = 105, B(-27758);
+												mC = nC[GC];
+												GC = 15;
+												nC = mC(GC, PC, qC);
+												d[M] = nC;
+												d = m[MC];
+												M, cC, GC = B(-27871), 0, B(-27756);
+												nC = A[GC];
+												GC = B(-27819);
+												mC = nC[GC];
+												GC, qC, PC = .5, .5, -150;
+												nC = mC(GC, PC, qC, sC);
+												PC, NC = 300, 240;
+												d[M] = nC;
+												d = m[MC];
+												M, GC = B(-27870), B(-27756);
+												nC = A[GC];
+												GC, qC = B(-27819), 0;
+												mC = nC[GC];
+												sC, GC = 380, 0;
+												nC = mC(GC, PC, qC, sC);
+												d[M] = nC;
+												d = m[MC];
+												mC, sC, M = 2, 90, B(-27789);
+												d[M] = mC;
+												d = m[MC];
+												M, mC, GC = B(-27727), 4476826 < 10061165, B(-27723);
+												d[M] = mC;
+												d = m[MC];
+												M, mC = B(-27877), 7587974 > 1295600;
+												d[M] = mC;
+												mC = B(-27906);
+												M = A[mC];
+												PC, mC = 12, B(-27819);
+												d = M[mC];
+												mC = B(-27904);
+												M = d(mC);
+												mC = M;
+												M = m[MC];
+												d = B(-27926);
+												mC[d] = M;
+												nC = A[GC];
+												d, GC = B(-27908), B(-27819);
+												M = nC[GC];
+												GC = 0;
+												nC = M(GC, PC);
+												mC[d] = nC;
+												jC, nC = -8, B(-27906);
+												M = A[nC];
+												nC = B(-27819);
+												d = M[nC];
+												nC = B(-27829);
+												M = d(nC);
+												nC = G();
+												m[nC] = M;
+												d = m[nC];
+												GC = m[MC];
+												M, qC = B(-27926), B(-27698);
+												d[M] = GC;
+												d = m[nC];
+												M = B(-27905);
+												PC = A[qC];
+												qC, eC = B(-27758), 110;
+												GC = PC[qC];
+												qC = 90;
+												PC = GC(qC, sC, zC);
+												d[M] = PC;
+												GC = 1.5;
+												d = m[nC];
+												M = B(-27879);
+												d[M] = GC;
+												GC = .7;
+												d = m[nC];
+												M = B(-27899);
+												d[M] = GC;
+												GC, EC = B(-27906), 0;
+												M = A[GC];
+												GC = B(-27819);
+												d = M[GC];
+												qC, GC = B(-27698), B(-27759);
+												M = d(GC);
+												d, GC = B(-27926), M;
+												M = m[MC];
+												GC[d] = M;
+												PC = A[qC];
+												d, qC, sC, oC = B(-27687), B(-27758), 25, -4;
+												M = PC[qC];
+												zC, qC = 25, 25;
+												PC = M(qC, sC, zC);
+												GC[d] = PC;
+												JC, sC, qC, d = 24, 0, B(-27756), B(-27871);
+												PC = A[qC];
+												qC = B(-27819);
+												M = PC[qC];
+												zC, qC = 0, 0;
+												PC = M(qC, sC, zC, EC);
+												GC[d] = PC;
+												d, sC, qC = B(-27870), 0, B(-27756);
+												PC = A[qC];
+												EC, zC, qC = 40, 0, B(-27819);
+												M = PC[qC];
+												qC = 1;
+												PC = M(qC, sC, zC, EC);
+												GC[d] = PC;
+												PC, d, M = B(-27906), B(-27789), 3;
+												GC[d] = M;
+												sC, d, M = B(-27723), B(-27727), 4688117 ~= 669672;
+												GC[d] = M;
+												EC, d, M = 0, B(-27877), 7793052 ~= 9307662;
+												GC[d] = M;
+												M = A[PC];
+												PC = B(-27819);
+												d = M[PC];
+												PC = B(-27904);
+												M = d(PC);
+												PC, d = M, B(-27926);
+												M = GC;
+												PC[d] = M;
+												qC = A[sC];
+												sC = B(-27819);
+												M = qC[sC];
+												d, sC, zC = B(-27908), 0, 12;
+												qC = M(sC, zC, EC, cC);
+												PC[d] = qC;
+												qC, EC, sC = B(-27906), B(-27698), GC;
+												M = A[qC];
+												qC = B(-27819);
+												d = M[qC];
+												qC = B(-27759);
+												M = d(qC);
+												qC = G();
+												m[qC] = M;
+												d = m[qC];
+												M = B(-27926);
+												d[M] = sC;
+												M = B(-27687);
+												d = m[qC];
+												zC = A[EC];
+												EC, cC = B(-27758), 100;
+												sC = zC[EC];
+												EC = 255;
+												zC = sC(EC, cC, rC);
+												EC = B(-27756);
+												d[M] = zC;
+												rC = .5;
+												d = m[qC];
+												M = B(-27871);
+												zC = A[EC];
+												EC = B(-27819);
+												sC = zC[EC];
+												cC, EC = 8, 0;
+												zC = sC(EC, cC, rC, oC);
+												d[M] = zC;
+												EC = B(-27756);
+												d = m[qC];
+												zC = A[EC];
+												M, rC, EC = B(-27870), 0, B(-27819);
+												sC = zC[EC];
+												EC, oC, cC = 0, 8, 8;
+												zC = sC(EC, cC, rC, oC);
+												d[M] = zC;
+												cC, M, rC, sC = 0, B(-27789), B(-27756), 4;
+												d = m[qC];
+												d[M] = sC;
+												sC = B(-27906);
+												M = A[sC];
+												sC = B(-27819);
+												d = M[sC];
+												sC = B(-27904);
+												M = d(sC);
+												sC, EC, YC, d = M, B(-27723), 25, B(-27926);
+												M = m[qC];
+												sC[d] = M;
+												d = B(-27908);
+												zC = A[EC];
+												EC = B(-27819);
+												M = zC[EC];
+												EC = 1;
+												zC = M(EC, cC);
+												sC[d] = zC;
+												zC = B(-27906);
+												M = A[zC];
+												zC = B(-27819);
+												d = M[zC];
+												EC, zC = GC, B(-27666);
+												M = d(zC);
+												zC = G();
+												m[zC] = M;
+												M = B(-27926);
+												d = m[zC];
+												d[M] = EC;
+												oC = 20;
+												d = m[zC];
+												M, EC = B(-27590), 1;
+												d[M] = EC;
+												d = m[zC];
+												cC = A[rC];
+												rC, M = B(-27819), B(-27871);
+												EC = cC[rC];
+												rC = 0;
+												cC = EC(rC, oC, XC, yC);
+												d[M] = cC;
+												d = m[zC];
+												aC, rC = 8, B(-27756);
+												cC = A[rC];
+												XC, rC, yC, M = 0, B(-27819), 12, B(-27870);
+												EC = cC[rC];
+												rC, oC = 0, 80;
+												cC = EC(rC, oC, XC, yC);
+												d[M] = cC;
+												M = B(-27597);
+												d = m[zC];
+												oC = B(-27857);
+												rC = A[oC];
+												oC = B(-27597);
+												cC = rC[oC];
+												rC = B(-27611);
+												EC = cC[rC];
+												d[M] = EC;
+												EC = B(-27672);
+												d = m[zC];
+												M = B(-27878);
+												d[M] = EC;
+												M = B(-27845);
+												d = m[zC];
+												oC, rC = 150, B(-27698);
+												cC = A[rC];
+												rC, XC = B(-27758), 150;
+												EC = cC[rC];
+												rC = 255;
+												cC = EC(rC, oC, XC);
+												d[M] = cC;
+												XC = 255;
+												d = m[zC];
+												M, EC, oC, gC = B(-27800), 9, B(-27857), 0;
+												d[M] = EC;
+												d = m[zC];
+												rC = A[oC];
+												oC = B(-27837);
+												cC = rC[oC];
+												M, rC = B(-27837), B(-27797);
+												EC = cC[rC];
+												d[M] = EC;
+												M, EC = B(-27789), 4;
+												d = m[zC];
+												d[M] = EC;
+												EC = B(-27906);
+												M = A[EC];
+												EC = B(-27819);
+												d = M[EC];
+												EC, rC, yC = B(-27759), B(-27698), -1;
+												M = d(EC);
+												EC, d = M, B(-27926);
+												M, oC = GC, 255;
+												EC[d] = M;
+												cC = A[rC];
+												d, rC = B(-27687), B(-27758);
+												M = cC[rC];
+												rC = 255;
+												cC = M(rC, oC, XC);
+												KC = -38;
+												EC[d] = cC;
+												oC, d, rC = 0, B(-27871), B(-27756);
+												cC = A[rC];
+												rC = B(-27819);
+												M = cC[rC];
+												rC, XC = 0, 1;
+												cC = M(rC, oC, XC, yC);
+												EC[d] = cC;
+												oC, rC = 0, B(-27756);
+												cC = A[rC];
+												yC, d, rC, XC = 1, B(-27870), B(-27819), 0;
+												M = cC[rC];
+												rC = 1;
+												cC = M(rC, oC, XC, yC);
+												EC[d] = cC;
+												cC, d, M = B(-27906), B(-27789), 4;
+												EC[d] = M;
+												yC = 0;
+												M = A[cC];
+												cC = B(-27819);
+												d = M[cC];
+												XC, cC = 0, B(-27666);
+												M = d(cC);
+												oC, cC = B(-27756), M;
+												M, d = GC, B(-27926);
+												cC[d] = M;
+												Ha, d, M = .5, B(-27590), 1;
+												cC[d] = M;
+												d = B(-27871);
+												rC = A[oC];
+												oC = B(-27819);
+												M = rC[oC];
+												oC = 0;
+												rC = M(oC, XC, yC, wC);
+												cC[d] = rC;
+												oC, d = B(-27756), B(-27870);
+												rC = A[oC];
+												oC = B(-27819);
+												M = rC[oC];
+												XC, wC, oC, yC = 0, 25, 1, 0;
+												rC = M(oC, XC, yC, wC);
+												cC[d] = rC;
+												XC, d = B(-27857), B(-27597);
+												oC = A[XC];
+												XC = B(-27597);
+												rC = oC[XC];
+												oC = B(-27842);
+												M = rC[oC];
+												cC[d] = M;
+												M, oC, d = B(-27648), B(-27698), B(-27878);
+												cC[d] = M;
+												d, XC = B(-27845), 255;
+												rC = A[oC];
+												oC, yC = B(-27758), 255;
+												M = rC[oC];
+												oC = 255;
+												rC = M(oC, XC, yC);
+												M = 18;
+												cC[d] = rC;
+												d = B(-27800);
+												cC[d] = M;
+												d, XC = B(-27837), B(-27857);
+												oC = A[XC];
+												XC = B(-27837);
+												rC = oC[XC];
+												XC, oC = B(-27857), B(-27662);
+												M = rC[oC];
+												cC[d] = M;
+												d = B(-27806);
+												oC = A[XC];
+												XC = B(-27806);
+												rC = oC[XC];
+												oC = B(-27662);
+												M = rC[oC];
+												cC[d] = M;
+												M, d = 4, B(-27789);
+												cC[d] = M;
+												rC, yC = B(-27906), 0;
+												M = A[rC];
+												rC = B(-27819);
+												d = M[rC];
+												rC = B(-27666);
+												M = d(rC);
+												rC, d = M, B(-27926);
+												M = GC;
+												rC[d] = M;
+												M, XC, wC, d = 1, B(-27756), 0, B(-27590);
+												rC[d] = M;
+												oC = A[XC];
+												d, XC = B(-27871), B(-27819);
+												M = oC[XC];
+												XC = 0;
+												oC = M(XC, yC, wC, YC);
+												rC[d] = oC;
+												wC, XC, yC, hC = 0, B(-27756), 0, 160;
+												oC = A[XC];
+												XC = B(-27819);
+												M = oC[XC];
+												d, YC, XC = B(-27870), 12, 1;
+												oC = M(XC, yC, wC, YC);
+												yC = B(-27857);
+												rC[d] = oC;
+												wC = 180;
+												XC = A[yC];
+												d, yC = B(-27597), B(-27597);
+												oC = XC[yC];
+												XC = B(-27681);
+												M = oC[XC];
+												XC = B(-27698);
+												rC[d] = M;
+												yC, M, YC, d = 180, B(-27732), 0, B(-27878);
+												rC[d] = M;
+												d = B(-27845);
+												oC = A[XC];
+												XC = B(-27758);
+												M = oC[XC];
+												XC = 180;
+												oC = M(XC, yC, wC);
+												M = 10;
+												rC[d] = oC;
+												d = B(-27800);
+												rC[d] = M;
+												yC = B(-27857);
+												XC = A[yC];
+												yC, d = B(-27837), B(-27837);
+												oC = XC[yC];
+												XC = B(-27662);
+												M = oC[XC];
+												rC[d] = M;
+												M, LC, oC, d = 4, 0, B(-27906), B(-27789);
+												rC[d] = M;
+												M = A[oC];
+												oC = B(-27819);
+												d = M[oC];
+												yC, oC = B(-27756), B(-27666);
+												M = d(oC);
+												oC, d = M, B(-27926);
+												M = m[MC];
+												oC[d] = M;
+												M, d = 1, B(-27590);
+												oC[d] = M;
+												XC = A[yC];
+												d, yC = B(-27871), B(-27819);
+												M = XC[yC];
+												wC, yC = 12, 0;
+												XC = M(yC, wC, YC, lC);
+												wC = -24;
+												oC[d] = XC;
+												d, yC = B(-27870), B(-27756);
+												XC = A[yC];
+												yC, lC, YC = B(-27819), 16, 0;
+												M = XC[yC];
+												yC = 1;
+												XC = M(yC, wC, YC, lC);
+												wC = B(-27857);
+												oC[d] = XC;
+												yC = A[wC];
+												wC, DC, d = B(-27597), 65, B(-27597);
+												XC = yC[wC];
+												yC = B(-27681);
+												M = XC[yC];
+												oC[d] = M;
+												d, lC = B(-27878), 30;
+												yC = m[BC];
+												xC, XC, wC = 25, B(-27821), 150;
+												M = XC .. yC;
+												oC[d] = M;
+												d, YC, yC = B(-27845), 150, B(-27698);
+												XC = A[yC];
+												yC = B(-27758);
+												M = XC[yC];
+												yC = 150;
+												XC = M(yC, wC, YC);
+												wC, M = B(-27857), 10;
+												oC[d] = XC;
+												d = B(-27800);
+												oC[d] = M;
+												d = B(-27837);
+												yC = A[wC];
+												wC = B(-27837);
+												XC = yC[wC];
+												yC = B(-27797);
+												M = XC[yC];
+												wC = B(-27857);
+												oC[d] = M;
+												yC = A[wC];
+												d, IC, wC, OC = B(-27730), 190, B(-27730), 0;
+												XC = yC[wC];
+												yC = B(-27699);
+												M = XC[yC];
+												oC[d] = M;
+												XC, d, M = B(-27906), B(-27789), 3;
+												oC[d] = M;
+												M = A[XC];
+												XC = B(-27819);
+												d = M[XC];
+												XC = B(-27759);
+												M = d(XC);
+												XC, YC, wC = M, 30, B(-27698);
+												M = m[MC];
+												d = B(-27926);
+												XC[d] = M;
+												d = B(-27687);
+												yC = A[wC];
+												wC = B(-27758);
+												M = yC[wC];
+												wC = 30;
+												yC = M(wC, YC, lC);
+												XC[d] = yC;
+												wC, d = B(-27756), B(-27871);
+												yC = A[wC];
+												wC, lC = B(-27819), 0;
+												M = yC[wC];
+												YC, wC = -135, .5;
+												yC = M(wC, YC, lC, DC);
+												XC[d] = yC;
+												DC, d, wC, lC = 35, B(-27870), B(-27756), 0;
+												yC = A[wC];
+												wC = B(-27819);
+												M = yC[wC];
+												YC, wC = 270, 0;
+												yC = M(wC, YC, lC, DC);
+												YC = B(-27723);
+												XC[d] = yC;
+												d, M, yC = B(-27789), 3, B(-27906);
+												XC[d] = M;
+												M = A[yC];
+												yC = B(-27819);
+												d = M[yC];
+												yC = B(-27904);
+												M = d(yC);
+												d, yC = B(-27926), M;
+												M = XC;
+												yC[d] = M;
+												wC = A[YC];
+												lC, YC, d = 6, B(-27819), B(-27908);
+												M = wC[YC];
+												YC = 0;
+												wC = M(YC, lC);
+												yC[d] = wC;
+												wC, DC = B(-27906), 110;
+												M = A[wC];
+												wC = B(-27819);
+												d = M[wC];
+												wC, lC = B(-27829), B(-27698);
+												M = d(wC);
+												wC, iC, tC = M, 1, 0;
+												M, d = XC, B(-27926);
+												wC[d] = M;
+												YC = A[lC];
+												lC, d = B(-27758), B(-27905);
+												M = YC[lC];
+												lC = 255;
+												YC = M(lC, DC, eC);
+												wC[d] = YC;
+												M, d = 1, B(-27879);
+												wC[d] = M;
+												d, eC, M, YC = B(-27899), 12, .2, B(-27906);
+												wC[d] = M;
+												M = A[YC];
+												YC = B(-27819);
+												d = M[YC];
+												YC = B(-27666);
+												M = d(YC);
+												d, YC = B(-27926), M;
+												M, DC = XC, B(-27756);
+												YC[d] = M;
+												M, d = 1, B(-27590);
+												YC[d] = M;
+												d = B(-27871);
+												lC = A[DC];
+												DC = B(-27819);
+												M = lC[DC];
+												DC = 0;
+												lC = M(DC, eC, tC, gC);
+												eC = -24;
+												YC[d] = lC;
+												gC, DC, RC = 0, B(-27756), 8;
+												lC = A[DC];
+												d, DC = B(-27870), B(-27819);
+												M = lC[DC];
+												DC, tC = 1, 1;
+												lC = M(DC, eC, tC, gC);
+												eC = B(-27857);
+												YC[d] = lC;
+												d = B(-27597);
+												DC = A[eC];
+												fC, eC = 284, B(-27597);
+												lC = DC[eC];
+												DC = B(-27611);
+												M = lC[DC];
+												gC = 40;
+												YC[d] = M;
+												M, tC, d = B(-27808), 180, B(-27878);
+												YC[d] = M;
+												DC, d = B(-27698), B(-27845);
+												lC = A[DC];
+												DC, eC = B(-27758), 180;
+												M = lC[DC];
+												DC = 255;
+												lC = M(DC, eC, tC);
+												eC = B(-27857);
+												YC[d] = lC;
+												d, M = B(-27800), 11;
+												YC[d] = M;
+												d = B(-27837);
+												DC = A[eC];
+												eC = B(-27837);
+												lC = DC[eC];
+												DC = B(-27797);
+												M = lC[DC];
+												YC[d] = M;
+												d, eC = B(-27806), B(-27857);
+												DC = A[eC];
+												eC = B(-27806);
+												lC = DC[eC];
+												DC = B(-27662);
+												M = lC[DC];
+												YC[d] = M;
+												d, lC, M = B(-27789), B(-27906), 4;
+												YC[d] = M;
+												tC = 25;
+												M = A[lC];
+												lC = B(-27819);
+												d = M[lC];
+												lC = B(-27759);
+												M = d(lC);
+												lC = M;
+												M = m[MC];
+												d = B(-27926);
+												lC[d] = M;
+												eC, d = B(-27698), B(-27687);
+												DC = A[eC];
+												eC = B(-27758);
+												M = DC[eC];
+												eC = 20;
+												DC = M(eC, tC, gC);
+												tC = -135;
+												lC[d] = DC;
+												d, gC, eC = B(-27871), 0, B(-27756);
+												DC = A[eC];
+												eC = B(-27819);
+												M = DC[eC];
+												eC = .5;
+												DC = M(eC, tC, gC, vC);
+												lC[d] = DC;
+												eC = B(-27756);
+												DC = A[eC];
+												gC, eC, d = 0, B(-27819), B(-27870);
+												M = DC[eC];
+												eC, tC, vC = 0, 270, 50;
+												DC = M(eC, tC, gC, vC);
+												lC[d] = DC;
+												d, M, tC = B(-27789), 3, B(-27723);
+												lC[d] = M;
+												DC, vC = B(-27906), 120;
+												M = A[DC];
+												DC = B(-27819);
+												d = M[DC];
+												DC, gC = B(-27904), 8;
+												M = d(DC);
+												DC, d = M, B(-27926);
+												M = lC;
+												DC[d] = M;
+												d = B(-27908);
+												eC = A[tC];
+												tC = B(-27819);
+												M = eC[tC];
+												tC = 0;
+												eC = M(tC, gC);
+												gC = B(-27698);
+												DC[d] = eC;
+												eC = B(-27906);
+												M = A[eC];
+												eC = B(-27819);
+												d = M[eC];
+												eC = B(-27829);
+												M = d(eC);
+												eC, d = M, B(-27926);
+												M = lC;
+												eC[d] = M;
+												tC = A[gC];
+												gC, d = B(-27758), B(-27905);
+												M = tC[gC];
+												gC = 80;
+												tC = M(gC, vC, UC);
+												M = 1.5;
+												eC[d] = tC;
+												d, UC = B(-27879), 45;
+												eC[d] = M;
+												d, tC, M = B(-27899), B(-27906), .3;
+												eC[d] = M;
+												M = A[tC];
+												tC = B(-27819);
+												d = M[tC];
+												tC = B(-27666);
+												M = d(tC);
+												d, tC = B(-27926), M;
+												M = lC;
+												tC[d] = M;
+												M, vC, d = 1, B(-27756), B(-27590);
+												tC[d] = M;
+												gC = A[vC];
+												vC = B(-27819);
+												M = gC[vC];
+												vC = 0;
+												gC = M(vC, UC, ZC, aC);
+												vC, d = B(-27756), B(-27871);
+												tC[d] = gC;
+												d = B(-27870);
+												gC = A[vC];
+												aC, vC, ZC, UC = 16, B(-27819), 0, 200;
+												M = gC[vC];
+												vC = 0;
+												gC = M(vC, UC, ZC, aC);
+												tC[d] = gC;
+												d, UC = B(-27597), B(-27857);
+												vC = A[UC];
+												UC = B(-27597);
+												gC = vC[UC];
+												vC = B(-27815);
+												M = gC[vC];
+												tC[d] = M;
+												vC, d, M = B(-27698), B(-27878), B(-27643);
+												tC[d] = M;
+												gC = A[vC];
+												ZC, d, vC = 220, B(-27845), B(-27758);
+												M = gC[vC];
+												vC, UC = 220, 220;
+												gC = M(vC, UC, ZC);
+												tC[d] = gC;
+												UC, d, M = B(-27857), B(-27800), 11;
+												tC[d] = M;
+												d = B(-27837);
+												vC = A[UC];
+												UC = B(-27837);
+												gC = vC[UC];
+												UC, vC = B(-27756), B(-27797);
+												M = gC[vC];
+												tC[d] = M;
+												d, M = B(-27789), 4;
+												tC[d] = M;
+												gC = B(-27906);
+												M = A[gC];
+												gC = B(-27819);
+												d = M[gC];
+												gC = B(-27666);
+												M = d(gC);
+												aC, gC, d = 0, M, B(-27926);
+												M = lC;
+												gC[d] = M;
+												M, d = 1, B(-27590);
+												gC[d] = M;
+												vC = A[UC];
+												d, ZC, UC = B(-27871), 45, B(-27819);
+												M = vC[UC];
+												UC = 0;
+												vC = M(UC, ZC, aC, JC);
+												gC[d] = vC;
+												d, UC, JC = B(-27870), B(-27756), 20;
+												vC = A[UC];
+												UC, aC = B(-27819), 0;
+												M = vC[UC];
+												ZC, UC = 200, 0;
+												vC = M(UC, ZC, aC, JC);
+												ZC = B(-27857);
+												gC[d] = vC;
+												d = B(-27597);
+												UC = A[ZC];
+												ZC = B(-27597);
+												vC = UC[ZC];
+												aC, ZC, UC = 255, 255, B(-27842);
+												M = vC[UC];
+												gC[d] = M;
+												d, M = B(-27878), B(-27860);
+												gC[d] = M;
+												d, UC = B(-27845), B(-27698);
+												vC = A[UC];
+												UC = B(-27758);
+												M = vC[UC];
+												UC = 255;
+												vC = M(UC, ZC, aC);
+												gC[d] = vC;
+												M, ZC, d = 18, B(-27857), B(-27800);
+												gC[d] = M;
+												UC = A[ZC];
+												ZC, d = B(-27837), B(-27837);
+												vC = UC[ZC];
+												UC, ZC = B(-27797), B(-27756);
+												M = vC[UC];
+												gC[d] = M;
+												vC, d, M = B(-27906), B(-27789), 4;
+												gC[d] = M;
+												M = A[vC];
+												vC = B(-27819);
+												d = M[vC];
+												vC = B(-27883);
+												M = d(vC);
+												d, vC = B(-27926), M;
+												M = lC;
+												vC[d] = M;
+												d, aC, M = B(-27590), 0, 1;
+												vC[d] = M;
+												d, JC = B(-27870), 1;
+												UC = A[ZC];
+												ZC = B(-27819);
+												M = UC[ZC];
+												ZC = 1;
+												UC = M(ZC, aC, JC, OC);
+												M = B(-27694);
+												vC[d] = UC;
+												d = B(-27878);
+												vC[d] = M;
+												UC, M, d = B(-27906), 5, B(-27789);
+												vC[d] = M;
+												M, d = 3338111 > 14565746, B(-27693);
+												vC[d] = M;
+												M = A[UC];
+												UC = B(-27819);
+												d = M[UC];
+												UC = B(-27666);
+												M = d(UC);
+												OC, aC, UC = 0, B(-27756), M;
+												M = m[MC];
+												JC, d = 0, B(-27926);
+												UC[d] = M;
+												M, d = 1, B(-27590);
+												UC[d] = M;
+												ZC = A[aC];
+												d, aC = B(-27871), B(-27819);
+												M = ZC[aC];
+												aC = 0;
+												ZC = M(aC, JC, OC, hC);
+												UC[d] = ZC;
+												JC, aC, hC, d = 0, B(-27756), 16, B(-27870);
+												ZC = A[aC];
+												aC, OC = B(-27819), 0;
+												M = ZC[aC];
+												aC = 1;
+												ZC = M(aC, JC, OC, hC);
+												UC[d] = ZC;
+												JC, d = B(-27857), B(-27597);
+												aC = A[JC];
+												JC = B(-27597);
+												ZC = aC[JC];
+												hC, aC = 25, B(-27611);
+												M = ZC[aC];
+												JC, aC = 200, B(-27698);
+												UC[d] = M;
+												M, d = B(-27778), B(-27878);
+												UC[d] = M;
+												d, OC = B(-27845), 80;
+												ZC = A[aC];
+												aC = B(-27758);
+												M = ZC[aC];
+												aC = 255;
+												ZC = M(aC, JC, OC);
+												UC[d] = ZC;
+												d, M = B(-27800), 11;
+												UC[d] = M;
+												d, JC = B(-27837), B(-27857);
+												aC = A[JC];
+												JC = B(-27837);
+												ZC = aC[JC];
+												aC = B(-27662);
+												M = ZC[aC];
+												UC[d] = M;
+												M, ZC, d = 3, B(-27906), B(-27789);
+												UC[d] = M;
+												M = A[ZC];
+												ZC = B(-27819);
+												d = M[ZC];
+												ZC = B(-27759);
+												M = d(ZC);
+												ZC = G();
+												m[ZC] = M;
+												d = m[ZC];
+												aC = m[MC];
+												M, OC = B(-27926), B(-27698);
+												d[M] = aC;
+												M = B(-27687);
+												d = m[ZC];
+												JC = A[OC];
+												OC = B(-27758);
+												aC = JC[OC];
+												OC = 25;
+												JC = aC(OC, hC, xC);
+												xC = 0;
+												d[M] = JC;
+												d = m[ZC];
+												OC = B(-27756);
+												JC = A[OC];
+												M, hC, OC = B(-27871), -120, B(-27819);
+												aC = JC[OC];
+												OC = .5;
+												JC = aC(OC, hC, xC, IC);
+												hC, OC = 240, B(-27756);
+												d[M] = JC;
+												M = B(-27870);
+												d = m[ZC];
+												JC = A[OC];
+												IC, xC, OC = 36, 0, B(-27819);
+												aC = JC[OC];
+												OC = 0;
+												JC = aC(OC, hC, xC, IC);
+												d[M] = JC;
+												aC = 3;
+												d = m[ZC];
+												M = B(-27789);
+												d[M] = aC;
+												hC, aC = 8, B(-27906);
+												M = A[aC];
+												aC, OC = B(-27819), B(-27723);
+												d = M[aC];
+												aC, TC = B(-27904), 1;
+												M = d(aC);
+												d, aC = B(-27926), M;
+												M = m[ZC];
+												aC[d] = M;
+												JC = A[OC];
+												d, OC = B(-27908), B(-27819);
+												M = JC[OC];
+												IC, OC, VC = 50, 0, 0;
+												JC = M(OC, hC);
+												aC[d] = JC;
+												JC = B(-27906);
+												M = A[JC];
+												JC = B(-27819);
+												d = M[JC];
+												JC = B(-27829);
+												M = d(JC);
+												JC = G();
+												xC = B(-27698);
+												m[JC] = M;
+												M, kC = B(-27926), 0;
+												d = m[JC];
+												OC = m[ZC];
+												d[M] = OC;
+												d = m[JC];
+												hC = A[xC];
+												xC, M = B(-27758), B(-27905);
+												OC = hC[xC];
+												xC = 50;
+												hC = OC(xC, IC, bC);
+												bC, OC = 12, 1;
+												d[M] = hC;
+												d = m[JC];
+												M = B(-27879);
+												d[M] = OC;
+												OC = B(-27906);
+												M = A[OC];
+												OC = B(-27819);
+												d = M[OC];
+												OC, IC = B(-27893), B(-27756);
+												M = d(OC);
+												OC = G();
+												m[OC] = M;
+												M = B(-27926);
+												d = m[OC];
+												hC = m[ZC];
+												d[M] = hC;
+												M, hC = B(-27590), 1;
+												d = m[OC];
+												d[M] = hC;
+												M = B(-27871);
+												d = m[OC];
+												xC = A[IC];
+												IC = B(-27819);
+												hC = xC[IC];
+												IC = 0;
+												xC = hC(IC, bC, SC, kC);
+												SC, IC = 1, B(-27756);
+												d[M] = xC;
+												M = B(-27870);
+												d = m[OC];
+												xC = A[IC];
+												IC = B(-27819);
+												hC = xC[IC];
+												kC, IC, bC = 0, 1, -24;
+												xC = hC(IC, bC, SC, kC);
+												bC = B(-27857);
+												d[M] = xC;
+												d = m[OC];
+												IC = A[bC];
+												M, bC, SC = B(-27597), B(-27597), 255;
+												xC = IC[bC];
+												IC = B(-27681);
+												hC = xC[IC];
+												d[M] = hC;
+												hC, IC = B(-27694), B(-27698);
+												d = m[OC];
+												M = B(-27878);
+												d[M] = hC;
+												M = B(-27845);
+												d = m[OC];
+												xC = A[IC];
+												bC, IC = 255, B(-27758);
+												hC = xC[IC];
+												IC = 255;
+												xC = hC(IC, bC, SC);
+												d[M] = xC;
+												IC, hC, M = B(-27698), 13, B(-27800);
+												d = m[OC];
+												d[M] = hC;
+												d = m[OC];
+												hC, M = B(-27824), B(-27636);
+												d[M] = hC;
+												d = m[OC];
+												xC = A[IC];
+												IC, M = B(-27758), B(-27913);
+												hC = xC[IC];
+												kC, bC, SC, IC = .5, 120, 120, 120;
+												xC = hC(IC, bC, SC);
+												d[M] = xC;
+												hC = 3276216 >= 9734551;
+												d = m[OC];
+												M = B(-27765);
+												d[M] = hC;
+												d = m[OC];
+												hC, M = 4, B(-27789);
+												d[M] = hC;
+												hC = B(-27906);
+												M = A[hC];
+												hC = B(-27819);
+												d = M[hC];
+												hC, bC = B(-27883), B(-27756);
+												M = d(hC);
+												hC = G();
+												SC = -50;
+												m[hC] = M;
+												M = B(-27926);
+												d = m[hC];
+												xC = m[ZC];
+												d[M] = xC;
+												d = m[hC];
+												M, xC = B(-27590), 1;
+												d[M] = xC;
+												d = m[hC];
+												M = B(-27871);
+												IC = A[bC];
+												bC = B(-27819);
+												xC = IC[bC];
+												bC = 1;
+												IC = xC(bC, SC, kC, jC);
+												jC = 20;
+												d[M] = IC;
+												bC, M, kC = B(-27756), B(-27870), 0;
+												d = m[hC];
+												IC = A[bC];
+												bC, SC = B(-27819), 20;
+												xC = IC[bC];
+												bC = 0;
+												IC = xC(bC, SC, kC, jC);
+												d[M] = IC;
+												SC = B(-27857);
+												d = m[hC];
+												bC = A[SC];
+												SC, kC = B(-27597), 120;
+												IC = bC[SC];
+												bC, SC = B(-27815), 120;
+												xC = IC[bC];
+												M = B(-27597);
+												d[M] = xC;
+												xC = B(-27787);
+												d = m[hC];
+												M = B(-27878);
+												d[M] = xC;
+												bC = B(-27698);
+												d = m[hC];
+												M = B(-27845);
+												IC = A[bC];
+												bC = B(-27758);
+												xC = IC[bC];
+												bC = 120;
+												IC = xC(bC, SC, kC);
+												d[M] = IC;
+												jC, M = 0, B(-27800);
+												d = m[hC];
+												xC = 12;
+												d[M] = xC;
+												xC = 4358051 > 5233426;
+												d = m[hC];
+												M, kC = B(-27652), -95;
+												d[M] = xC;
+												d = m[hC];
+												M, xC = B(-27789), 4;
+												d[M] = xC;
+												SC, xC = B(-27756), B(-27906);
+												M = A[xC];
+												xC = B(-27819);
+												d = M[xC];
+												xC = B(-27883);
+												M = d(xC);
+												xC = G();
+												m[xC] = M;
+												M = B(-27926);
+												d = m[xC];
+												IC = m[MC];
+												d[M] = IC;
+												M = B(-27871);
+												d = m[xC];
+												bC = A[SC];
+												SC = B(-27819);
+												IC = bC[SC];
+												SC = .5;
+												bC = IC(SC, kC, jC, NC);
+												jC = 0;
+												d[M] = bC;
+												SC = B(-27756);
+												d = m[xC];
+												M = B(-27870);
+												bC = A[SC];
+												SC, kC = B(-27819), 190;
+												IC = bC[SC];
+												SC, NC = 0, 36;
+												bC = IC(SC, kC, jC, NC);
+												d[M] = bC;
+												d = m[xC];
+												jC, M, SC, kC = 255, B(-27687), B(-27698), 255;
+												bC = A[SC];
+												SC = B(-27758);
+												IC = bC[SC];
+												SC = 255;
+												bC = IC(SC, kC, jC);
+												d[M] = bC;
+												d = m[xC];
+												kC, M = B(-27857), B(-27597);
+												SC = A[kC];
+												kC = B(-27597);
+												bC = SC[kC];
+												SC = B(-27609);
+												IC = bC[SC];
+												d[M] = IC;
+												jC, M, IC, kC = 0, B(-27878), B(-27739), 0;
+												d = m[xC];
+												d[M] = IC;
+												M, SC = B(-27845), B(-27698);
+												d = m[xC];
+												bC = A[SC];
+												SC = B(-27758);
+												IC = bC[SC];
+												SC = 0;
+												bC = IC(SC, kC, jC);
+												IC = 16;
+												d[M] = bC;
+												jC, M = B(-27756), B(-27800);
+												d = m[xC];
+												d[M] = IC;
+												IC, NC = 1, -95;
+												d = m[xC];
+												M = B(-27685);
+												d[M] = IC;
+												kC = B(-27857);
+												d = m[xC];
+												SC = A[kC];
+												kC = B(-27837);
+												bC = SC[kC];
+												SC = B(-27662);
+												IC = bC[SC];
+												M = B(-27837);
+												d[M] = IC;
+												d = m[xC];
+												M, kC = B(-27806), B(-27857);
+												SC = A[kC];
+												kC = B(-27806);
+												bC = SC[kC];
+												SC = B(-27662);
+												IC = bC[SC];
+												d[M] = IC;
+												d = m[xC];
+												M, IC = B(-27682), 0;
+												d[M] = IC;
+												M, IC = B(-27693), 15198391 < 14226142;
+												d = m[xC];
+												d[M] = IC;
+												IC = 3;
+												d = m[xC];
+												M = B(-27789);
+												d[M] = IC;
+												IC = B(-27906);
+												M = A[IC];
+												SC, IC = B(-27723), B(-27819);
+												d = M[IC];
+												Wa, IC = -190, B(-27904);
+												M = d(IC);
+												IC, d = M, B(-27926);
+												M = m[xC];
+												IC[d] = M;
+												kC = 8;
+												bC = A[SC];
+												d, SC = B(-27908), B(-27819);
+												M = bC[SC];
+												SC = 0;
+												bC = M(SC, kC);
+												Ba = B(-27857);
+												IC[d] = bC;
+												bC = B(-27906);
+												M = A[bC];
+												bC = B(-27819);
+												d = M[bC];
+												bC = B(-27883);
+												M = d(bC);
+												bC = G();
+												m[bC] = M;
+												d = m[bC];
+												M = B(-27926);
+												SC = m[MC];
+												d[M] = SC;
+												d = m[bC];
+												kC = A[jC];
+												jC, M = B(-27819), B(-27871);
+												SC = kC[jC];
+												jC = .5;
+												kC = SC(jC, NC, VC, fC);
+												jC = B(-27756);
+												d[M] = kC;
+												VC = 0;
+												d = m[bC];
+												kC = A[jC];
+												fC, NC, jC = 30, 190, B(-27819);
+												SC = kC[jC];
+												M, jC = B(-27870), 0;
+												kC = SC(jC, NC, VC, fC);
+												d[M] = kC;
+												M = B(-27687);
+												d = m[bC];
+												NC, VC, jC = 50, 60, B(-27698);
+												kC = A[jC];
+												jC = B(-27758);
+												SC = kC[jC];
+												jC = 180;
+												kC = SC(jC, NC, VC);
+												d[M] = kC;
+												M, NC = B(-27597), B(-27857);
+												d = m[bC];
+												jC = A[NC];
+												NC = B(-27597);
+												kC = jC[NC];
+												jC = B(-27815);
+												SC = kC[jC];
+												d[M] = SC;
+												d = m[bC];
+												SC, M = B(-27628), B(-27878);
+												d[M] = SC;
+												M, jC, VC = B(-27845), B(-27698), 255;
+												d = m[bC];
+												kC = A[jC];
+												jC = B(-27758);
+												SC = kC[jC];
+												NC, jC = 255, 255;
+												kC = SC(jC, NC, VC);
+												SC = 13;
+												d[M] = kC;
+												uC = -20;
+												d = m[bC];
+												VC, M = B(-27756), B(-27800);
+												d[M] = SC;
+												NC, M = B(-27857), B(-27837);
+												d = m[bC];
+												jC = A[NC];
+												NC = B(-27837);
+												kC = jC[NC];
+												jC = B(-27662);
+												SC = kC[jC];
+												d[M] = SC;
+												NC, M, jC, SC = 8, B(-27682), B(-27723), 0;
+												d = m[bC];
+												d[M] = SC;
+												SC = 12665084 < 5241977;
+												d = m[bC];
+												M = B(-27693);
+												d[M] = SC;
+												d = m[bC];
+												M, SC = B(-27789), 3;
+												d[M] = SC;
+												SC = B(-27906);
+												M = A[SC];
+												SC = B(-27819);
+												d = M[SC];
+												SC = B(-27904);
+												M = d(SC);
+												fC, SC, d = 0, M, B(-27926);
+												M = m[bC];
+												SC[d] = M;
+												kC = A[jC];
+												jC, d = B(-27819), B(-27908);
+												M = kC[jC];
+												jC = 0;
+												kC = M(jC, NC);
+												SC[d] = kC;
+												kC = B(-27906);
+												M = A[kC];
+												kC = B(-27819);
+												d = M[kC];
+												kC = B(-27666);
+												M = d(kC);
+												kC = G();
+												m[kC] = M;
+												M = B(-27926);
+												d = m[kC];
+												jC = m[MC];
+												d[M] = jC;
+												d = m[kC];
+												jC, M = 1, B(-27590);
+												d[M] = jC;
+												d = m[kC];
+												M = B(-27871);
+												NC = A[VC];
+												VC = B(-27819);
+												jC = NC[VC];
+												VC = 0;
+												NC = jC(VC, fC, TC, KC);
+												VC = B(-27756);
+												d[M] = NC;
+												M = B(-27870);
+												d = m[kC];
+												NC = A[VC];
+												KC, fC, VC = 14, 0, B(-27819);
+												jC = NC[VC];
+												VC, TC = 1, 0;
+												NC = jC(VC, fC, TC, KC);
+												fC = B(-27857);
+												d[M] = NC;
+												d = m[kC];
+												M = B(-27597);
+												VC = A[fC];
+												fC = B(-27597);
+												NC = VC[fC];
+												VC = B(-27611);
+												jC = NC[VC];
+												VC = B(-27702);
+												d[M] = jC;
+												M = B(-27878);
+												d = m[kC];
+												NC = A[VC];
+												VC = B(-27626);
+												jC = NC[VC];
+												TC = m[x];
+												KC = m[h];
+												VC = B(-27783);
+												fC = TC - KC;
+												TC = m[x];
+												NC = jC(VC, fC, TC);
+												VC = B(-27698);
+												d[M] = NC;
+												M = B(-27845);
+												d = m[kC];
+												NC = A[VC];
+												VC, fC = B(-27758), 180;
+												jC = NC[VC];
+												TC, VC = 180, 180;
+												NC = jC(VC, fC, TC);
+												jC, fC = 10, B(-27857);
+												d[M] = NC;
+												TC = -35;
+												d = m[kC];
+												M = B(-27800);
+												d[M] = jC;
+												d = m[kC];
+												VC = A[fC];
+												M, fC = B(-27837), B(-27837);
+												NC = VC[fC];
+												VC = B(-27662);
+												jC = NC[VC];
+												d[M] = jC;
+												M, jC = B(-27789), 3;
+												d = m[kC];
+												d[M] = jC;
+												jC = B(-27906);
+												M = A[jC];
+												jC = B(-27819);
+												d = M[jC];
+												jC = B(-27883);
+												M = d(jC);
+												jC = G();
+												KC = 0;
+												m[jC] = M;
+												M = B(-27926);
+												d = m[jC];
+												NC = m[MC];
+												d[M] = NC;
+												M, fC = B(-27871), B(-27756);
+												d = m[jC];
+												VC = A[fC];
+												fC = B(-27819);
+												NC = VC[fC];
+												fC = 1;
+												VC = NC(fC, TC, KC, RC);
+												fC, RC = B(-27756), 24;
+												d[M] = VC;
+												d = m[jC];
+												CC, KC, M = B(-27857), 0, B(-27870);
+												VC = A[fC];
+												TC, fC = 24, B(-27819);
+												NC = VC[fC];
+												fC = 0;
+												VC = NC(fC, TC, KC, RC);
+												RC, KC = 0, 35;
+												d[M] = VC;
+												fC, M = B(-27698), B(-27687);
+												d = m[jC];
+												VC = A[fC];
+												fC, TC = B(-27758), 35;
+												NC = VC[fC];
+												fC = 35;
+												VC = NC(fC, TC, KC);
+												d[M] = VC;
+												TC, M = B(-27857), B(-27597);
+												d = m[jC];
+												fC = A[TC];
+												TC = B(-27597);
+												VC = fC[TC];
+												fC, KC = B(-27815), 200;
+												NC = VC[fC];
+												d[M] = NC;
+												M = B(-27878);
+												d = m[jC];
+												NC = B(-27787);
+												d[M] = NC;
+												M, TC, fC = B(-27845), 200, B(-27698);
+												d = m[jC];
+												VC = A[fC];
+												fC = B(-27758);
+												NC = VC[fC];
+												fC = 200;
+												VC = NC(fC, TC, KC);
+												KC = B(-27756);
+												d[M] = VC;
+												d = m[jC];
+												TC, NC, M = B(-27857), 18, B(-27800);
+												d[M] = NC;
+												M = B(-27837);
+												d = m[jC];
+												fC = A[TC];
+												TC = B(-27837);
+												VC = fC[TC];
+												fC = B(-27662);
+												NC = VC[fC];
+												TC = 6;
+												d[M] = NC;
+												M = B(-27682);
+												d = m[jC];
+												NC = 0;
+												d[M] = NC;
+												d = m[jC];
+												M, NC = B(-27693), 2022404 > 16509513;
+												d[M] = NC;
+												d = m[jC];
+												NC, M = 10, B(-27789);
+												d[M] = NC;
+												NC = B(-27906);
+												M = A[NC];
+												NC = B(-27819);
+												d = M[NC];
+												NC, fC = B(-27904), B(-27723);
+												M = d(NC);
+												d, NC = B(-27926), M;
+												M = m[jC];
+												NC[d] = M;
+												VC = A[fC];
+												fC = B(-27819);
+												M = VC[fC];
+												fC = 0;
+												VC = M(fC, TC);
+												d = B(-27908);
+												NC[d] = VC;
+												VC = B(-27906);
+												M = A[VC];
+												VC = B(-27819);
+												d = M[VC];
+												VC = B(-27666);
+												M = d(VC);
+												VC = G();
+												m[VC] = M;
+												M = B(-27926);
+												d = m[VC];
+												fC = m[MC];
+												d[M] = fC;
+												fC, M = 1, B(-27590);
+												d = m[VC];
+												d[M] = fC;
+												d = m[VC];
+												M = B(-27871);
+												TC = A[KC];
+												KC = B(-27819);
+												fC = TC[KC];
+												KC = 0;
+												TC = fC(KC, RC, iC, uC);
+												KC, RC = B(-27756), 0;
+												d[M] = TC;
+												d = m[VC];
+												TC = A[KC];
+												KC, M = B(-27819), B(-27870);
+												fC = TC[KC];
+												uC, KC, iC = 16, 1, 0;
+												TC = fC(KC, RC, iC, uC);
+												RC = B(-27857);
+												d[M] = TC;
+												M = B(-27597);
+												d = m[VC];
+												KC = A[RC];
+												RC = B(-27597);
+												TC = KC[RC];
+												KC, iC = B(-27681), 150;
+												fC = TC[KC];
+												d[M] = fC;
+												fC = B(-27694);
+												d = m[VC];
+												M, KC, RC = B(-27878), B(-27698), 150;
+												d[M] = fC;
+												M = B(-27845);
+												d = m[VC];
+												TC = A[KC];
+												KC = B(-27758);
+												fC = TC[KC];
+												KC = 150;
+												TC = fC(KC, RC, iC);
+												fC = 10;
+												d[M] = TC;
+												RC, M = B(-27857), B(-27800);
+												d = m[VC];
+												d[M] = fC;
+												d = m[VC];
+												KC = A[RC];
+												M, RC = B(-27837), B(-27837);
+												TC = KC[RC];
+												KC = B(-27662);
+												fC = TC[KC];
+												d[M] = fC;
+												fC = 1140482 > 12226228;
+												d = m[VC];
+												M = B(-27652);
+												d[M] = fC;
+												M, fC, uC, RC = B(-27789), 3, 60, 0;
+												d = m[VC];
+												d[M] = fC;
+												fC = B(-27906);
+												M = A[fC];
+												fC, iC = B(-27819), 0;
+												d = M[fC];
+												KC, fC = B(-27756), B(-27883);
+												M = d(fC);
+												fC, d = M, B(-27926);
+												M = m[MC];
+												fC[d] = M;
+												M, d = 1, B(-27590);
+												fC[d] = M;
+												TC = A[KC];
+												KC, d = B(-27819), B(-27870);
+												M = TC[KC];
+												KC = 1;
+												TC = M(KC, RC, iC, uC);
+												fC[d] = TC;
+												d, M = B(-27878), B(-27694);
+												fC[d] = M;
+												M, d = 5, B(-27789);
+												fC[d] = M;
+												d, M, uC = B(-27693), 3851490 > 5294393, 0;
+												fC[d] = M;
+												d = B(-27652);
+												M = m[N];
+												fC[d] = M;
+												d = m[MC];
+												M, RC = B(-27870), B(-27756);
+												KC = A[RC];
+												RC, iC = B(-27819), 0;
+												TC = KC[RC];
+												RC = 0;
+												KC = TC(RC, iC, uC, LC);
+												iC, uC, LC = 0, .5, 0;
+												d[M] = KC;
+												M, RC = B(-27871), B(-27756);
+												d = m[MC];
+												KC = A[RC];
+												RC = B(-27819);
+												TC = KC[RC];
+												RC = .5;
+												KC = TC(RC, iC, uC, LC);
+												TC, iC = 1, B(-27746);
+												d[M] = KC;
+												d = m[MC];
+												M = B(-27590);
+												d[M] = TC;
+												d = m[E];
+												TC = m[MC];
+												RC = A[iC];
+												iC = B(-27819);
+												KC = RC[iC];
+												iC = .4;
+												Aa = A[CC];
+												CC = B(-27644);
+												LC = Aa[CC];
+												Aa = B(-27869);
+												uC = LC[Aa];
+												CC = A[Ba];
+												Ba = B(-27761);
+												Aa = CC[Ba];
+												M, CC = B(-27677), B(-27853);
+												LC = Aa[CC];
+												Aa, CC = B(-27756), 300;
+												RC = KC(iC, uC, LC);
+												iC = B(-27870);
+												LC = A[Aa];
+												M, Aa, Ba = d[M], B(-27819), 0;
+												uC = LC[Aa];
+												Aa = 0;
+												LC = uC(Aa, CC, Ba, da);
+												Ba = B(-27756);
+												CC = A[Ba];
+												uC, Ba = B(-27871), B(-27819);
+												Aa = CC[Ba];
+												da, Ba = -150, .5;
+												CC = Aa(Ba, da, Ha, Wa);
+												Aa, Ba = B(-27590), 0;
+												KC = { [iC] = LC, [uC] = CC, [Aa] = Ba };
+												M = M(d, TC, RC, KC);
+												d, TC = B(-27773), M;
+												d = TC[d];
+												d = d(TC);
+												d = c(11214791, { kC, x, h });
+												RC = G();
+												KC = G();
+												m[KC] = d;
+												d = c(2854501, { s });
+												m[RC] = d;
+												d = w(4826435, { VC });
+												iC = G();
+												m[iC] = d;
+												uC = G();
+												LC = B(-27603);
+												d = X(7893326, { qC, zC });
+												m[uC] = d;
+												M = m[OC];
+												d = M[LC];
+												LC = Y(1345548, {
+														JC,
+														E,
+														ZC,
+														OC,
+														hC,
+													});
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												M = m[OC];
+												Aa = G();
+												LC = B(-27903);
+												d = M[LC];
+												M = B(-27745);
+												M = d[M];
+												LC = r(10288655, {
+														JC,
+														E,
+														ZC,
+														hC,
+													});
+												M = M(d, LC);
+												d = m[OC];
+												M = B(-27734);
+												M, LC = d[M], B(-27878);
+												M = M(d, LC);
+												LC = y(2333457, { hC, OC });
+												d = B(-27745);
+												d = M[d];
+												d = d(M, LC);
+												M = m[hC];
+												LC = B(-27612);
+												d = M[LC];
+												M = B(-27745);
+												M = d[M];
+												LC = y(1911220, { E, hC });
+												M = M(d, LC);
+												LC = B(-27823);
+												M = m[hC];
+												d = M[LC];
+												LC = r(16377803, { E, hC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												M = m[hC];
+												LC = B(-27619);
+												d = M[LC];
+												LC = X(11865605, { OC, RC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												LC = B(-27612);
+												M = m[xC];
+												d = M[LC];
+												M = B(-27745);
+												M = d[M];
+												LC = c(6212248, { E, xC });
+												M = M(d, LC);
+												LC = B(-27823);
+												M = m[xC];
+												d = M[LC];
+												LC = Y(7713600, { E, xC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												LC = B(-27811);
+												M = m[xC];
+												d = M[LC];
+												LC = r(2900981, { E, xC, RC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												LC = B(-27623);
+												M = m[xC];
+												d = M[LC];
+												M = B(-27745);
+												LC = o(1901128, { E, xC });
+												M = d[M];
+												M = M(d, LC);
+												M = m[jC];
+												LC = B(-27612);
+												d = M[LC];
+												M = B(-27745);
+												LC = o(15786739, { E, jC });
+												M = d[M];
+												M = M(d, LC);
+												LC = B(-27823);
+												M = m[jC];
+												d = M[LC];
+												LC = Y(4021239, { E, jC });
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												LC = r(4853649, { I, iC });
+												M = B(-27619);
+												d = vC[M];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												d = l(9950830, {
+														V,
+														N,
+														S,
+														k,
+														MC,
+														j,
+													});
+												LC = d;
+												d = o(2363128, { S });
+												m[Aa] = d;
+												d = m[N];
+												d = d and 8240446 or 9899685;
+											end;
+										end;
+									end;
+								else
+									if d > 14752000 then
+										if d > 15066006 then
+											if d < 15099891 then
+												s = B(-27848);
+												q = A[s];
+												d = q and 7245650 or 15362569;
+											elseif 15165095 > d then
+												s, D = B(-27702), 1;
+												M = A[s];
+												s = B(-27838);
+												d = M[s];
+												s = 1;
+												E = q - D;
+												M = d(P, s, E);
+												d, P = 14477792, M;
+											else
+												g, E = B(-27604), 3;
+												s = P[E];
+												e = 4;
+												D = P[e];
+												e, E, t = B(-27731), B(-27731), B(-27799);
+												q = s or E;
+												s = D or e;
+												E, e = d, B(-27702);
+												D = A[e];
+												e = B(-27684);
+												E = D[e];
+												e = A[t];
+												t = { e(q) };
+												e = d;
+												D = E(H(t));
+												t = D == g;
+												E, d = t, t and 581931 or 5118859;
+											end;
+										else
+											if d < 14862894 then
+												q = B(-27874);
+												M = A[q];
+												d = 15362569;
+												m[P] = M;
+											elseif 15012765 > d then
+												d, e = A[B(-27753)], B(-27875);
+												M = { e };
+											else
+												n = B(-27878);
+												M = m[F[2]];
+												d = M[n];
+												n = G();
+												m[n] = d;
+												P = m[n];
+												M = #P;
+												P = 0;
+												d = M == P;
+												d = d and 2303350 or 13742632;
+											end;
+										end;
+									else
+										if d > 14563669 then
+											if 14649339 > d then
+												d = m[F[3]];
+												P, M = B(-27743), B(-27878);
+												d[M] = P;
+												M, P = B(-27693), 10847151 < 6556961;
+												d = m[F[3]];
+												d[M] = P;
+												P = B(-27627);
+												M = A[P];
+												P = B(-27705);
+												d = M[P];
+												P = Y(5374412, {
+														F[4],
+														F[2],
+														F[5],
+														F[6],
+														F[3],
+														F[7],
+														n,
+														F[8],
+														F[9],
+														F[10],
+														F[11],
+														F[12],
+														F[1],
+													});
+												n = z(n);
+												M = d(P);
+												M, d = {}, A[B(-27645)];
+											elseif 14715609 > d then
+												d, M = 15796149 > 5564301, B(-27713);
+												M = { d, M };
+												d = A[B(-27674)];
+											else
+												s = G();
+												n = G();
+												P = W[2];
+												q = G();
+												d = nil;
+												m[n] = W[1];
+												m[q] = d;
+												E, d = B(-27627), 10739609 > 15447170;
+												m[s] = d;
+												M = A[E];
+												E = B(-27705);
+												d = M[E];
+												E = y(1926253, {
+														F[1],
+														n,
+														q,
+														s,
+													});
+												M = d(E);
+												M = B(-27911);
+												d = A[M];
+												M = d();
+												E, d = M, 9430336;
+											end;
+										else
+											if d < 14438089 then
+												n = B(-27926);
+												M = m[F[1]];
+												d = M[n];
+												d = d and 2566582 or 2979538;
+											elseif 14483709 > d then
+												d = nil;
+												E = #P;
+												D, s = 1, d;
+												d, e = 9723954, D;
+												D = -1;
+												t = D;
+												D = 0;
+												g = D > t;
+												D = E - t;
+											elseif 14502506 > d then
+												s = m[F[2]];
+												P, q = s, d;
+												d = s and 16341109 or 4803644;
+											else
+												d, M = e, { s };
+												d = A[B(-27802)];
+											end;
+										end;
+									end;
+								end;
+							end;
+						else
+							if d > 9910406 then
+								if d > 11297577 then
+									if 11814038 > d then
+										if d < 11513433 then
+											if d < 11312574 then
+												t = B(-27702);
+												e = A[t];
+												t = B(-27668);
+												D = e[t];
+												t = B(-27900);
+												e = D(E, t);
+												D, d = B(-27921), A[B(-27880)];
+												M = e or D;
+												e = m[F[8]];
+												D = M;
+												M = 12981061 <= 4470250;
+												t = e(D);
+												e = nil;
+												M = { M, t, e };
+											elseif 11361710 > d then
+												d = m[F[5]];
+												M, q, n, P = B(-27878), B(-27628), nil, nil;
+												d[M] = q;
+												M, d = {}, 9402150 <= 6601746;
+												m[F[6]] = d;
+												d = A[B(-27843)];
+											else
+												d = m[F[1]];
+												P = m[F[2]];
+												q = { d(P) };
+												M, n = q[1], q[2];
+												P = M;
+												d = P and 11156149 or 3500214;
+											end;
+										else
+											if 11636699 > d then
+												d = s and 4433084 or 586240;
+											elseif d < 11723636 then
+												d = m[F[4]];
+												M = d();
+												d = 6033674;
+											else
+												d = m[F[3]];
+												M = { d };
+												d = A[B(-27923)];
+											end;
+										end;
+									else
+										if d > 11883173 then
+											if 11911235 > d then
+												t, s = B(-27857), B(-27746);
+												d = m[F[1]];
+												n = m[F[2]];
+												q = A[s];
+												M, s = B(-27677), B(-27819);
+												P = q[s];
+												M, s = d[M], .3;
+												e = A[t];
+												t, v = B(-27644), -190;
+												D = e[t];
+												e = B(-27742);
+												E = D[e];
+												q = P(s, E);
+												s, t, g, e = B(-27871), -150, .5, B(-27756);
+												D = A[e];
+												e = B(-27819);
+												E = D[e];
+												e = .5;
+												D = E(e, t, g, v);
+												P = { [s] = D };
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												M, d = {}, A[B(-27688)];
+											elseif d < 11954477 then
+												M, d = {}, A[B(-27724)];
+											else
+												P, s = d, B(-27629);
+												q = A[s];
+												d, n = q and 5519520 or 3098989, q;
+											end;
+										else
+											if 11841170 > d then
+												d = e;
+												d = s and 15962705 or 6303993;
+											elseif d < 11856631 then
+												v = B(-27840);
+												g = A[v];
+												I, v = B(-27640), B(-27914);
+												t = g[v];
+												Z, a, d = B(-27840), B(-27840), A[B(-27639)];
+												g = t();
+												e = g + E;
+												V, g, h = B(-27664), B(-27667), B(-27840);
+												t = A[g];
+												U = A[Z];
+												Z = B(-27695);
+												v = U[Z];
+												Z = B(-27596);
+												U = { v(Z, e) };
+												J = B(-27840);
+												g = t(H(U));
+												v = B(-27667);
+												t = A[v];
+												Z = A[a];
+												a = B(-27695);
+												U = Z[a];
+												a = B(-27649);
+												Z = { U(a, e) };
+												v = t(H(Z));
+												U, k = B(-27667), B(-27804);
+												t = A[U];
+												O = B(-27840);
+												a = A[J];
+												J = B(-27695);
+												Z = a[J];
+												J = B(-27610);
+												a = { Z(J, e) };
+												U = t(H(a));
+												Z = B(-27667);
+												t = A[Z];
+												J = A[O];
+												O = B(-27695);
+												a = J[O];
+												O = B(-27607);
+												J = { a(O, e) };
+												Z = t(H(J));
+												a = B(-27667);
+												t = A[a];
+												O = A[h];
+												h = B(-27695);
+												J = O[h];
+												h = B(-27798);
+												O = { J(h, e) };
+												a = t(H(O));
+												O = B(-27673);
+												N = V .. a;
+												j = Z .. N;
+												S = k .. j;
+												b = U .. S;
+												x = I .. b;
+												h = v .. x;
+												J = O .. h;
+												t = g .. J;
+												M = { t };
+											else
+												M = B(-27878);
+												d = m[F[1]];
+												n = B(-27694);
+												d[M] = n;
+												P, M = .3, B(-27818);
+												d = m[F[1]];
+												M = d[M];
+												M = M(d);
+												n = B(-27844);
+												d = m[F[2]];
+												M = d(n, P);
+												d, M = A[B(-27722)], {};
+											end;
+										end;
+									end;
+								else
+									if d < 10655053 then
+										if d < 10205284 then
+											if d < 9935979 then
+												d = m[F[6]];
+												e = B(-27702);
+												M = d(s);
+												E, t = M, 3;
+												D = A[e];
+												e = B(-27838);
+												M = D[e];
+												e = 1;
+												D = M(E, e, t);
+												M = B(-27592);
+												d = D == M;
+												d = d and 11286080 or 13812452;
+											elseif 10026846 > d then
+												n, q = W[1], d;
+												s = m[F[1]];
+												d, P = s and 8748332 or 6207130, s;
+											elseif 10112388 > d then
+												d = B(-27694);
+												M = { d };
+												d = A[B(-27709)];
+											else
+												s = B(-27896);
+												n = G();
+												P = G();
+												m[n] = W[1];
+												d = nil;
+												m[P] = d;
+												q = A[s];
+												d, M = q and 8211392 or 13836174, q;
+											end;
+										else
+											if 10416214 > d then
+												s, M, e, q = 50, B(-27905), B(-27698), B(-27698);
+												d = m[F[1]];
+												P = A[q];
+												q, E = B(-27758), 50;
+												n = P[q];
+												g, t, q = 25, 25, 50;
+												P = n(q, s, E);
+												d[M] = P;
+												M = B(-27677);
+												d = m[F[2]];
+												n = m[F[3]];
+												s = B(-27746);
+												q = A[s];
+												s = B(-27819);
+												P = q[s];
+												s, M = .2, d[M];
+												q = P(s);
+												s = B(-27687);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e = 25;
+												D = E(e, t, g);
+												P = { [s] = D };
+												M = M(d, n, q, P);
+												d, n = B(-27773), 14021722 > 15655898;
+												d = M[d];
+												d = d(M);
+												M = B(-27652);
+												d = m[F[4]];
+												d[M] = n;
+												M, d = {}, A[B(-27826)];
+											elseif 10586047 > d then
+												d, M = q, P;
+												d = 845816;
+											else
+												d, E = 9723954, nil;
+											end;
+										end;
+									else
+										if d < 11185470 then
+											if 10760422 > d then
+												E, d = B(-27875), A[B(-27635)];
+												M = { E };
+											elseif d < 10997604 then
+												M = m[F[1]];
+												n = B(-27926);
+												d = M[n];
+												d = d and 3340440 or 7947304;
+											else
+												e, D = 255, B(-27698);
+												d = m[F[3]];
+												E = A[D];
+												t, q, D = 80, B(-27713), B(-27758);
+												s = E[D];
+												D = 80;
+												E = s(D, e, t);
+												s, e = 2, 100;
+												M = d(q, E, s);
+												d = m[F[4]];
+												M, q = B(-27878), B(-27694);
+												d[M] = q;
+												d = m[F[5]];
+												M, D, E = B(-27687), 180, B(-27698);
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												E = 80;
+												s = q(E, D, e);
+												q = B(-27627);
+												d[M] = s;
+												E = B(-27698);
+												M = A[q];
+												q, D, e = B(-27686), 50, 60;
+												d = M[q];
+												q = 1.5;
+												M = d(q);
+												d = m[F[5]];
+												M = B(-27687);
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												E = 180;
+												s = q(E, D, e);
+												d[M] = s;
+												d = 11316075;
+											end;
+										else
+											if 11246421 > d then
+												M, q = B(-27878), B(-27702);
+												d = m[F[1]];
+												P = A[q];
+												q = B(-27626);
+												n = P[q];
+												q = B(-27783);
+												E = m[F[2]];
+												D = m[F[3]];
+												s = E - D;
+												E = m[F[2]];
+												P = n(q, s, E);
+												d[M] = P;
+												d, M = A[B(-27854)], {};
+											elseif d < 11282066 then
+												P = m[F[1]];
+												M, d, n = P, P and 13771150 or 845816, W[1];
+											else
+												M = m[F[7]];
+												D = { M(E) };
+												d = 15848421 > 1259558;
+												M = { d, E, H(D) };
+												d = A[B(-27803)];
+											end;
+										end;
+									end;
+								end;
+							else
+								if d > 8434753 then
+									if d < 9133402 then
+										if d < 8883404 then
+											if 8647570 > d then
+												g, U, Z = d, B(-27667), B(-27667);
+												v = A[U];
+												U = v(q);
+												v = 0;
+												t, g = U or v, 86400;
+												v = d;
+												e = t * g;
+												U = A[Z];
+												Z = U(s);
+												U = 0;
+												g, v = Z or U, 60;
+												t = g * v;
+												E = e + t;
+												t = 0;
+												e = E <= t;
+												d = e and 14966282 or 11847658;
+											elseif d < 8725060 then
+												P = B(-27701);
+												d = m[F[2]];
+												E = B(-27698);
+												s = A[E];
+												E, D = B(-27758), 180;
+												q = s[E];
+												E, e = 255, 80;
+												s = q(E, D, e);
+												q = 1.5;
+												M = d(P, s, q);
+												M, d = {}, A[B(-27868)];
+											elseif 8760026 > d then
+												D = B(-27651);
+												E = n[D];
+												d, g = 6207130, B(-27857);
+												t = A[g];
+												g = B(-27651);
+												e = t[g];
+												t = B(-27613);
+												D = e[t];
+												s = E == D;
+												P = s;
+											else
+												t, v = s, B(-27702);
+												g = A[v];
+												t, v, Z, a = nil, B(-27680), B(-27892), 57;
+												M = g[v];
+												U = A[Z];
+												Z = B(-27704);
+												v = U[Z];
+												Z = 48;
+												U = { v(Z, a) };
+												g = M(H(U));
+												d = q .. g;
+												q = d;
+												d = 3112704;
+											end;
+										else
+											if 9017890 > d then
+												d = 10839060;
+											elseif d < 9082906 then
+												q = B(-27702);
+												M = A[q];
+												q = B(-27920);
+												d = M[q];
+												q = B(-27801);
+												M = d(P, q);
+												d = M and 4647376 or 5080696;
+											else
+												e = o(3349424, { n });
+												E = B(-27836);
+												s = A[E];
+												t = { s(e) };
+												E, D = t[1], t[2];
+												d = E and 6881648 or 4892250;
+											end;
+										end;
+									else
+										if d < 9551108 then
+											if d < 9275364 then
+												s, d = D, 11834682;
+											elseif 9419689 > d then
+												d = m[F[6]];
+												s = m[F[7]];
+												E = { d(s) };
+												P = E[2];
+												M, q = E[1], E[3];
+												s = M;
+												d = s and 1374668 or 15820877;
+											else
+												e = m[s];
+												D = not e;
+												d, M = D and 13325636 or 554762, D;
+											end;
+										else
+											if d < 9697917 then
+												d = M and 14686725 or 2871974;
+											elseif 9811819 > d then
+												v, D = not g, D + t;
+												E = D <= e;
+												E = v and E;
+												v = e <= D;
+												v = g and v;
+												E = v or E;
+												v = 14195431;
+												d = E and v;
+												E = 11619520;
+												d = d or E;
+											else
+												M = B(-27598);
+												d = GC[M];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												d = 14215802;
+											end;
+										end;
+									end;
+								else
+									if d < 7969529 then
+										if 7806364 > d then
+											if d < 7352741 then
+												d = B(-27630);
+												M = { d };
+												d = A[B(-27859)];
+											elseif d < 7555606 then
+												d = nil;
+												M = { d };
+												d = A[B(-27790)];
+											elseif d < 7716501 then
+												d = m[F[1]];
+												s, t = B(-27746), 255;
+												n = m[F[2]];
+												q = A[s];
+												e, s = B(-27698), B(-27819);
+												P = q[s];
+												s, g = .2, 255;
+												q = P(s);
+												M, s = B(-27677), B(-27687);
+												D = A[e];
+												e = B(-27758);
+												E = D[e];
+												e = 255;
+												D = E(e, t, g);
+												P, M = { [s] = D }, d[M];
+												M = M(d, n, q, P);
+												d = B(-27773);
+												d = M[d];
+												d = d(M);
+												M, d = {}, A[B(-27692)];
+											else
+												d, M = A[B(-27715)], {};
+											end;
+										else
+											if d < 7893597 then
+												M = B(-27687);
+												d = m[F[1]];
+												n, P = W[1], W[2];
+												q = n;
+												d[M] = q;
+												d = m[F[2]];
+												q, M = P, B(-27878);
+												d[M] = q;
+												P, M = nil, B(-27845);
+												d = m[F[2]];
+												q = n;
+												d[M] = q;
+												M, d, n = {}, A[B(-27678)], nil;
+											elseif d < 7920586 then
+												n = W[1];
+												d = not n;
+												d = d and 10102863 or 2384086;
+											else
+												M, d = {}, A[B(-27918)];
+											end;
+										end;
+									else
+										if 8187395 > d then
+											if d < 8046343 then
+												D = m[F[3]];
+												s, E = D, d;
+												d = D and 8276156 or 15564909;
+											elseif d < 8132165 then
+												P, M, s = B(-27861), B(-27764), B(-27654);
+												d = A[M];
+												n = A[P];
+												q = m[F[1]];
+												s = n[s];
+												P = { s(n, q) };
+												M = d(H(P));
+												d = M();
+												d, M = A[B(-27601)], {};
+											else
+												e = 80;
+												d = m[F[2]];
+												E, P = B(-27698), B(-27831);
+												s = A[E];
+												E = B(-27758);
+												q = s[E];
+												D, E = 255, 80;
+												s = q(E, D, e);
+												q = 2;
+												M = d(P, s, q);
+												P = B(-27627);
+												M = A[P];
+												P = B(-27686);
+												d = M[P];
+												P = 1;
+												M = d(P);
+												M = B(-27642);
+												d = m[F[3]];
+												M = d[M];
+												M = M(d);
+												d = m[F[4]];
+												M = d();
+												d, M = A[B(-27595)], {};
+											end;
+										else
+											if 8225919 > d then
+												E = B(-27896);
+												s = A[E];
+												d, E = 13836174, B(-27848);
+												q = s[E];
+												M = q;
+											elseif d < 8258301 then
+												M = B(-27598);
+												d = fC[M];
+												M = B(-27745);
+												M = d[M];
+												M = M(d, LC);
+												d = 14215802;
+											else
+												U, t = B(-27857), B(-27651);
+												e = n[t];
+												v = A[U];
+												U = B(-27651);
+												g = v[U];
+												v = B(-27602);
+												t = g[v];
+												D = e == t;
+												s, d = D, 15564909;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+					end;
+				end;
+				d = #Q;
+				return H(M);
+			end, function(A, B)
+				local H = q(B);
+				local W = function()
+						return d(A, {}, B, H);
+					end;
+				return W;
+			end, 0, function(A, B)
+				local H = q(B);
+				local W = function(...)
+						return d(A, { ... }, B, H);
+					end;
+				return W;
+			end, function(A)
+				n[A] = n[A] - 1;
+				if n[A] == 0 then
+					n[A], m[A] = nil, nil;
+				end;
+			end, function(A, B)
+				local H = q(B);
+				local W = function(W, F, Q, p, M, m, n, G)
+						return d(A, {
+							W,
+							F,
+							Q,
+							p,
+							M,
+							m,
+							n,
+							G,
+						}, B, H);
+					end;
+				return W;
+			end, function()
+				P = 1 + P;
+				n[P] = 1;
+				return P;
+			end, function(A, B)
+				local H = q(B);
+				local W = function(W, F)
+						return d(A, { W, F }, B, H);
+					end;
+				return W;
+			end, {}, function(A, B)
+				local H = q(B);
+				local W = function(W)
+						return d(A, { W }, B, H);
+					end;
+				return W;
+			end, function(A, B)
+				local H = q(B);
+				local W = function(W, F, Q, p, M)
+						return d(A, {
+							W,
+							F,
+							Q,
+							p,
+							M,
+						}, B, H);
+					end;
+				return W;
+			end, function(A)
+				for B = 1, #A, 1 do
+					n[A[B]] = n[A[B]] + 1;
+				end;
+				if W then
+					local d = W(true);
+					local H = Q(d);
+					H[B(-27872)], H[B(-27760)], H[B(-27856)] = A, s, function()
+							return -1177572;
+						end;
+					return d;
+				else
+					return F({}, { [B(-27760)] = s, [B(-27872)] = A, [B(-27856)] = function()
+							return -1177572;
+						end });
+				end;
+			end, function(A, B)
+				local H = q(B);
+				local W = function(W, F, Q)
+						return d(A, { W, F, Q }, B, H);
+					end;
+				return W;
+			end, function(A, B)
+				local H = q(B);
+				local W = function(W, F, Q, p)
+						return d(A, {
+							W,
+							F,
+							Q,
+							p,
+						}, B, H);
+					end;
+				return W;
+			end, {}, function(A, B)
+				local H = q(B);
+				local W = function(W, F, Q, p, M, m)
+						return d(A, {
+							W,
+							F,
+							Q,
+							p,
+							M,
+							m,
+						}, B, H);
+					end;
+				return W;
+			end, function(A)
+				local B, d = 1, A[1];
+				while d do
+					n[d], B = n[d] - 1, 1 + B;
+					if 0 == n[d] then
+						n[d], m[d] = nil, nil;
+					end;
+					d = A[B];
+				end;
+			end;
+		return (E(16604105, {}))(H(M));
+	end)(setmetatable, getfenv and getfenv() or _ENV, newproxy, getmetatable, select, unpack or table[B(-27605)], { ... });
+end)(...);
