@@ -1,0 +1,5158 @@
+--[[
+███████╗██╗   ██╗██╗██╗         █████╗ ██╗  ██╗███████╗
+██╔════╝██║   ██║██║██║        ██╔══██╗╚██╗██╔╝██╔════╝
+█████╗  ██║   ██║██║██║        ███████║ ╚███╔╝ █████╗
+██╔══╝  ╚██╗ ██╔╝██║██║        ██╔══██║ ██╔██╗ ██╔══╝
+███████╗ ╚████╔╝ ██║███████╗   ██║  ██║██╔╝ ██╗███████╗
+╚══════╝  ╚═══╝  ╚═╝╚══════╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+
+        STUDIOS V2 OBFUSCATOR By MAX
+        https://eaxe.net
+
+        Sponsored by
+        https://BloxDen.com
+--]]
+
+return (function(...)
+	local p = {
+			"O.I2^qnE\"8^tNVeZMP!",
+			"O^M^iTLBZpQL6e.8^sH",
+			"On/j[fM=3\\b,!fi_,5",
+			"O+9pndL+",
+			"OJe>OUtNFJTE:Ra9F8?",
+			"OMY[a",
+			"Ou\\!%0B-2PLEVb2l",
+			"Ou\\!%0B-c45LM\\p-.dp",
+			"O)q4P$E^W$&B+(,@",
+			"O^J3^m",
+			"O\'I<Y)9^hoN49Y=u?j[",
+			"O!pU,nL6TZD+DX&pN\\",
+			"O6t=2fB2XlZL`sRig8b$G5Z4R$:*`(B?j[",
+			"Ona[7C!BrCpcK)HV+W[",
+			"OJN!iNtsP",
+			"Onu",
+			"Og;dd?#\"1Ni2jPa0",
+			"O.8jV;EVb9",
+			"O.dM$\\+:0",
+			"O!tKM6BW7mDBd",
+			"Ogb\'.6oCs)-2X0RC\'sM>)2DQ884u3Y8\\AI:,o$&+JR<UV)1?pl*g8c<Ue/2",
+			"O!6VDPNObaAJQ>!h,5",
+			"OSjDCfBWH9RE^9:qE%",
+			"OE.SJ2c_n+o6@1.-Bd",
+			"Og*7Z0oMF%_jP9<o\'I<p",
+			"O.hh1.,<",
+			"O!\"pGKMs]eZC]#sHFH",
+			"O.7j[;trebYEVb2l",
+			"Od.7NLt:aN*B17.2",
+			"OF7N05M8MG7E\'$=\\S?",
+			"Oc4`=",
+			"OL$flM,K\"KG)e!@\\!5O",
+			"OfQ*F9\'A>7#&-O",
+			"OF8(McnB?`pS0;W9!op",
+			"OB9MQJCl:",
+			"Ocf@e*",
+			"OB9MQJCl9u63ES\"%KJ",
+			"O!Eo^O!V]Y%E4=*\\2Xf_k\\]P`Iohe",
+			"O!Eo^O!T!@p%G]6T",
+			"O6a]p/n6f@S)>M>r",
+			"OSa6a4!ph",
+			"OENcV>M8oY2uPKUN",
+			"OMKK-a",
+			"OgQV1TRbS%L_d",
+			"OC=gupL]Z>)t\'J)mJ%8:B,dE3:FH",
+			"OS6GhT",
+			"OEq7AShFe\"ln/:_^ufV",
+			"Ot-Z2DLh_bfL+",
+			"OcQpGt!Zts=.tNI;Fs]",
+			"OCMB\\kB9uoK,([j&",
+			"OLhBRGBd",
+			"O6t=2fB2XlZL`sRig*7Z0oMF^B4uYdqItcH2gQV1R&1J,d5/",
+			"OB[*([",
+			"O\'YDXE5cB][r\"a/,\'A>6s`:gW_V.I&m\'l)%",
+			"O\\]P`Ioho*Cmo]ko",
+			"OF*mci+upYL6\"NWO)J",
+			"O6t=2fB2XlZL`sRigQG561*(V*",
+			"OSjSgTB:bb",
+			"OF=;]i^dW7Z!oA&7^H",
+			"OJN!iNts-L6M_<",
+			"O^su*VEqH(Qh;?",
+			"O\'8\'?n5uFJ=mo]ko",
+			"O)[\"B",
+			"O.!gQJCB5YjteHh&",
+			"O.I2^q^s`1;",
+			"O\'*$_j`SEjkV.U5,gb=h\'%;:",
+			"O+uBqD^suHDt\'A5",
+			"OSjSljC#l",
+			"OSnLB6tSpGNMY*Iehfn6&",
+			"OB>M`7E.^",
+			"Ot\\+i@C*$",
+			"OcYTs",
+			"O+k:^5F*/-Mh;dk4",
+			"OSnLB6",
+			"OuFES/d.16gFM5j\"EP",
+			"O!t#S/hr0lN%[+*",
+			"OL]oe?M3",
+			"O\'*Vo52\'s\"E49d7J\\p1]",
+			"OL/Aj<MYlUDht",
+			"OtN&AiE0o",
+			"Og*7Z0oMF%@oFDkAFi@LM",
+			"OSRY(,F83XJ?].YGJ\\Y",
+			"Oc_\'\'<cfb4e+[U\"_",
+			"OC8JSNB9&0",
+			"Ocf@e&BW3iHB)5l#B2<c",
+			"O,JWg!.Mj&SCM+;Z!tC",
+			"O^s5toEDRIOFMY`aSq=",
+			"O$gc",
+			"O)WK3?!^;b8S\"TJT",
+			"Oh4]k%FQt:p^beo=c<",
+			"OIL!.G1*?/XT\\1R",
+			"OL]!7mcJh$Lc&m(U",
+			"O.(&[8M!ZIs!p\'!Z",
+			"Ocf@e&BW3iHB)5lPMsO3k,t",
+			"Ou\\!%0B-2PoB9E",
+			"O)R?Jl",
+			"O\'*Vo52\'$qBS>\\L",
+			"O\'*$_j`SEjkV.U5,gb=h",
+			"O!`F+!.dcUcnt@%qFj",
+			"OcY_sW,%V2ntrk2D",
+			"OcrD([hda:0BuGOD+d",
+			"OuQ&7",
+			"O+9<PfLEhAmB:\'",
+			"OSj)i$B9hTRB+(,(",
+			"O(ic",
+			"OBfU:r.M3,ZLC@JR.h3",
+			"OSo,KRB9E",
+			"OEVuEQhF)ga,P(#h!N",
+			"OMKK4qtC",
+			"OCL0`aB1EF_.$(m9Sf",
+			"Ocf@e*B9hc/t/",
+			"Our?_WM_i4\\dXo9FN\\",
+			"O.d^[CMYT90Bd",
+			"O\\]P`Ioho0Q:*0&B",
+			"O(XC",
+			"O.h>1qC*7d%",
+			"O\'(FBV#Vu,u&.cAj",
+			"O(\"]cjEqO\'dB9VcX!BF%%tY)%7C@NrQ(3&tOB7",
+			"OJkWT7Eqi5uteU",
+			"O.I2^qS3:t\\Mb7",
+			"OS\"71NB7",
+			"OcQ[t2MP!",
+			"Ot:I>i,80:MMP[>cn9",
+			"OSje=dLh8",
+			"O^b3biE0BWYMPB($h;U",
+			"OueICrhba0VdaMi",
+			"OLUV;PBW\'lgMsie>B7",
+			"O^s@fjBWZa#t/",
+			"OB2<JKC8%8",
+			"O!ZhcHL6dCL+N/[bMj",
+			"Ou&#XP)))",
+			"O+9a",
+			"Ou\\!%0B-c45LM\\p-",
+			"O)mB>\\+)e:Rue=bnMKU",
+			"O\'d;s/5c#F>jPW\"/\'dc4B-!^\'j:(tfl\'7\\N",
+			"O.(`uNh_5k,J&eLWct",
+			"O7Z_",
+			"OB>$Q7^L=p",
+			"OgQ;$",
+			"O.hG7FC*N/]",
+			"OSZrL5C*Sk",
+			"Og*6X2eUt6j49Ynp\'U.c",
+			"O)q4P$E^W6YEc-@",
+			"Oc_!Ba+\'$4jhFd2m!p,",
+			"OSjSQ#h;)`aB7",
+			"OLAPd@h;TfZMlljO",
+			"Ou\\!%0B13jM!ph",
+			"O.dM$\\+9<PfLti-]Bd",
+			"O?R",
+			"O+9<PfLEJ$&M_U4\'",
+			"O^8b0mC*IP4,&2/6",
+			"OS2n2.3V=(#",
+			"OC7>j,L+",
+			"O)ch)-M_]DfdXK\"",
+			"OEc-h[!pXPA",
+			"O\'YjeS#H1",
+			"OLU]!cM_<",
+			"O.I2^q.(i7iEGOYg",
+			"OE2mK\\B:\'",
+			"O)0dlnC*N>KC**:>t-1l\'B:[$:tNV(>",
+			"OdHga)MC:",
+			"O\\]P`IohobCjPSsd\\@_r",
+			"O.I2^qnT3\'.tNVeZMP!",
+			"OnA7b8",
+			"O)q4P$E^1",
+			"OC8%jfB[*@D",
+			"OB)5GHE0ta=t\\s(aLhWZ",
+			"Ot\\lDXh;?",
+			"Ogl/ck5alY?`3]%!\'U.,k#\"!%K9/",
+			"O\'*$_mjpM]NRG()3\'YdJk5WH@m#U@5rg*!&=rN\'CX1\\",
+			"Odf",
+			"OMbJtUMYDJ\'t\\K:I3jP`lE05L=",
+			"Ot_mOp?<=4YChqJ\"ct",
+			"O\'l)_e#j\',92Xf_k\'*$_m&+<<=WC1PR\'l)_e#j*",
+			"OMbo",
+			"OS6GD9B9h`/dn5>s!#AT",
+			"O,bWS\'E:CaQ+NC6WF3",
+			"Ohfn4%CR",
+			"OSoGntC/32GLBdlMMsiGF",
+			"O?Loq:,,!JFh4]GNhJc",
+			"O?]LL^hd\"X0h7592h&g",
+			"O3mY!2",
+			"Oc,+i4",
+			"O+-je2c_X\'C!^f#/nt6",
+			"Oh%)?(h?k<YC!BR_,;e",
+			"O.dM$\\+9<PfLB\\=\'!p\'!Z",
+			"OteW3+LX\'O(C==%CtN]Y\"L`bP)B9MciMPPd(Ln0@BMAlVp?</jrFMT(d%:/TBJ,sWH+&nG;t\\NWP!TZ\\Jt1<\\NL`o",
+			"OSaLrZLhbc",
+			"OLMN9@",
+			"O,_,7W!aon8.d0X,uC",
+			"O.I2^qS60]",
+			"O+uBqD)0d*",
+			"Ou\\!%0B-c45LM\\p-SH:us",
+			"On@@^>).AGQESD-/C/R",
+			"Ohr0lN%>H<Rd)g]dL+",
+			"O)RFljLA_\'",
+			"O^M&/4S2\'q_cFa5L",
+			"OE:k(-C<VS<.M:u0ML-",
+			"OnU<Io^=1+kM!n^I?d\'",
+			"O.7HM8L]oeKBWHa@",
+			"OtkNmQ",
+			"OcY9]NNZ\'@kc4c%6+&2",
+			"OCI..Dh5",
+			"OEWul3uF%&2BGN0YFMZ",
+			"OE05c\'",
+			"O%d",
+			"OB?i8UCIAW?,7]2a",
+			"OLM\\NtC89CA",
+			"OFM5_l+[]`#!XcTQ",
+			"O.*^sOMK4",
+			"O+9<PfLE@1-E^j",
+			"O.(&[8ML[$mMj",
+			"OteW3+LX\'O(",
+			"ONZa-\\h(8Hj.(2*J",
+			"O.d^D",
+			"OLM\\]]B>$Y<L$7dk",
+			"Oc&I?TB9:",
+			"O)ch)-M_]E-C8%=<t\\E\'",
+			"Ou1pQm",
+			"Ohf./DLU]!cM_<",
+			"Oc4Gsb!@pVcBfFM@",
+			"O)RFljLpQr[L+",
+			"Og*7Z0oMFFI95V&0",
+			"O\'h2+IrV]jM49!H]gr0]Y_^\"fZ",
+			"O)NllG.dr#fEqO$X!^u",
+			"OFK#-3tfK&o?B!8)dF",
+			"O!B;&^L]o1ZBd",
+			"OS2n2.3VLS$u,^N",
+			"O)i`VkJ1OU8nB/Q)C.",
+			"O(OrXU60)3",
+			"OLU,G",
+			"Ot\\+U<h;TCsEGOhQ",
+			"OBS^RYNZnGV.h$pd",
+			"O!tK7F",
+			"OSqY&#t4PI\\h;YEp",
+			"On9",
+			"OEq7:gMH",
+			"OJC",
+			"O^s`7#",
+			"O\'8\'?n5uF?Q14Em#\'*Vo52\'#",
+			"O",
+			"OSm=02L/&p$MsiGF",
+			"OM%a@kt\\)egCIU*0MJX",
+			"Og*7Z0oMFc\\:l\"fF\'*5:Xj87Mk9]",
+			"OB)bLF.lB=9B>`E:M%9",
+			"O!pX?\"B7",
+			"O)R&GWBd",
+			"O.I>H2h&D`]Cq",
+			"OLUVm",
+			"OJbRbmnA-TM.hu<[cK6",
+			"O!Eo^O!VrOJ,*N",
+			"O\'d;s/5c#F>jPW\"/\\@(85m;I",
+			"OL/]%7E0H",
+			"OBk>OaMUQb=u&:d@.$i",
+			"O!Eo^O!o^Y#ES>\"mtC",
+			"O\\]P`IohosG2Xf_k",
+			"OgQV1T1$pqi:P",
+			"OC=/fqMbX",
+			"OLMNSX",
+			"O\\]P`Ioho;\\-eME\\[pnVErGS\"?9t^PP\\@_8.Iu",
+			"O^b3sqBk`^",
+			"OB)u:\'",
+			"OLEs+`,PTQ\\!^gVJ",
+			"O(\"]c#E.7DB(\"AM&Ec&!dLi8n)C@NrQ(6SZiC*=di(3&tOB7",
+			"O3mYV#M3",
+			"O\'8\'?n5uFS?-eME\\",
+			"O?tu]T",
+			"OhfkeC+D(p)^/+(An9",
+			"OhbIFASqejVC79&D",
+			"O\'8\'?n5uF?4jJ+e\'?j[",
+			"O.I2^q",
+			"O6a42tB2a",
+			"Og*7Z0oMF%_jPW\"/\'!CQ[1*I",
+			"O(\"]cjEqO\'VMY:.ZBJZsGC8p.jLi8=kED]7j(nr\'kkm!KqL3rG#",
+			"O)^lS8",
+			"O.I2^qu-VhBh5",
+			"O+9<9\'E^5:l",
+			"O7Ha",
+			"Ou\\!%0B-c45LM\\p-SoGYdht",
+			"O)n@%)L67-bFQ_Ql",
+			"O,Ppmq+u%ueC]+eKu]",
+			"OSnLB6tSpGNMY*`sE^`KUE.7GOEO_",
+			"O)uU]eB>Qc9c&]O>+4\"",
+			"O\'IpN",
+			"O6XP.(.8dMDnCTVd",
+			"OE%",
+			"O.hh1.",
+			"OJbMi&,8GOL,!>",
+			"OS6Wj7B\\;b3,b<iCN\\",
+			"OER7s<",
+			"OEmFG\"L]0",
+			"O.7j[;tC",
+			"OSjSljCR",
+			"O,;unUCh?..u&Yu:u]",
+			"Ou\'BCTMs<",
+			"OtreXOS^ci$!\"+CR",
+			"Og85ZZ5GTHlW/D+t\'78uneU.c\\(a_o9B7",
+			"O.I2^q^bDpHhrGY*E^`KUE.7GOEO_",
+			"OS\")ubS3:t\\MbKG#hfnn",
+			"O\'YjeS#HmZ/&.cAj",
+			"O\'I<YuRbS%L_d",
+			"OEqdhIL/$6+Bd",
+			"Ocf@e*B9M;",
+			"OB:leKENJ*1JP.PrB:D4UE1Pj&B&Eo7E\\3AZ,,=He",
+			"OSZP;_t\\=",
+			"O3mY&8B)5H",
+			"O\'U&[s",
+			"O\'K*d%TA!YV-eME\\",
+			"OCI-@7E^5m>L+",
+			"OS2n2.3V=M",
+			"OteW3+3jP`ZL$7Ru",
+			"OE>3@FEDm`Jn@KLu",
+			"O.8j7;C79*n^s`1;",
+			"O)q4P$E^W6rh;U",
+			"OLM\\<6MK)@O",
+			"O!E6?(",
+			"Od+[S^S\")dtC`-MWt\'T",
+			"OSZG`5hQ;98C8<=p",
+			"OE^PO0EcmmgMbJtUMYf",
+			"O+W^GjC8K=/t;.F/B9:",
+			"OMsg$",
+			"O.I2^qSjSljC#l",
+			"O)0dlEB9MOKE06",
+			"O\\]P`IohobCjPSsd\\@_-E5WH\"hT(ihL\'sCVPPqa",
+			"O\'*$_RP>aO714ErGg*7Z0oMU",
+			"O^b3sqBNl<T!p\'!Z",
+			"Ogr0]Y_^\"fZg*3[k#\"!I\'49!H]g82%<&N>ldT(iG>",
+			"OMsb",
+			"O^s`1;",
+			"OL/AHkMQ(A",
+			"O\'*`fC4&NY^r3N[&gl/ck5a#",
+			"O)VeDW",
+			"O(ad",
+			"O\\]P`IohobFjJ+e\'?j[",
+			"O^b3sqB7",
+			"OcfhM;LMNjF",
+			"OLhtSI",
+		};
+	local function j(j)
+		return p[j - 19756];
+	end;
+	for j, t in ipairs({ { 1, 337 }, { 1, 228 }, { 229, 337 } }) do
+		while t[1] < t[2] do
+			p[t[1]], p[t[2]], t[1], t[2] = p[t[2]], p[t[1]], t[1] + 1, t[2] - 1;
+		end;
+	end;
+	do
+		local j = type;
+		local t = table.concat;
+		local G = math.floor;
+		local D = string.char;
+		local w = {
+				Z = 20,
+				v = 22,
+				a = 51,
+				["/"] = 1,
+				J = 44,
+				["0"] = 10,
+				G = 11,
+				["+"] = 27,
+				m = 3,
+				H = 21,
+				S = 0,
+				w = 49,
+				P = 42,
+				c = 30,
+				y = 56,
+				C = 55,
+				p = 9,
+				["4"] = 47,
+				["7"] = 36,
+				Q = 43,
+				N = 35,
+				B = 46,
+				s = 39,
+				["2"] = 19,
+				R = 34,
+				V = 45,
+				z = 13,
+				g = 5,
+				D = 54,
+				q = 2,
+				r = 16,
+				l = 41,
+				T = 32,
+				["8"] = 14,
+				O = 29,
+				f = 59,
+				["5"] = 26,
+				i = 58,
+				X = 23,
+				o = 52,
+				["3"] = 60,
+				h = 15,
+				["9"] = 37,
+				E = 33,
+				["6"] = 4,
+				Y = 57,
+				I = 12,
+				e = 62,
+				M = 63,
+				A = 53,
+				k = 31,
+				d = 28,
+				K = 25,
+				t = 8,
+				j = 17,
+				n = 50,
+				F = 18,
+				b = 24,
+				u = 38,
+				x = 61,
+				W = 6,
+				U = 7,
+				["1"] = 40,
+				L = 48,
+			};
+		local e = p;
+		local Q = {
+				["/"] = 63,
+				M = 35,
+				["#"] = 59,
+				X = 2,
+				["5"] = 60,
+				u = 24,
+				P = 42,
+				H = 84,
+				C = 36,
+				["-"] = 46,
+				I = 10,
+				Z = 83,
+				W = 50,
+				e = 48,
+				["+"] = 23,
+				["`"] = 61,
+				h = 34,
+				s = 68,
+				["\\"] = 75,
+				["\""] = 3,
+				Q = 70,
+				i = 0,
+				R = 54,
+				b = 69,
+				["7"] = 11,
+				["0"] = 80,
+				K = 13,
+				["1"] = 47,
+				["?"] = 18,
+				["!"] = 38,
+				["6"] = 29,
+				["."] = 27,
+				["("] = 12,
+				r = 43,
+				S = 21,
+				O = 82,
+				N = 20,
+				U = 9,
+				["$"] = 62,
+				V = 53,
+				["^"] = 26,
+				["["] = 77,
+				["9"] = 51,
+				a = 1,
+				[","] = 16,
+				["%"] = 14,
+				["@"] = 6,
+				[":"] = 49,
+				["<"] = 5,
+				Y = 40,
+				["8"] = 65,
+				q = 81,
+				["3"] = 30,
+				l = 67,
+				[";"] = 71,
+				n = 28,
+				A = 7,
+				j = 57,
+				T = 58,
+				["4"] = 45,
+				["]"] = 8,
+				m = 55,
+				D = 76,
+				[">"] = 78,
+				t = 33,
+				[")"] = 22,
+				G = 79,
+				["2"] = 52,
+				g = 73,
+				o = 56,
+				["="] = 64,
+				["&"] = 44,
+				F = 17,
+				_ = 41,
+				["*"] = 66,
+				d = 39,
+				J = 15,
+				c = 25,
+				B = 32,
+				E = 31,
+				k = 19,
+				L = 37,
+				["\'"] = 74,
+				p = 4,
+				f = 72,
+			};
+		local L = table.insert;
+		local U = string.sub;
+		local V = string.len;
+		for p = 1, #e, 1 do
+			local H = e[p];
+			if j(H) == "string" then
+				local j = U(H, 1, 1);
+				if j == "I" then
+					H = U(H, 2);
+					local j = V(H);
+					local Q = {};
+					local g = 1;
+					local T = 0;
+					local m = 0;
+					while g <= j do
+						local p = U(H, g, g);
+						local t = w[p];
+						if t then
+							T = T + t * (64 ^ ((3 - m)));
+							m = m + 1;
+							if m == 4 then
+								m = 0;
+								local p = G(T / 65536);
+								local j = G((T % 65536) / 256);
+								local t = T % 256;
+								L(Q, D(p, j, t));
+								T = 0;
+							end;
+						elseif p == "=" then
+							L(Q, D(G(T / 65536)));
+							if g >= j or U(H, g + 1, g + 1) ~= "=" then
+								L(Q, D(G((T % 65536) / 256)));
+							end;
+							break;
+						end;
+						g = g + 1;
+					end;
+					e[p] = t(Q);
+				elseif j == "O" then
+					H = U(H, 2);
+					local j = V(H);
+					local w = {};
+					local g = 1;
+					while g <= j do
+						local p = (j - g) + 1;
+						local t = p >= 5 and 5 or p;
+						local e = 0;
+						local V = t > 1;
+						for p = 0, 4, 1 do
+							local j;
+							if p < t then
+								local t = U(H, g + p, g + p);
+								j = Q[t];
+								if not j then
+									V = false;
+									break;
+								end;
+							else
+								j = 84;
+							end;
+							e = e * 85 + j;
+						end;
+						if V then
+							local p = G(e / 16777216) % 256;
+							local j = G(e / 65536) % 256;
+							local Q = G(e / 256) % 256;
+							local U = e % 256;
+							if t == 5 then
+								L(w, D(p, j, Q, U));
+							elseif t == 4 then
+								L(w, D(p, j, Q));
+							elseif t == 3 then
+								L(w, D(p, j));
+							elseif t == 2 then
+								L(w, D(p));
+							end;
+						end;
+						g = g + t;
+					end;
+					e[p] = t(w);
+				end;
+			end;
+		end;
+	end;
+	return (function(G, e, Q, p, w, L, D, v, T, N, h, W, m, l, g, o, a, H, U, b, t, P, V, Z)
+		a, m, l, t, W, V, h, P, b, N, U, Z, o, T, v, H, g = function(p, j)
+				local G = T(j);
+				local D = function(D, w, e, Q, L, U, V)
+						return t(p, {
+							D,
+							w,
+							e,
+							Q,
+							L,
+							U,
+							V,
+						}, j, G);
+					end;
+				return D;
+			end, function(p)
+				local j, t = 1, p[1];
+				while t do
+					V[t], j = V[t] - 1, 1 + j;
+					if 0 == V[t] then
+						V[t], U[t] = nil, nil;
+					end;
+					t = p[j];
+				end;
+			end, function(p, j)
+				local G = T(j);
+				local D = function(D, w)
+						return t(p, { D, w }, j, G);
+					end;
+				return D;
+			end, function(t, D, w, e)
+				local lX, g, L, AX, d, xX, UX, sX, yX, i, jd, RX, OX, KX, R, K, q, tX, wX, h, kX, IX, nX, MX, jX, GX, SX, mX, Gd, V, C, cX, DX, EX, CX, WX, YX, FX, rX, J, k, s, TX, JX, wd, A, oX, m, iX, B, HX, pX, zX, F, bX, O, z, ed, vX, T, Y, td, M, fX, NX, gX, E, I, pd, BX, y, qX, r, ZX, QX, Dd, c, PX, X, x, XX, eX, LX, u, uX, n, S, VX, hX, f, dX, aX;
+				while t do
+					if t > 8221898 then
+						if 11994572 > t then
+							if 9790895 > t then
+								if t < 8923031 then
+									if t > 8638482 then
+										if t < 8879721 then
+											if 8676076 > t then
+												T = t;
+												m = U[w[2]];
+												g, t = m, m and 5487154 or 544991;
+											elseif 8779678 > t then
+												m = j(19999);
+												g = U[w[1]];
+												L, M = j(19860), j(19766);
+												T = g();
+												C = U[w[2]];
+												h = C .. M;
+												g = m .. h;
+												V = T .. g;
+												t = L .. V;
+												L = { t };
+												t = p[j(20083)];
+											else
+												m = j(19804);
+												L = p[m];
+												m = j(19878);
+												t = L[m];
+												m, C = 1, 1;
+												h = T - C;
+												L = t(g, m, h);
+												g, t = L, 13650604;
+											end;
+										else
+											if t < 8906906 then
+												L, t = { g }, p[j(20018)];
+											elseif t < 8915302 then
+												t = g;
+												t, L = 6400642, V;
+											else
+												t = m and 7054047 or 8903902;
+											end;
+										end;
+									else
+										if t > 8524627 then
+											if t < 8610532 then
+												C, O = m, j(20035);
+												M = p[O];
+												O = j(20055);
+												t = M[O];
+												M = t(g, C);
+												t, C = 1742126, nil;
+											elseif 8627519 > t then
+												L = j(19858);
+												t = HX[L];
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												t = 5780825;
+											else
+												V = D[1];
+												t = V and 9193413 or 5865365;
+											end;
+										else
+											if t < 8330448 then
+												h, M = j(20052), 80;
+												t = U[w[3]];
+												m = p[h];
+												h, C, g = j(19785), 180, j(19972);
+												T = m[h];
+												h = 255;
+												m = T(h, C, M);
+												T = 1.5;
+												L = t(g, m, T);
+												L, t = {}, p[j(19868)];
+											elseif 8388522 > t then
+												L = j(20004);
+												t = p[L];
+												V = U[w[1]];
+												g = U[w[2]];
+												L = t(V, g);
+												t = 6042595;
+											elseif t < 8428929 then
+												J, r = j(19937), t;
+												A = C[J];
+												J = j(19888);
+												O, t = A or J, 11587925;
+												m = O;
+											else
+												t = U[w[1]];
+												t = t and 455716 or 11558123;
+											end;
+										end;
+									end;
+								else
+									if 9445543 > t then
+										if 9187734 > t then
+											if t < 8937155 then
+												t = U[w[1]];
+												V = U[w[2]];
+												O, r, m = 35, 35, j(19859);
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m = .2;
+												T = g(m);
+												m, M = j(20053), j(20052);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M = 35;
+												C = h(M, O, r);
+												J, L, h, r = 200, j(19771), j(19969), j(20052);
+												O = p[r];
+												L, r = t[L], j(19785);
+												M = O[r];
+												r, A = 200, 200;
+												O = M(r, A, J);
+												g = { [m] = C, [h] = O };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												L, t = {}, p[j(19987)];
+											elseif t < 9022943 then
+												t = U[w[1]];
+												V = U[w[2]];
+												L = t(V);
+												U[w[3]] = L;
+												L, t = {}, 7940768 ~= 3852398;
+												U[w[4]] = t;
+												t = p[j(19998)];
+											elseif 9139500 > t then
+												T = j(19896);
+												L = p[T];
+												T = j(20068);
+												t = L[T];
+												U[g] = t;
+												t = 12681251;
+											else
+												V = D[1];
+												t = U[w[1]];
+												t = t and 6261119 or 2547151;
+											end;
+										else
+											if 9227853 > t then
+												g = j(19926);
+												L = U[w[1]];
+												t = L[g];
+												L = j(19979);
+												L = t[L];
+												L = L(t);
+												t = 5865365;
+											elseif 9347632 > t then
+												g, m, V = .3, j(19859), j(20029);
+												t = U[w[1]];
+												L = t(V, g);
+												J = .5;
+												t = U[w[2]];
+												V = U[w[3]];
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												O = j(19922);
+												M = p[O];
+												m, A, O = .3, 0, j(19801);
+												C = M[O];
+												M = j(20058);
+												h = C[M];
+												r = j(19922);
+												O = p[r];
+												r = j(19865);
+												M = O[r];
+												O = j(19779);
+												C = M[O];
+												T = g(m, h, C);
+												m, M = j(19976), j(20010);
+												C = p[M];
+												B, r, O, M = 0, 0, 0, j(19990);
+												h = C[M];
+												M = 0;
+												C = h(M, O, r, A);
+												A, h, L, r = 0, j(19983), j(19771), j(20010);
+												O = p[r];
+												L, r = t[L], j(19990);
+												M = O[r];
+												r = .5;
+												O = M(r, A, J, B);
+												r, M = 1, j(19929);
+												g = { [m] = C, [h] = O, [M] = r };
+												L = L(t, V, T, g);
+												V, t = L, j(20020);
+												t, L = V[t], j(19792);
+												t = t(V);
+												t = V[L];
+												L = j(19811);
+												L = t[L];
+												L = L(t);
+												V, L = nil, j(19788);
+												t = U[w[4]];
+												L = t[L];
+												L = L(t);
+												L, t = {}, p[j(19757)];
+											else
+												m = nil;
+												L, t = { m }, p[j(20066)];
+											end;
+										end;
+									else
+										if t > 9631537 then
+											if t < 9674351 then
+												L = j(19848);
+												t = p[L];
+												h = j(20077);
+												F = H();
+												L, g, V = j(19970), j(19950), D;
+												L, lX, FX = t[L], -4, 0;
+												DX = H();
+												NX = 100;
+												L = L(t, g);
+												m = j(19973);
+												S = H();
+												g = L;
+												k = H();
+												L, T = j(19848), j(19833);
+												q = H();
+												X = H();
+												hX = 0;
+												t = p[L];
+												L = j(19970);
+												L = t[L];
+												A = H();
+												tX = H();
+												L = L(t, T);
+												T, VX = L, 0;
+												L = j(19848);
+												t = p[L];
+												L = j(19970);
+												L, C = t[L], j(20051);
+												L = L(t, m);
+												JX = 200;
+												M = H();
+												m = H();
+												U[m] = L;
+												L = j(19848);
+												f = H();
+												gX, HX = 0, 0;
+												O = H();
+												t = p[L];
+												Y = H();
+												L, WX = j(19970), 25;
+												L = t[L];
+												L = L(t, h);
+												r = H();
+												h = H();
+												i = H();
+												eX = j(19924);
+												U[h] = L;
+												L = j(19848);
+												y = H();
+												J = H();
+												t = p[L];
+												mX, L = -190, j(19970);
+												L = t[L];
+												L = L(t, C);
+												C = H();
+												U[C] = L;
+												L = j(19773);
+												d = H();
+												E = H();
+												B = H();
+												s = H();
+												t = g[L];
+												U[M] = t;
+												t = j(20060);
+												U[O] = t;
+												R = H();
+												x = H();
+												t = j(19842);
+												GX = H();
+												U[r] = t;
+												z = H();
+												t = j(20044);
+												U[A] = t;
+												jX = H();
+												t, oX = j(19898), 90;
+												U[J] = t;
+												t = j(19933);
+												U[B] = t;
+												t = j(19951);
+												K = t;
+												I = H();
+												n = H();
+												t = j(19834);
+												U[S] = t;
+												TX, t, L = 15, 10069648 >= 16517984, nil;
+												U[x] = t;
+												t = 0;
+												U[X] = t;
+												u = H();
+												t = 3;
+												U[k] = t;
+												t = 8354655 > 15719847;
+												U[n] = t;
+												t = 12640097 >= 14285716;
+												U[q] = t;
+												t = 3492972 > 13092091;
+												U[u] = t;
+												t, UX = nil, j(19758);
+												U[F] = t;
+												U[s] = L;
+												L = j(20012);
+												wX = H();
+												t = T[L];
+												U[Y] = t;
+												L = j(19991);
+												t = T[L];
+												U[y] = t;
+												t = P(5218530, { x, r, O });
+												U[f] = t;
+												t = N(8703816, { f, J });
+												U[E] = t;
+												QX = j(19902);
+												t = Z(4732942, {});
+												U[I] = t;
+												t = a(4533318, { I });
+												U[R] = t;
+												t = N(6296720, {
+														O,
+														A,
+														R,
+														x,
+													});
+												c, OX = t, 0;
+												t = l(4228547, {});
+												U[i] = t;
+												t = b(3313778, {});
+												U[z] = t;
+												t = P(14124325, {});
+												U[d] = t;
+												t = W(3062747, { M });
+												pX = t;
+												t = pX();
+												U[jX] = t;
+												t = v(4347807, {
+														E,
+														C,
+														jX,
+														B,
+														R,
+														i,
+														d,
+														z,
+													});
+												U[tX] = t;
+												t = b(4681074, {
+														E,
+														C,
+														jX,
+														B,
+														R,
+														i,
+														z,
+													});
+												U[GX] = t;
+												t = N(10700773, { E, B, R });
+												U[DX] = t;
+												t = Z(12890924, { S });
+												U[wX] = t;
+												L = p[eX];
+												eX = j(19990);
+												t = L[eX];
+												yX, eX = 0, j(19775);
+												L = t(eX);
+												eX = H();
+												U[eX] = L;
+												L = j(19830);
+												t = U[eX];
+												t[L] = QX;
+												t = U[eX];
+												L, CX = j(19769), 65;
+												LX = U[M];
+												QX = LX[UX];
+												t[L] = QX;
+												QX = 5475802 < 7164993;
+												t = U[eX];
+												L = j(19967);
+												t[L] = QX;
+												t = U[eX];
+												UX, QX, L, MX = j(20052), 100, j(19965), 110;
+												t[L] = QX;
+												QX = j(19924);
+												L = p[QX];
+												QX = j(19990);
+												t = L[QX];
+												QX, cX = j(19894), 1;
+												L = t(QX);
+												qX, t, QX = 50, j(19769), L;
+												L = U[eX];
+												QX[t] = L;
+												RX = 8;
+												LX = p[UX];
+												t, UX = j(20053), j(19785);
+												L = LX[UX];
+												UX = 0;
+												LX = L(UX, VX, HX);
+												QX[t] = LX;
+												t, HX, L, UX = j(19929), 1, .7, j(20010);
+												QX[t] = L;
+												LX = p[UX];
+												UX, t, dX = j(19990), j(19976), j(19922);
+												L = LX[UX];
+												VX, UX = 0, 1;
+												LX = L(UX, VX, HX, gX);
+												L, HX = 1, j(20052);
+												QX[t] = LX;
+												LX, t = j(19924), j(19919);
+												QX[t] = L;
+												L = p[LX];
+												LX, bX = j(19990), 0;
+												t = L[LX];
+												Dd, LX, zX = -190, j(19894), 0;
+												L = t(LX);
+												LX = H();
+												U[LX] = L;
+												t = U[LX];
+												L = j(19769);
+												UX = U[eX];
+												gX = 15;
+												t[L] = UX;
+												t = U[LX];
+												L = j(20053);
+												VX = p[HX];
+												HX = j(19785);
+												UX = VX[HX];
+												HX = 15;
+												VX = UX(HX, gX, TX);
+												t[L] = VX;
+												L, HX, gX = j(19983), j(20010), -150;
+												t = U[LX];
+												VX = p[HX];
+												TX, HX = .5, j(19990);
+												UX = VX[HX];
+												HX = .5;
+												VX = UX(HX, gX, TX, mX);
+												t[L] = VX;
+												L, HX = j(19976), j(20010);
+												t = U[LX];
+												VX = p[HX];
+												TX, HX, gX, mX = 0, j(19990), 300, 380;
+												UX = VX[HX];
+												HX = 0;
+												VX = UX(HX, gX, TX, mX);
+												t[L] = VX;
+												L, UX = j(19919), 2;
+												t = U[LX];
+												t[L] = UX;
+												t = U[LX];
+												aX, UX, PX, L = -6, 11203843 > 5847351, 0, j(20025);
+												t[L] = UX;
+												L, TX, UX = j(20045), j(20052), 15609090 >= 4027062;
+												t = U[LX];
+												t[L] = UX;
+												UX = j(19924);
+												L = p[UX];
+												UX = j(19990);
+												t = L[UX];
+												UX, HX = j(19763), j(19934);
+												L = t(UX);
+												UX = L;
+												L = U[LX];
+												t = j(19769);
+												UX[t] = L;
+												VX = p[HX];
+												HX, YX = j(19990), 240;
+												L = VX[HX];
+												HX, gX = 0, 12;
+												VX = L(HX, gX);
+												t = j(20088);
+												UX[t] = VX;
+												VX = j(19924);
+												L = p[VX];
+												VX = j(19990);
+												t = L[VX];
+												VX = j(19787);
+												L = t(VX);
+												VX = H();
+												U[VX] = L;
+												t = U[VX];
+												L = j(19769);
+												HX = U[LX];
+												t[L] = HX;
+												L = j(19940);
+												t = U[VX];
+												gX = p[TX];
+												TX = j(19785);
+												HX = gX[TX];
+												TX, mX = 90, 90;
+												gX = HX(TX, mX, oX);
+												t[L] = gX;
+												HX = 1.5;
+												t = U[VX];
+												L = j(19895);
+												t[L] = HX;
+												L = j(19847);
+												t = U[VX];
+												HX = .7;
+												t[L] = HX;
+												ZX, HX = .5, j(19924);
+												L = p[HX];
+												HX, mX = j(19990), 25;
+												t = L[HX];
+												HX = j(19894);
+												L = t(HX);
+												TX, t, HX = j(20052), j(19769), L;
+												L = U[LX];
+												HX[t] = L;
+												t = j(20053);
+												gX = p[TX];
+												TX = j(19785);
+												L = gX[TX];
+												oX, TX = 25, 25;
+												gX = L(TX, mX, oX);
+												TX = j(20010);
+												HX[t] = gX;
+												t = j(19983);
+												gX = p[TX];
+												TX, mX = j(19990), 0;
+												L = gX[TX];
+												oX, TX = 0, 0;
+												gX = L(TX, mX, oX, hX);
+												HX[t] = gX;
+												TX = j(20010);
+												gX = p[TX];
+												TX = j(19990);
+												L = gX[TX];
+												oX, TX, t, hX, mX = 0, 1, j(19976), 40, 0;
+												gX = L(TX, mX, oX, hX);
+												L, oX = 3, 12;
+												HX[t] = gX;
+												t = j(19919);
+												HX[t] = L;
+												L, mX, t = 10788203 > 5354420, j(19934), j(20025);
+												HX[t] = L;
+												nX, gX, L, t = 190, j(19924), 14181385 < 15763301, j(20045);
+												HX[t] = L;
+												L = p[gX];
+												gX = j(19990);
+												t = L[gX];
+												hX, gX = 0, j(19763);
+												L = t(gX);
+												t, kX, gX = j(19769), 25, L;
+												L = HX;
+												gX[t] = L;
+												t = j(20088);
+												TX = p[mX];
+												iX, mX = -20, j(19990);
+												L = TX[mX];
+												mX = 0;
+												TX = L(mX, oX, hX, PX);
+												gX[t] = TX;
+												TX = j(19924);
+												L = p[TX];
+												TX = j(19990);
+												t = L[TX];
+												TX = j(19894);
+												L = t(TX);
+												hX = j(20052);
+												TX = H();
+												PX = 100;
+												U[TX] = L;
+												t = U[TX];
+												mX, L = HX, j(19769);
+												t[L] = mX;
+												t = U[TX];
+												oX = p[hX];
+												hX, L = j(19785), j(20053);
+												mX = oX[hX];
+												hX = 255;
+												oX = mX(hX, PX, NX);
+												hX, PX, NX = j(20010), 8, .5;
+												t[L] = oX;
+												t = U[TX];
+												L = j(19983);
+												oX = p[hX];
+												hX = j(19990);
+												mX = oX[hX];
+												IX, hX = -38, 0;
+												oX = mX(hX, PX, NX, lX);
+												t[L] = oX;
+												hX, L = j(20010), j(19976);
+												t = U[TX];
+												oX = p[hX];
+												hX, NX = j(19990), 0;
+												mX = oX[hX];
+												lX, hX, PX = 8, 0, 8;
+												oX = mX(hX, PX, NX, lX);
+												t[L] = oX;
+												mX, L = 4, j(19919);
+												t = U[TX];
+												t[L] = mX;
+												mX, vX = j(19924), 45;
+												L = p[mX];
+												mX = j(19990);
+												t = L[mX];
+												mX = j(19763);
+												L = t(mX);
+												t, mX, hX = j(19769), L, j(19934);
+												L = U[TX];
+												mX[t] = L;
+												oX = p[hX];
+												t, hX = j(20088), j(19990);
+												L = oX[hX];
+												hX, PX = 1, 0;
+												oX = L(hX, PX);
+												mX[t] = oX;
+												hX, oX = HX, j(19924);
+												L = p[oX];
+												oX = j(19990);
+												t = L[oX];
+												oX = j(19923);
+												L = t(oX);
+												oX = H();
+												U[oX] = L;
+												L = j(19769);
+												t = U[oX];
+												t[L] = hX;
+												t = U[oX];
+												hX, lX, L = 1, 20, j(19929);
+												t[L] = hX;
+												NX, L = j(20010), j(19983);
+												t = U[oX];
+												PX = p[NX];
+												NX = j(19990);
+												hX = PX[NX];
+												NX = 0;
+												PX = hX(NX, lX, ZX, aX);
+												lX, NX = 80, j(20010);
+												t[L] = PX;
+												aX = 12;
+												t = U[oX];
+												PX = p[NX];
+												NX, L, ZX = j(19990), j(19976), 0;
+												hX = PX[NX];
+												xX, NX = 0, 0;
+												PX = hX(NX, lX, ZX, aX);
+												lX = j(19922);
+												t[L] = PX;
+												t = U[oX];
+												L, ZX = j(20080), 150;
+												NX = p[lX];
+												lX = j(20080);
+												PX = NX[lX];
+												NX = j(19993);
+												hX = PX[NX];
+												NX = j(20052);
+												t[L] = hX;
+												hX, lX, L = j(19948), 150, j(19918);
+												t = U[oX];
+												t[L] = hX;
+												t = U[oX];
+												L = j(19969);
+												PX = p[NX];
+												NX = j(19785);
+												hX = PX[NX];
+												NX = 255;
+												PX = hX(NX, lX, ZX);
+												t[L] = PX;
+												L, hX = j(20049), 9;
+												t = U[oX];
+												t[L] = hX;
+												rX, lX, L = 0, j(19922), j(19985);
+												t = U[oX];
+												NX = p[lX];
+												lX = j(19985);
+												PX = NX[lX];
+												NX = j(19866);
+												hX = PX[NX];
+												t[L] = hX;
+												NX = j(20052);
+												t = U[oX];
+												L, ZX, hX = j(19919), 255, 4;
+												t[L] = hX;
+												hX = j(19924);
+												L = p[hX];
+												aX, hX = -1, j(19990);
+												t = L[hX];
+												hX = j(19894);
+												L = t(hX);
+												t, hX, lX = j(19769), L, 255;
+												L = HX;
+												hX[t] = L;
+												PX = p[NX];
+												NX, t = j(19785), j(20053);
+												L = PX[NX];
+												NX = 255;
+												PX = L(NX, lX, ZX);
+												ZX = 1;
+												hX[t] = PX;
+												NX = j(20010);
+												PX = p[NX];
+												NX, t, lX = j(19990), j(19983), 0;
+												L = PX[NX];
+												NX = 0;
+												PX = L(NX, lX, ZX, aX);
+												lX, NX = 0, j(20010);
+												hX[t] = PX;
+												aX = 1;
+												PX = p[NX];
+												ZX, NX = 0, j(19990);
+												L = PX[NX];
+												NX, t = 1, j(19976);
+												PX = L(NX, lX, ZX, aX);
+												hX[t] = PX;
+												t, PX, ZX, L = j(19919), j(19924), 0, 4;
+												hX[t] = L;
+												L = p[PX];
+												PX, BX = j(19990), 0;
+												t = L[PX];
+												PX, lX = j(19923), j(20010);
+												L = t(PX);
+												t, PX = j(19769), L;
+												L = HX;
+												PX[t] = L;
+												aX, t, SX, L = 0, j(19929), 24, 1;
+												PX[t] = L;
+												NX = p[lX];
+												t, lX = j(19983), j(19990);
+												L = NX[lX];
+												lX = 0;
+												NX = L(lX, ZX, aX, bX);
+												bX = 25;
+												PX[t] = NX;
+												t, lX, ZX, aX = j(19976), j(20010), 0, 0;
+												NX = p[lX];
+												lX = j(19990);
+												L = NX[lX];
+												lX = 1;
+												NX = L(lX, ZX, aX, bX);
+												PX[t] = NX;
+												ZX = j(19922);
+												lX = p[ZX];
+												ZX, t = j(20080), j(20080);
+												NX = lX[ZX];
+												lX = j(19790);
+												L = NX[lX];
+												PX[t] = L;
+												lX, t, L = j(20052), j(19918), j(20022);
+												PX[t] = L;
+												ZX = 255;
+												NX = p[lX];
+												lX = j(19785);
+												L = NX[lX];
+												lX, t, aX = 255, j(19969), 255;
+												NX = L(lX, ZX, aX);
+												L = 18;
+												PX[t] = NX;
+												t = j(20049);
+												PX[t] = L;
+												ZX, t = j(19922), j(19985);
+												lX = p[ZX];
+												ZX = j(19985);
+												NX = lX[ZX];
+												ZX, lX = j(19922), j(20091);
+												L = NX[lX];
+												PX[t] = L;
+												lX = p[ZX];
+												ZX = j(19810);
+												NX = lX[ZX];
+												EX, lX, aX, t = 1, j(20091), 0, j(19810);
+												L = NX[lX];
+												PX[t] = L;
+												NX, t, bX, L = j(19924), j(19919), 0, 4;
+												PX[t] = L;
+												L = p[NX];
+												NX = j(19990);
+												t = L[NX];
+												NX = j(19923);
+												L = t(NX);
+												NX, t = L, j(19769);
+												L, ZX = HX, j(20010);
+												NX[t] = L;
+												t, L = j(19929), 1;
+												NX[t] = L;
+												lX = p[ZX];
+												t, ZX = j(19983), j(19990);
+												L = lX[ZX];
+												ZX = 0;
+												lX = L(ZX, aX, bX, WX);
+												NX[t] = lX;
+												bX, aX, WX, t, ZX = 0, 0, 12, j(19976), j(20010);
+												lX = p[ZX];
+												ZX = j(19990);
+												L = lX[ZX];
+												ZX = 1;
+												lX = L(ZX, aX, bX, WX);
+												NX[t] = lX;
+												t, aX = j(20080), j(19922);
+												ZX = p[aX];
+												bX, aX = 180, j(20080);
+												lX = ZX[aX];
+												ZX = j(19812);
+												L = lX[ZX];
+												NX[t] = L;
+												t, ZX, XX, aX, L = j(19918), j(20052), 160, 180, j(19891);
+												NX[t] = L;
+												lX = p[ZX];
+												ZX, t = j(19785), j(19969);
+												L = lX[ZX];
+												ZX = 180;
+												lX = L(ZX, aX, bX);
+												NX[t] = lX;
+												L, t = 10, j(20049);
+												NX[t] = L;
+												t, aX = j(19985), j(19922);
+												ZX = p[aX];
+												aX, bX = j(19985), 12;
+												lX = ZX[aX];
+												ZX = j(20091);
+												L = lX[ZX];
+												NX[t] = L;
+												WX, L, t = 0, 4, j(19919);
+												NX[t] = L;
+												lX = j(19924);
+												L = p[lX];
+												lX = j(19990);
+												t = L[lX];
+												aX, lX = j(20010), j(19923);
+												L = t(lX);
+												lX, t = L, j(19769);
+												L = U[LX];
+												lX[t] = L;
+												L, t = 1, j(19929);
+												lX[t] = L;
+												ZX = p[aX];
+												t, aX = j(19983), j(19990);
+												L = ZX[aX];
+												aX = 0;
+												ZX = L(aX, bX, WX, vX);
+												lX[t] = ZX;
+												t, aX, WX = j(19976), j(20010), 0;
+												ZX = p[aX];
+												aX, bX = j(19990), -24;
+												L = ZX[aX];
+												aX, vX = 1, 16;
+												ZX = L(aX, bX, WX, vX);
+												bX = j(19922);
+												lX[t] = ZX;
+												aX = p[bX];
+												bX, t = j(20080), j(20080);
+												ZX = aX[bX];
+												aX = j(19812);
+												L = ZX[aX];
+												jd, ZX = j(19922), j(20081);
+												lX[t] = L;
+												t = j(19918);
+												aX = U[jX];
+												L = ZX .. aX;
+												bX, WX = 150, 150;
+												lX[t] = L;
+												aX, t = j(20052), j(19969);
+												ZX = p[aX];
+												AX, aX = 105, j(19785);
+												L = ZX[aX];
+												aX = 150;
+												ZX = L(aX, bX, WX);
+												L = 10;
+												lX[t] = ZX;
+												t, bX, WX = j(20049), j(19922), 30;
+												lX[t] = L;
+												t = j(19985);
+												aX = p[bX];
+												bX = j(19985);
+												ZX = aX[bX];
+												aX = j(19866);
+												L = ZX[aX];
+												bX = j(19922);
+												lX[t] = L;
+												t = j(19805);
+												aX = p[bX];
+												bX = j(19805);
+												ZX = aX[bX];
+												aX, vX = j(19768), 30;
+												L = ZX[aX];
+												ZX = j(19924);
+												lX[t] = L;
+												L, t = 3, j(19919);
+												lX[t] = L;
+												L = p[ZX];
+												bX, ZX = j(20052), j(19990);
+												t = L[ZX];
+												ZX = j(19894);
+												L = t(ZX);
+												ZX, t = L, j(19769);
+												L = U[LX];
+												ZX[t] = L;
+												aX = p[bX];
+												fX, t, bX = 284, j(20053), j(19785);
+												L = aX[bX];
+												bX = 30;
+												aX = L(bX, WX, vX);
+												td, WX = 380, -135;
+												ZX[t] = aX;
+												t, bX = j(19983), j(20010);
+												aX = p[bX];
+												vX, bX = 0, j(19990);
+												L = aX[bX];
+												bX = .5;
+												aX = L(bX, WX, vX, CX);
+												vX = 0;
+												ZX[t] = aX;
+												t, bX = j(19976), j(20010);
+												aX = p[bX];
+												bX = j(19990);
+												L = aX[bX];
+												WX, CX, bX = 270, 35, 0;
+												aX = L(bX, WX, vX, CX);
+												ZX[t] = aX;
+												L, t, aX, vX = 3, j(19919), j(19924), 6;
+												ZX[t] = L;
+												L = p[aX];
+												aX = j(19990);
+												t = L[aX];
+												aX, CX = j(19763), 110;
+												L = t(aX);
+												t, aX, WX = j(19769), L, j(19934);
+												L = ZX;
+												aX[t] = L;
+												t = j(20088);
+												bX = p[WX];
+												WX = j(19990);
+												L = bX[WX];
+												WX = 0;
+												bX = L(WX, vX);
+												aX[t] = bX;
+												bX = j(19924);
+												L = p[bX];
+												bX = j(19990);
+												t = L[bX];
+												vX, bX = j(20052), j(19787);
+												L = t(bX);
+												bX = L;
+												L, t = ZX, j(19769);
+												bX[t] = L;
+												WX = p[vX];
+												t, vX = j(19940), j(19785);
+												L = WX[vX];
+												vX = 255;
+												WX = L(vX, CX, MX);
+												bX[t] = WX;
+												t, WX, L = j(19895), j(19924), 1;
+												bX[t] = L;
+												CX, t, L = j(20010), j(19847), .2;
+												bX[t] = L;
+												L = p[WX];
+												MX, WX = 12, j(19990);
+												t = L[WX];
+												WX = j(19923);
+												L = t(WX);
+												WX = L;
+												L, t = ZX, j(19769);
+												WX[t] = L;
+												t, L = j(19929), 1;
+												WX[t] = L;
+												vX = p[CX];
+												t, CX = j(19983), j(19990);
+												L = vX[CX];
+												CX = 0;
+												vX = L(CX, MX, OX, rX);
+												CX = j(20010);
+												WX[t] = vX;
+												rX, MX = 0, -24;
+												vX = p[CX];
+												OX, t, CX = 1, j(19976), j(19990);
+												L = vX[CX];
+												CX = 1;
+												vX = L(CX, MX, OX, rX);
+												WX[t] = vX;
+												MX, t, OX = j(19922), j(20080), 180;
+												CX = p[MX];
+												MX = j(20080);
+												vX = CX[MX];
+												CX = j(19993);
+												L = vX[CX];
+												WX[t] = L;
+												CX, L, t = j(20052), j(19821), j(19918);
+												WX[t] = L;
+												MX = 180;
+												vX = p[CX];
+												CX, t = j(19785), j(19969);
+												L = vX[CX];
+												CX = 255;
+												vX = L(CX, MX, OX);
+												L, MX = 11, j(19922);
+												WX[t] = vX;
+												OX, t = 25, j(20049);
+												WX[t] = L;
+												t = j(19985);
+												CX = p[MX];
+												MX = j(19985);
+												vX = CX[MX];
+												CX = j(19866);
+												L = vX[CX];
+												KX = 8;
+												WX[t] = L;
+												MX, t = j(19922), j(19810);
+												CX = p[MX];
+												MX = j(19810);
+												vX = CX[MX];
+												CX, rX = j(20091), 40;
+												L = vX[CX];
+												WX[t] = L;
+												L, t, vX = 4, j(19919), j(19924);
+												WX[t] = L;
+												L = p[vX];
+												vX = j(19990);
+												t = L[vX];
+												vX = j(19894);
+												L = t(vX);
+												t, vX = j(19769), L;
+												L = U[LX];
+												vX[t] = L;
+												MX = j(20052);
+												CX = p[MX];
+												t, MX = j(20053), j(19785);
+												L = CX[MX];
+												MX = 20;
+												CX = L(MX, OX, rX);
+												vX[t] = CX;
+												OX, t, MX = -135, j(19983), j(20010);
+												CX = p[MX];
+												MX, rX = j(19990), 0;
+												L = CX[MX];
+												MX = .5;
+												CX = L(MX, OX, rX, AX);
+												vX[t] = CX;
+												rX, OX, t, MX = 0, 270, j(19976), j(20010);
+												CX = p[MX];
+												MX = j(19990);
+												L = CX[MX];
+												AX, MX = 50, 0;
+												CX = L(MX, OX, rX, AX);
+												vX[t] = CX;
+												t, CX, L = j(19919), j(19924), 3;
+												vX[t] = L;
+												L = p[CX];
+												CX = j(19990);
+												t = L[CX];
+												CX = j(19763);
+												L = t(CX);
+												CX, OX = L, j(19934);
+												L, t, rX = vX, j(19769), 8;
+												CX[t] = L;
+												MX = p[OX];
+												t, OX = j(20088), j(19990);
+												L = MX[OX];
+												OX = 0;
+												MX = L(OX, rX);
+												CX[t] = MX;
+												MX = j(19924);
+												L = p[MX];
+												MX = j(19990);
+												t = L[MX];
+												MX, rX = j(19787), j(20052);
+												L = t(MX);
+												MX = L;
+												L, AX, t = vX, 120, j(19769);
+												MX[t] = L;
+												OX = p[rX];
+												t, rX = j(19940), j(19785);
+												L = OX[rX];
+												rX = 80;
+												OX = L(rX, AX, JX);
+												MX[t] = OX;
+												t, L = j(19895), 1.5;
+												MX[t] = L;
+												L, OX, t = .3, j(19924), j(19847);
+												MX[t] = L;
+												L = p[OX];
+												OX = j(19990);
+												t = L[OX];
+												OX = j(19923);
+												L = t(OX);
+												AX, t, OX = j(20010), j(19769), L;
+												L = vX;
+												OX[t] = L;
+												t, JX, L = j(19929), 45, 1;
+												OX[t] = L;
+												rX = p[AX];
+												AX = j(19990);
+												L = rX[AX];
+												AX, t = 0, j(19983);
+												rX = L(AX, JX, BX, KX);
+												BX, AX = 0, j(20010);
+												OX[t] = rX;
+												rX = p[AX];
+												JX, AX, KX = 200, j(19990), 16;
+												L = rX[AX];
+												t, AX = j(19976), 0;
+												rX = L(AX, JX, BX, KX);
+												OX[t] = rX;
+												JX, t = j(19922), j(20080);
+												AX = p[JX];
+												JX = j(20080);
+												rX = AX[JX];
+												AX = j(19961);
+												L = rX[AX];
+												OX[t] = L;
+												L, JX, t, AX = j(19871), 220, j(19918), j(20052);
+												OX[t] = L;
+												rX = p[AX];
+												AX = j(19785);
+												L = rX[AX];
+												t, AX, BX = j(19969), 220, 220;
+												rX = L(AX, JX, BX);
+												L = 11;
+												OX[t] = rX;
+												t = j(20049);
+												OX[t] = L;
+												t, JX = j(19985), j(19922);
+												AX = p[JX];
+												JX = j(19985);
+												rX = AX[JX];
+												BX, AX = 45, j(19866);
+												L = rX[AX];
+												rX, JX = j(19924), j(20010);
+												OX[t] = L;
+												L, t = 4, j(19919);
+												OX[t] = L;
+												L = p[rX];
+												rX = j(19990);
+												t = L[rX];
+												rX = j(19923);
+												L = t(rX);
+												rX, t = L, j(19769);
+												L = vX;
+												rX[t] = L;
+												L, t = 1, j(19929);
+												rX[t] = L;
+												AX = p[JX];
+												JX, KX = j(19990), 0;
+												L = AX[JX];
+												t, JX = j(19983), 0;
+												AX = L(JX, BX, KX, SX);
+												rX[t] = AX;
+												BX, JX, SX, t = 200, j(20010), 20, j(19976);
+												AX = p[JX];
+												JX = j(19990);
+												L = AX[JX];
+												JX, KX = 0, 0;
+												AX = L(JX, BX, KX, SX);
+												rX[t] = AX;
+												BX, t = j(19922), j(20080);
+												JX = p[BX];
+												BX = j(20080);
+												AX = JX[BX];
+												JX = j(19790);
+												L = AX[JX];
+												BX = 255;
+												rX[t] = L;
+												t, L = j(19918), j(19935);
+												rX[t] = L;
+												t, JX = j(19969), j(20052);
+												AX = p[JX];
+												KX, JX = 255, j(19785);
+												L = AX[JX];
+												JX = 255;
+												AX = L(JX, BX, KX);
+												rX[t] = AX;
+												L, t, BX = 18, j(20049), j(19922);
+												rX[t] = L;
+												JX = p[BX];
+												BX, t = j(19985), j(19985);
+												AX = JX[BX];
+												JX = j(19866);
+												L = AX[JX];
+												rX[t] = L;
+												t, L, AX = j(19919), 4, j(19924);
+												rX[t] = L;
+												L = p[AX];
+												BX, AX = j(20010), j(19990);
+												t = L[AX];
+												KX, AX = 0, j(19767);
+												L = t(AX);
+												t, AX = j(19769), L;
+												L = vX;
+												AX[t] = L;
+												t, L = j(19929), 1;
+												AX[t] = L;
+												JX = p[BX];
+												BX, t = j(19990), j(19976);
+												L = JX[BX];
+												BX, SX = 1, 1;
+												JX = L(BX, KX, SX, xX);
+												KX = j(20010);
+												AX[t] = JX;
+												L, t = j(19888), j(19918);
+												AX[t] = L;
+												t, L, JX = j(19919), 5, j(19924);
+												AX[t] = L;
+												L, t = 16114680 <= 4461927, j(19946);
+												AX[t] = L;
+												L = p[JX];
+												JX = j(19990);
+												t = L[JX];
+												xX, JX = 0, j(19923);
+												L = t(JX);
+												JX, t = L, j(19769);
+												L = U[LX];
+												JX[t] = L;
+												t, SX, L = j(19929), 0, 1;
+												JX[t] = L;
+												BX = p[KX];
+												KX, t = j(19990), j(19983);
+												L = BX[KX];
+												KX = 0;
+												BX = L(KX, SX, xX, XX);
+												xX, SX, uX = 0, 0, 0;
+												JX[t] = BX;
+												t, KX = j(19976), j(20010);
+												BX = p[KX];
+												KX, XX = j(19990), 16;
+												L = BX[KX];
+												KX = 1;
+												BX = L(KX, SX, xX, XX);
+												SX = j(19922);
+												JX[t] = BX;
+												t = j(20080);
+												KX = p[SX];
+												xX, SX = 80, j(20080);
+												BX = KX[SX];
+												KX = j(19993);
+												L = BX[KX];
+												JX[t] = L;
+												L, SX, KX, t = j(20065), 200, j(20052), j(19918);
+												JX[t] = L;
+												t = j(19969);
+												BX = p[KX];
+												XX, KX = 25, j(19785);
+												L = BX[KX];
+												KX = 255;
+												BX = L(KX, SX, xX);
+												SX, L = j(19922), 11;
+												JX[t] = BX;
+												t = j(20049);
+												JX[t] = L;
+												KX = p[SX];
+												t, SX = j(19985), j(19985);
+												BX = KX[SX];
+												KX = j(20091);
+												L = BX[KX];
+												JX[t] = L;
+												L, t, BX = 3, j(19919), j(19924);
+												JX[t] = L;
+												xX = j(20052);
+												L = p[BX];
+												BX = j(19990);
+												t = L[BX];
+												BX = j(19894);
+												L = t(BX);
+												BX = H();
+												U[BX] = L;
+												L = j(19769);
+												t = U[BX];
+												KX = U[LX];
+												t[L] = KX;
+												t = U[BX];
+												SX = p[xX];
+												xX, L = j(19785), j(20053);
+												KX = SX[xX];
+												xX = 25;
+												SX = KX(xX, XX, kX);
+												xX = j(20010);
+												t[L] = SX;
+												L, XX = j(19983), -120;
+												t = U[BX];
+												SX = p[xX];
+												xX, kX = j(19990), 0;
+												KX = SX[xX];
+												xX = .5;
+												SX = KX(xX, XX, kX, nX);
+												xX = j(20010);
+												t[L] = SX;
+												kX = 0;
+												t = U[BX];
+												XX, L, nX = 240, j(19976), 36;
+												SX = p[xX];
+												xX = j(19990);
+												KX = SX[xX];
+												xX = 0;
+												SX = KX(xX, XX, kX, nX);
+												t[L] = SX;
+												nX = 50;
+												t = U[BX];
+												L, KX = j(19919), 3;
+												t[L] = KX;
+												KX = j(19924);
+												L = p[KX];
+												KX, xX = j(19990), j(19934);
+												t = L[KX];
+												XX, KX, Gd = 8, j(19763), .5;
+												L = t(KX);
+												t, KX = j(19769), L;
+												L = U[BX];
+												KX[t] = L;
+												SX = p[xX];
+												t, xX = j(20088), j(19990);
+												L = SX[xX];
+												kX, xX = j(20052), 0;
+												SX = L(xX, XX);
+												KX[t] = SX;
+												SX = j(19924);
+												L = p[SX];
+												SX = j(19990);
+												t = L[SX];
+												SX = j(19787);
+												L = t(SX);
+												SX = H();
+												U[SX] = L;
+												t = U[SX];
+												xX = U[BX];
+												L = j(19769);
+												t[L] = xX;
+												t = U[SX];
+												sX, L = -8, j(19940);
+												XX = p[kX];
+												kX = j(19785);
+												xX = XX[kX];
+												kX = 50;
+												XX = xX(kX, nX, qX);
+												xX = 1;
+												t[L] = XX;
+												t = U[SX];
+												L = j(19895);
+												t[L] = xX;
+												xX = j(19924);
+												L = p[xX];
+												xX = j(19990);
+												t = L[xX];
+												xX, qX, nX = j(19838), 12, j(20010);
+												L = t(xX);
+												xX = H();
+												U[xX] = L;
+												t = U[xX];
+												XX = U[BX];
+												L = j(19769);
+												t[L] = XX;
+												t = U[xX];
+												XX, L = 1, j(19929);
+												t[L] = XX;
+												L = j(19983);
+												t = U[xX];
+												kX = p[nX];
+												nX = j(19990);
+												XX = kX[nX];
+												nX = 0;
+												kX = XX(nX, qX, uX, FX);
+												FX = 0;
+												t[L] = kX;
+												nX, L, uX = j(20010), j(19976), 1;
+												t = U[xX];
+												kX = p[nX];
+												nX = j(19990);
+												XX = kX[nX];
+												nX, qX = 1, -24;
+												kX = XX(nX, qX, uX, FX);
+												qX = j(19922);
+												t[L] = kX;
+												L = j(20080);
+												t = U[xX];
+												nX = p[qX];
+												qX = j(20080);
+												kX = nX[qX];
+												nX = j(19812);
+												XX = kX[nX];
+												t[L] = XX;
+												XX = j(19888);
+												t = U[xX];
+												L = j(19918);
+												t[L] = XX;
+												t = U[xX];
+												nX, qX, uX = j(20052), 255, 255;
+												kX = p[nX];
+												L, nX = j(19969), j(19785);
+												XX = kX[nX];
+												nX = 255;
+												kX = XX(nX, qX, uX);
+												t[L] = kX;
+												XX = 13;
+												t = U[xX];
+												L, qX = j(20049), 120;
+												t[L] = XX;
+												L, XX = j(20069), j(20050);
+												t = U[xX];
+												nX, uX = j(20052), 120;
+												t[L] = XX;
+												t = U[xX];
+												kX = p[nX];
+												nX = j(19785);
+												XX = kX[nX];
+												nX, L = 120, j(20078);
+												kX = XX(nX, qX, uX);
+												uX, XX = -50, 4549748 >= 9937728;
+												t[L] = kX;
+												L = j(19826);
+												t = U[xX];
+												t[L] = XX;
+												t = U[xX];
+												L, XX = j(19919), 4;
+												t[L] = XX;
+												XX = j(19924);
+												L = p[XX];
+												XX = j(19990);
+												t = L[XX];
+												XX = j(19767);
+												L = t(XX);
+												XX = H();
+												U[XX] = L;
+												L, FX = j(19769), .5;
+												t = U[XX];
+												qX = j(20010);
+												kX = U[BX];
+												t[L] = kX;
+												t = U[XX];
+												kX, L = 1, j(19929);
+												t[L] = kX;
+												t = U[XX];
+												nX = p[qX];
+												qX, L = j(19990), j(19983);
+												kX = nX[qX];
+												qX = 1;
+												nX = kX(qX, uX, FX, sX);
+												qX, FX, uX = j(20010), 0, 20;
+												t[L] = nX;
+												L = j(19976);
+												t = U[XX];
+												nX = p[qX];
+												qX, sX = j(19990), 20;
+												kX = nX[qX];
+												qX = 0;
+												nX = kX(qX, uX, FX, sX);
+												t[L] = nX;
+												L = j(20080);
+												t = U[XX];
+												uX = j(19922);
+												qX = p[uX];
+												uX = j(20080);
+												nX = qX[uX];
+												qX = j(19961);
+												kX = nX[qX];
+												t[L] = kX;
+												qX, L, kX = j(20052), j(19918), j(20072);
+												t = U[XX];
+												FX = 120;
+												t[L] = kX;
+												t = U[XX];
+												L = j(19969);
+												nX = p[qX];
+												qX = j(19785);
+												kX = nX[qX];
+												qX, uX = 120, 120;
+												nX = kX(qX, uX, FX);
+												t[L] = nX;
+												L, kX = j(20049), 12;
+												t = U[XX];
+												t[L] = kX;
+												L = j(20002);
+												t = U[XX];
+												kX = 15926 >= 16078364;
+												t[L] = kX;
+												t = U[XX];
+												L, kX = j(19919), 4;
+												t[L] = kX;
+												kX = j(19924);
+												L = p[kX];
+												sX, kX = 0, j(19990);
+												t = L[kX];
+												FX, kX = -95, j(19767);
+												L = t(kX);
+												kX = H();
+												U[kX] = L;
+												L = j(19769);
+												t = U[kX];
+												uX = j(20010);
+												nX = U[LX];
+												t[L] = nX;
+												L = j(19983);
+												t = U[kX];
+												qX = p[uX];
+												uX = j(19990);
+												nX = qX[uX];
+												uX = .5;
+												qX = nX(uX, FX, sX, YX);
+												uX = j(20010);
+												t[L] = qX;
+												L = j(19976);
+												t = U[kX];
+												qX = p[uX];
+												uX, YX = j(19990), 36;
+												nX = qX[uX];
+												FX, uX, sX = 190, 0, 0;
+												qX = nX(uX, FX, sX, YX);
+												uX = j(20052);
+												t[L] = qX;
+												L = j(20053);
+												t = U[kX];
+												qX = p[uX];
+												uX, FX = j(19785), 255;
+												nX = qX[uX];
+												sX, uX = 255, 255;
+												qX = nX(uX, FX, sX);
+												t[L] = qX;
+												FX = j(19922);
+												t = U[kX];
+												uX = p[FX];
+												FX, L = j(20080), j(20080);
+												qX = uX[FX];
+												uX = j(19772);
+												nX = qX[uX];
+												t[L] = nX;
+												L = j(19918);
+												t = U[kX];
+												nX = j(19903);
+												t[L] = nX;
+												uX = j(20052);
+												t = U[kX];
+												qX = p[uX];
+												uX, FX, L = j(19785), 0, j(19969);
+												nX = qX[uX];
+												uX, sX = 0, 0;
+												qX = nX(uX, FX, sX);
+												t[L] = qX;
+												nX = 16;
+												t = U[kX];
+												L, FX = j(20049), j(19922);
+												t[L] = nX;
+												nX = 1;
+												t = U[kX];
+												L = j(19945);
+												t[L] = nX;
+												t = U[kX];
+												uX = p[FX];
+												FX, L = j(19985), j(19985);
+												qX = uX[FX];
+												uX = j(20091);
+												nX = qX[uX];
+												t[L] = nX;
+												FX, L = j(19922), j(19810);
+												t = U[kX];
+												uX = p[FX];
+												FX, sX = j(19810), j(20010);
+												qX = uX[FX];
+												uX = j(20091);
+												nX = qX[uX];
+												t[L] = nX;
+												L = j(19823);
+												t = U[kX];
+												nX = 0;
+												t[L] = nX;
+												t = U[kX];
+												L, nX = j(19946), 763628 > 10504991;
+												t[L] = nX;
+												t = U[kX];
+												nX, L = 3, j(19919);
+												t[L] = nX;
+												nX = j(19924);
+												L = p[nX];
+												nX = j(19990);
+												t = L[nX];
+												nX = j(19763);
+												L = t(nX);
+												t, nX, FX, uX = j(19769), L, 8, j(19934);
+												L = U[kX];
+												nX[t] = L;
+												t = j(20088);
+												qX = p[uX];
+												uX = j(19990);
+												L = qX[uX];
+												uX = 0;
+												qX = L(uX, FX);
+												nX[t] = qX;
+												qX = j(19924);
+												L = p[qX];
+												qX = j(19990);
+												t = L[qX];
+												qX = j(19767);
+												L = t(qX);
+												qX = H();
+												U[qX] = L;
+												L = j(19769);
+												t = U[qX];
+												YX = -95;
+												uX = U[LX];
+												t[L] = uX;
+												t = U[qX];
+												FX = p[sX];
+												L, sX = j(19983), j(19990);
+												uX = FX[sX];
+												sX = .5;
+												FX = uX(sX, YX, yX, fX);
+												YX = 190;
+												t[L] = FX;
+												t = U[qX];
+												L, sX = j(19976), j(20010);
+												FX = p[sX];
+												sX, yX, fX = j(19990), 0, 30;
+												uX = FX[sX];
+												sX = 0;
+												FX = uX(sX, YX, yX, fX);
+												t[L] = FX;
+												t = U[qX];
+												sX = j(20052);
+												FX = p[sX];
+												YX, yX, sX, fX = 50, 60, j(19785), 0;
+												uX = FX[sX];
+												L, sX = j(20053), 180;
+												FX = uX(sX, YX, yX);
+												t[L] = FX;
+												t = U[qX];
+												YX = j(19922);
+												sX = p[YX];
+												L, YX = j(20080), j(20080);
+												FX = sX[YX];
+												sX = j(19961);
+												uX = FX[sX];
+												t[L] = uX;
+												uX = j(19887);
+												t = U[qX];
+												L = j(19918);
+												t[L] = uX;
+												L = j(19969);
+												t = U[qX];
+												yX, sX = 255, j(20052);
+												FX = p[sX];
+												sX = j(19785);
+												uX = FX[sX];
+												sX, YX = 255, 255;
+												FX = uX(sX, YX, yX);
+												uX = 13;
+												t[L] = FX;
+												t = U[qX];
+												YX, L = j(19922), j(20049);
+												t[L] = uX;
+												L = j(19985);
+												t = U[qX];
+												sX = p[YX];
+												YX = j(19985);
+												FX = sX[YX];
+												sX = j(20091);
+												uX = FX[sX];
+												t[L] = uX;
+												sX = j(19934);
+												t = U[qX];
+												L, uX = j(19823), 0;
+												t[L] = uX;
+												L, uX = j(19946), 10277161 <= 3347851;
+												t = U[qX];
+												t[L] = uX;
+												L = j(19919);
+												t = U[qX];
+												YX, uX = 8, 3;
+												t[L] = uX;
+												uX = j(19924);
+												L = p[uX];
+												uX = j(19990);
+												t = L[uX];
+												uX = j(19763);
+												L = t(uX);
+												uX, t = L, j(19769);
+												L = U[qX];
+												uX[t] = L;
+												t = j(20088);
+												FX = p[sX];
+												sX = j(19990);
+												L = FX[sX];
+												sX = 0;
+												FX = L(sX, YX);
+												uX[t] = FX;
+												FX = j(19924);
+												L = p[FX];
+												FX = j(19990);
+												t = L[FX];
+												FX = j(19923);
+												L = t(FX);
+												FX = H();
+												U[FX] = L;
+												L, yX = j(19769), j(20010);
+												t = U[FX];
+												sX = U[LX];
+												t[L] = sX;
+												sX = 1;
+												t = U[FX];
+												L = j(19929);
+												t[L] = sX;
+												L = j(19983);
+												t = U[FX];
+												YX = p[yX];
+												yX = j(19990);
+												sX = YX[yX];
+												yX = 0;
+												YX = sX(yX, fX, EX, IX);
+												yX = j(20010);
+												t[L] = YX;
+												L, fX = j(19976), 0;
+												t = U[FX];
+												IX = 14;
+												YX = p[yX];
+												yX = j(19990);
+												sX = YX[yX];
+												EX, yX = 0, 1;
+												YX = sX(yX, fX, EX, IX);
+												t[L] = YX;
+												t = U[FX];
+												L, fX = j(20080), j(19922);
+												yX = p[fX];
+												fX = j(20080);
+												YX = yX[fX];
+												yX = j(19993);
+												sX = YX[yX];
+												t[L] = sX;
+												yX, L = j(19804), j(19918);
+												t = U[FX];
+												YX = p[yX];
+												yX = j(20054);
+												sX = YX[yX];
+												EX = U[k];
+												yX = j(19944);
+												IX = U[X];
+												fX = EX - IX;
+												EX = U[k];
+												YX = sX(yX, fX, EX);
+												yX = j(20052);
+												t[L] = YX;
+												L = j(19969);
+												t = U[FX];
+												YX = p[yX];
+												fX, yX, EX = 180, j(19785), 180;
+												sX = YX[yX];
+												yX = 180;
+												YX = sX(yX, fX, EX);
+												t[L] = YX;
+												fX, sX = j(19922), 10;
+												t = U[FX];
+												L = j(20049);
+												t[L] = sX;
+												t = U[FX];
+												yX = p[fX];
+												L, fX = j(19985), j(19985);
+												YX = yX[fX];
+												yX = j(20091);
+												sX = YX[yX];
+												t[L] = sX;
+												L = j(19919);
+												t = U[FX];
+												sX = 3;
+												t[L] = sX;
+												sX = j(19924);
+												L = p[sX];
+												sX = j(19990);
+												t = L[sX];
+												sX = j(19767);
+												L = t(sX);
+												EX = -35;
+												sX = H();
+												U[sX] = L;
+												t = U[sX];
+												YX = U[LX];
+												L = j(19769);
+												t[L] = YX;
+												t = U[sX];
+												L, fX, IX = j(19983), j(20010), 0;
+												yX = p[fX];
+												fX = j(19990);
+												YX = yX[fX];
+												fX = 1;
+												yX = YX(fX, EX, IX, RX);
+												t[L] = yX;
+												L, EX, fX = j(19976), 24, j(20010);
+												t = U[sX];
+												yX = p[fX];
+												fX = j(19990);
+												YX = yX[fX];
+												fX, RX, IX = 0, 24, 0;
+												yX = YX(fX, EX, IX, RX);
+												fX = j(20052);
+												t[L] = yX;
+												t = U[sX];
+												L, EX = j(20053), 35;
+												yX = p[fX];
+												RX, fX = 0, j(19785);
+												YX = yX[fX];
+												IX, fX = 35, 35;
+												yX = YX(fX, EX, IX);
+												t[L] = yX;
+												t = U[sX];
+												EX, L, IX = j(19922), j(20080), 200;
+												fX = p[EX];
+												EX = j(20080);
+												yX = fX[EX];
+												fX = j(19961);
+												YX = yX[fX];
+												t[L] = YX;
+												YX, fX, L = j(20072), j(20052), j(19918);
+												t = U[sX];
+												t[L] = YX;
+												t = U[sX];
+												L = j(19969);
+												yX = p[fX];
+												fX, EX = j(19785), 200;
+												YX = yX[fX];
+												fX = 200;
+												yX = YX(fX, EX, IX);
+												t[L] = yX;
+												L = j(20049);
+												t = U[sX];
+												YX, EX = 18, j(19922);
+												t[L] = YX;
+												L = j(19985);
+												t = U[sX];
+												fX = p[EX];
+												EX = j(19985);
+												yX = fX[EX];
+												fX = j(20091);
+												YX = yX[fX];
+												t[L] = YX;
+												t = U[sX];
+												L, YX, IX = j(19823), 0, j(20010);
+												t[L] = YX;
+												L = j(19946);
+												t = U[sX];
+												YX = 8540819 >= 8826247;
+												t[L] = YX;
+												L, YX = j(19919), 10;
+												t = U[sX];
+												t[L] = YX;
+												YX = j(19924);
+												L = p[YX];
+												YX, fX = j(19990), j(19934);
+												t = L[YX];
+												YX = j(19763);
+												L = t(YX);
+												t, YX = j(19769), L;
+												L = U[sX];
+												YX[t] = L;
+												yX = p[fX];
+												fX, t = j(19990), j(20088);
+												L = yX[fX];
+												fX, EX = 0, 6;
+												yX = L(fX, EX);
+												YX[t] = yX;
+												yX = j(19924);
+												L = p[yX];
+												yX = j(19990);
+												t = L[yX];
+												yX = j(19923);
+												L = t(yX);
+												yX = H();
+												U[yX] = L;
+												t = U[yX];
+												fX = U[LX];
+												L = j(19769);
+												t[L] = fX;
+												fX = 1;
+												t = U[yX];
+												L = j(19929);
+												t[L] = fX;
+												t = U[yX];
+												L = j(19983);
+												EX = p[IX];
+												IX = j(19990);
+												fX = EX[IX];
+												IX = 0;
+												EX = fX(IX, RX, cX, iX);
+												t[L] = EX;
+												IX = j(20010);
+												t = U[yX];
+												L = j(19976);
+												EX = p[IX];
+												cX, IX, RX, iX = 0, j(19990), 0, 16;
+												fX = EX[IX];
+												IX = 1;
+												EX = fX(IX, RX, cX, iX);
+												t[L] = EX;
+												RX = j(19922);
+												t = U[yX];
+												IX = p[RX];
+												RX = j(20080);
+												EX = IX[RX];
+												L, IX = j(20080), j(19812);
+												fX = EX[IX];
+												t[L] = fX;
+												t = U[yX];
+												fX, L = j(19888), j(19918);
+												t[L] = fX;
+												t = U[yX];
+												L, cX, IX = j(19969), 150, j(20052);
+												EX = p[IX];
+												IX = j(19785);
+												fX = EX[IX];
+												IX, RX = 150, 150;
+												EX = fX(IX, RX, cX);
+												RX = j(19922);
+												t[L] = EX;
+												cX = 0;
+												t = U[yX];
+												fX, L = 10, j(20049);
+												t[L] = fX;
+												L = j(19985);
+												t = U[yX];
+												IX = p[RX];
+												RX = j(19985);
+												EX = IX[RX];
+												IX = j(20091);
+												fX = EX[IX];
+												t[L] = fX;
+												fX, L = 12072550 <= 6896495, j(20002);
+												t = U[yX];
+												t[L] = fX;
+												t = U[yX];
+												fX, L = 3, j(19919);
+												t[L] = fX;
+												fX = j(19924);
+												L = p[fX];
+												fX = j(19990);
+												t = L[fX];
+												fX = j(19767);
+												L = t(fX);
+												fX = L;
+												L = U[LX];
+												t = j(19769);
+												fX[t] = L;
+												iX, L, t, RX, IX = 60, 1, j(19929), 0, j(20010);
+												fX[t] = L;
+												t = j(19976);
+												EX = p[IX];
+												IX = j(19990);
+												L = EX[IX];
+												IX = 1;
+												EX = L(IX, RX, cX, iX);
+												fX[t] = EX;
+												t, L = j(19918), j(19888);
+												fX[t] = L;
+												t, L, RX = j(19919), 5, j(20010);
+												fX[t] = L;
+												iX, t, L = 0, j(19946), 9345582 >= 13225078;
+												fX[t] = L;
+												t = j(20002);
+												L = U[Y];
+												cX = 0;
+												fX[t] = L;
+												L = j(19976);
+												t = U[LX];
+												IX = p[RX];
+												RX = j(19990);
+												EX = IX[RX];
+												RX = 0;
+												IX = EX(RX, cX, iX, zX);
+												t[L] = IX;
+												cX, RX, L = 0, j(20010), j(19983);
+												t = U[LX];
+												IX = p[RX];
+												zX, RX = 0, j(19990);
+												EX = IX[RX];
+												RX, iX = .5, .5;
+												IX = EX(RX, cX, iX, zX);
+												t[L] = IX;
+												EX = 1;
+												t = U[LX];
+												L, cX = j(19929), j(19859);
+												t[L] = EX;
+												t = U[h];
+												EX = U[LX];
+												RX = p[cX];
+												cX = j(19990);
+												IX = RX[cX];
+												pd = p[dX];
+												dX, cX = j(19801), .4;
+												zX = pd[dX];
+												pd = j(20058);
+												iX = zX[pd];
+												dX = p[jd];
+												jd = j(19865);
+												pd = dX[jd];
+												dX = j(20015);
+												zX = pd[dX];
+												dX = 300;
+												RX = IX(cX, iX, zX);
+												pd, cX = j(20010), j(19976);
+												zX = p[pd];
+												pd = j(19990);
+												iX = zX[pd];
+												jd, pd = 0, 0;
+												zX = iX(pd, dX, jd, td);
+												iX, jd = j(19983), j(20010);
+												dX = p[jd];
+												jd = j(19990);
+												pd = dX[jd];
+												jd, L, td = .5, j(19771), -150;
+												L = t[L];
+												dX = pd(jd, td, Gd, Dd);
+												pd, jd = j(19929), 0;
+												IX = { [cX] = zX, [iX] = dX, [pd] = jd };
+												L = L(t, EX, RX, IX);
+												EX, t = L, j(20020);
+												t = EX[t];
+												IX = H();
+												cX = H();
+												t = t(EX);
+												RX = H();
+												t = W(14602200, { FX, k, X });
+												U[IX] = t;
+												t = a(7627230, { m });
+												zX = j(19843);
+												U[RX] = t;
+												iX = H();
+												t = P(13511629, { yX });
+												U[cX] = t;
+												t = Z(3966183, { TX, oX });
+												U[iX] = t;
+												L = U[xX];
+												t = L[zX];
+												zX = l(12413806, {
+														SX,
+														h,
+														BX,
+														xX,
+														XX,
+													});
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												zX = j(19869);
+												L = U[xX];
+												t = L[zX];
+												zX = l(11483642, {
+														SX,
+														h,
+														BX,
+														XX,
+													});
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												t = U[xX];
+												L, zX = j(19807), j(19918);
+												L = t[L];
+												L = L(t, zX);
+												t = j(20042);
+												t = L[t];
+												zX = N(224196, { XX, xX });
+												t = t(L, zX);
+												L = U[XX];
+												zX = j(20079);
+												t = L[zX];
+												zX = P(15914130, { h, XX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												zX = j(19794);
+												L = U[XX];
+												t = L[zX];
+												zX = P(15036226, { h, XX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												zX = j(19926);
+												L = U[XX];
+												t = L[zX];
+												zX = N(10133835, { xX, RX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												zX = j(20079);
+												L = U[kX];
+												t = L[zX];
+												zX = P(2902226, { h, kX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												L = U[kX];
+												zX = j(19794);
+												t = L[zX];
+												zX = b(10789948, { h, kX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												L = U[kX];
+												zX = j(19840);
+												t = L[zX];
+												L = j(20042);
+												L = t[L];
+												zX = W(13156236, { h, kX, RX });
+												L = L(t, zX);
+												L = U[kX];
+												zX = j(19992);
+												t = L[zX];
+												L = j(20042);
+												zX = W(7240006, { h, kX });
+												L = t[L];
+												L = L(t, zX);
+												zX = j(20079);
+												L = U[sX];
+												t = L[zX];
+												L = j(20042);
+												L = t[L];
+												zX = b(7466304, { h, sX });
+												L = L(t, zX);
+												L = U[sX];
+												zX = j(19794);
+												pd = H();
+												t = L[zX];
+												zX = b(8925367, { h, sX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												L = j(19926);
+												t = AX[L];
+												zX = l(10900709, { n, cX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												t = P(6565736, {
+														y,
+														Y,
+														u,
+														F,
+														LX,
+														s,
+													});
+												zX = t;
+												t = W(12037301, { u });
+												U[pd] = t;
+												t = U[Y];
+												t = t and 6712523 or 8626412;
+											elseif 9682421 > t then
+												t, L = T, g;
+												t = g and 14941563 or 8648337;
+											else
+												t = 5377997 <= 7321129;
+												U[w[1]] = t;
+												L = U[w[4]];
+												g, T = j(19918), j(20046);
+												L[g] = T;
+												L = U[w[4]];
+												h, g = j(20052), j(20053);
+												m = p[h];
+												h = j(19785);
+												T = m[h];
+												t, M, h, C = p[j(19941)], 80, 100, 80;
+												m = T(h, C, M);
+												L[g] = m;
+												T = j(19984);
+												g = p[T];
+												T = j(20061);
+												L = g[T];
+												T = P(13563931, {
+														w[5],
+														V,
+														w[3],
+														w[2],
+														w[4],
+														w[1],
+													});
+												g = L(T);
+												L = {};
+												V = o(V);
+											end;
+										else
+											if 9486267 > t then
+												B = j(19855);
+												J = p[B];
+												B = J(T);
+												J = j(19914);
+												A = B == J;
+												t, O = 14742598, A;
+											elseif t < 9555241 then
+												m = C + m;
+												L, O = m <= h, not M;
+												L = O and L;
+												O = h <= m;
+												O = M and O;
+												L = O or L;
+												O = 14547420;
+												t = L and O;
+												L = 4658620;
+												t = t or L;
+											else
+												t, L = p[j(19791)], { L };
+											end;
+										end;
+									end;
+								end;
+							else
+								if t < 11029911 then
+									if t > 10710351 then
+										if t > 10812795 then
+											if t < 10868176 then
+												t, L = 4770000 > 3274886, j(19913);
+												L = { t, L };
+												t = p[j(20084)];
+											elseif 10945839 > t then
+												t = U[w[1]];
+												t = t and 2081345 or 7741964;
+											else
+												L = j(19867);
+												t = p[L];
+												g = j(19848);
+												V = p[g];
+												T = U[w[1]];
+												m = j(19839);
+												m = V[m];
+												g = { m(V, T) };
+												L = t(G(g));
+												t = L();
+												t, L = p[j(20040)], {};
+											end;
+										else
+											if t < 10741162 then
+												t = j(19799);
+												L = { t };
+												t = p[j(20026)];
+											elseif t < 10776171 then
+												t, r, A = 8155205, j(19804), 3;
+												O = p[r];
+												r = j(19878);
+												M = O[r];
+												r = 1;
+												O = M(h, r, A);
+												M = j(19968);
+												C = O == M;
+												L = C;
+											else
+												t = U[w[1]];
+												m, M = j(19859), j(20052);
+												V = U[w[2]];
+												L = j(19771);
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m = .2;
+												T = g(m);
+												C = p[M];
+												O, M, m, r = 255, j(19785), j(20053), 255;
+												h = C[M];
+												L, M = t[L], 255;
+												C = h(M, O, r);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(19930)], {};
+											end;
+										end;
+									else
+										if t < 10312361 then
+											if t < 9964530 then
+												M, h, g = 80, j(20052), j(19971);
+												t = U[w[2]];
+												m = p[h];
+												h, C = j(19785), 255;
+												T = m[h];
+												h = 80;
+												m = T(h, C, M);
+												T = 2;
+												L = t(g, m, T);
+												g = j(19984);
+												L = p[g];
+												g = j(19963);
+												t = L[g];
+												g = 1;
+												L = t(g);
+												t = U[w[3]];
+												L = j(19788);
+												L = t[L];
+												L = L(t);
+												t = U[w[4]];
+												L = t();
+												t, L = p[j(19989)], {};
+											elseif 10082128 > t then
+												t, L = T, g;
+												t = 1129971;
+											elseif 10201427 > t then
+												V = j(19888);
+												t = U[w[1]];
+												L, g = j(19918), .3;
+												t[L] = V;
+												t = U[w[1]];
+												L = j(19889);
+												L = t[L];
+												L = L(t);
+												t = U[w[2]];
+												V = j(20029);
+												L = t(V, g);
+												L, t = {}, p[j(19856)];
+											else
+												L, t, M = 4715385 >= 9309349, p[j(19759)], j(19995);
+												C = M .. h;
+												L = { L, C };
+											end;
+										else
+											if t < 10493885 then
+												t = h;
+												h, m = nil, t;
+												t = 8920695;
+											elseif t < 10666420 then
+												M, r = t, j(20030);
+												O = C[r];
+												m, t = O, O and 11587925 or 8403256;
+											else
+												V = j(19804);
+												L = p[V];
+												V = j(20054);
+												t = L[V];
+												C = j(19822);
+												g = U[w[1]];
+												T = g();
+												V = j(19765);
+												g = U[w[2]];
+												h = p[C];
+												C = j(19836);
+												m = h[C];
+												h = { m() };
+												L = t(V, T, g, G(h));
+												t = U[w[3]];
+												g, V = 5, L;
+												L = t(V, g);
+												g = L;
+												t = not g;
+												t = t and 5857137 or 11068853;
+											end;
+										end;
+									end;
+								else
+									if t > 11530847 then
+										if t > 11641684 then
+											if t < 11729492 then
+												t = L and 4559071 or 11195760;
+											elseif 11857692 > t then
+												t = h;
+												t, g = m and 10030421 or 1048407, m;
+											else
+												t = c();
+												td = j(20052);
+												t = U[IX];
+												L = t();
+												y = o(y);
+												t = U[iX];
+												iX = o(iX);
+												CX = nil;
+												cX = o(cX);
+												DX = o(DX);
+												Dd = 100;
+												LX = o(LX);
+												IX = o(IX);
+												jd = p[td];
+												RX = o(RX);
+												vX, Gd = nil, 100;
+												s = o(s);
+												C = o(C);
+												E = o(E);
+												eX = o(eX);
+												pX, td = nil, j(19785);
+												A = o(A);
+												tX = o(tX);
+												oX = o(oX);
+												WX = nil;
+												i = o(i);
+												R = o(R);
+												dX = jd[td];
+												td, rX = 255, nil;
+												O = o(O);
+												jd = dX(td, Gd, Dd);
+												dX = j(19948);
+												x = o(x);
+												L = t(jd, dX);
+												f = o(f);
+												L, fX, gX, EX = j(19800), nil, nil, nil;
+												sX = o(sX);
+												xX = o(xX);
+												T, jd, JX = nil, j(20041), nil;
+												z = o(z);
+												dX = j(20036);
+												m = o(m);
+												t = p[L];
+												L = t(dX);
+												L, MX = j(19800), nil;
+												FX = o(FX);
+												BX = o(BX);
+												lX = nil;
+												I = o(I);
+												wd = j(20075);
+												kX = o(kX);
+												t = p[L];
+												M = o(M);
+												c = nil;
+												Gd = U[B];
+												nX = nil;
+												ed = U[J];
+												bX = nil;
+												h = o(h);
+												zX, YX = nil, nil;
+												r = o(r);
+												Dd = wd .. ed;
+												td = Gd .. Dd;
+												VX = o(VX);
+												uX = nil;
+												dX = jd .. td;
+												u = o(u);
+												SX = o(SX);
+												d = o(d);
+												F = o(F);
+												L = t(dX);
+												OX, jd = nil, j(19997);
+												qX = o(qX);
+												X = o(X);
+												L, PX = j(19800), nil;
+												t = p[L];
+												mX = nil;
+												n = o(n);
+												K, KX, hX = nil, nil, nil;
+												k = o(k);
+												QX = nil;
+												td = U[S];
+												jX = o(jX);
+												yX = o(yX);
+												wX = o(wX);
+												J = o(J);
+												GX = o(GX);
+												UX = nil;
+												XX = o(XX);
+												ZX = nil;
+												dX = jd .. td;
+												S = o(S);
+												AX = nil;
+												B = o(B);
+												g, aX = nil, nil;
+												pd = o(pd);
+												NX = nil;
+												q = o(q);
+												HX = nil;
+												L = t(dX);
+												L = {};
+												TX = o(TX);
+												Y = o(Y);
+												t = p[j(19996)];
+											end;
+										else
+											if 11548594 > t then
+												t = U[m];
+												t = t and 16368865 or 2095439;
+											elseif 11573024 > t then
+												V = j(19918);
+												L = U[w[2]];
+												t = L[V];
+												V = H();
+												U[V] = t;
+												g = U[V];
+												L = #g;
+												g = 0;
+												t = L == g;
+												t = t and 8287108 or 9683152;
+											else
+												L, t = { m }, M;
+												t = p[j(19841)];
+											end;
+										end;
+									else
+										if 11498040 > t then
+											if t < 11132306 then
+												T = j(19804);
+												L = p[T];
+												T = j(20037);
+												t = L[T];
+												T = j(19774);
+												L = t(g, T);
+												t = L and 497600 or 5693393;
+											elseif t < 11339701 then
+												t, L = 925514 > 147801, 4110079 >= 6139388;
+												U[w[4]] = t;
+												t, L = p[j(20048)], { L };
+											else
+												T, L = j(20052), j(19940);
+												t = U[w[1]];
+												g = p[T];
+												T, O, h = j(19785), 25, 50;
+												V = g[T];
+												m, T = 50, 50;
+												g = V(T, m, h);
+												t[L] = g;
+												L = j(19771);
+												t = U[w[2]];
+												m = j(19859);
+												V = U[w[3]];
+												T = p[m];
+												m, r = j(19990), 25;
+												g = T[m];
+												L, M, m = t[L], j(20052), .2;
+												T = g(m);
+												m = j(20053);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M = 25;
+												C = h(M, O, r);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												V, t = 9711653 <= 285288, j(20020);
+												t = L[t];
+												t = t(L);
+												L = j(20002);
+												t = U[w[4]];
+												t[L] = V;
+												L, t = {}, p[j(19837)];
+											end;
+										else
+											if t < 11514066 then
+												t, m = 12681251, j(20068);
+												T = p[m];
+												U[g] = T;
+											elseif t < 11519161 then
+												m, t = C, 2813343;
+											else
+												t, g, m = 10937739 >= 264871, j(19983), j(19983);
+												U[w[3]] = t;
+												L = V[g];
+												U[w[4]] = L;
+												t = 4830926;
+												T = U[w[5]];
+												g = T[m];
+												U[w[6]] = g;
+											end;
+										end;
+									end;
+								end;
+							end;
+						else
+							if 14574810 > t then
+								if t > 13537780 then
+									if 14012615 > t then
+										if 13839584 > t then
+											if t < 13607267 then
+												t = U[w[1]];
+												g = U[w[2]];
+												T = { t(g) };
+												L, V = T[1], T[2];
+												g = L;
+												t = g and 755504 or 3695987;
+											elseif 13655773 > t then
+												t = nil;
+												m, C = t, 1;
+												M = C;
+												h = #g;
+												C = -1;
+												O, t = C, 1632348;
+												C = 0;
+												r = C > O;
+												C = h - O;
+											elseif t < 13697974 then
+												L = j(20002);
+												t = U[w[5]];
+												V = 11371231 >= 1189384;
+												t[L] = V;
+												t = 2084638;
+											else
+												T, g = j(19804), V;
+												L = p[T];
+												T = j(20037);
+												t = L[T];
+												T = j(19808);
+												L = t(g, T);
+												T = L;
+												t = T and 8855541 or 13650604;
+											end;
+										else
+											if 13956576 > t then
+												r, O = 80, 255;
+												t = U[w[8]];
+												M = j(20052);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M = 80;
+												C = h(M, O, r);
+												h = j(20028);
+												L = t(C, h);
+												O = j(19855);
+												t = U[w[2]];
+												C = j(19907);
+												M = p[O];
+												O = M(T);
+												A = 80;
+												h = C .. O;
+												O = j(20052);
+												M = p[O];
+												O = j(19785);
+												C = M[O];
+												O, r = 80, 255;
+												M = C(O, r, A);
+												C = 2;
+												L = t(h, M, C);
+												t = U[w[5]];
+												h, L = j(20017), j(19918);
+												t[L] = h;
+												O, M, r, L = 255, j(20052), 80, j(20053);
+												t = U[w[5]];
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M = 80;
+												C = h(M, O, r);
+												h = j(20029);
+												t[L] = C;
+												C = .6;
+												t = U[w[9]];
+												L = t(h, C);
+												h = j(19984);
+												L = p[h];
+												h = j(19963);
+												t = L[h];
+												h = 1.5;
+												L = t(h);
+												L = j(19788);
+												t = U[w[3]];
+												L = t[L];
+												L = L(t);
+												t = U[w[4]];
+												L = t();
+												t = 5605513;
+											elseif t < 13981548 then
+												h = t;
+												C = U[w[2]];
+												T, m = t, C;
+												t = C and 2079211 or 11763541;
+											else
+												L = j(19793);
+												t = p[L];
+												V = j(19935);
+												L = t(V);
+												t, L = p[j(19824)], {};
+											end;
+										end;
+									else
+										if 14215699 > t then
+											if 14034294 > t then
+												L = j(19906);
+												t = p[L];
+												L = t();
+												V = L;
+												g = U[w[1]];
+												L = V - g;
+												g = U[w[2]];
+												t = L < g;
+												t = t and 3848034 or 8018008;
+											elseif 14080895 > t then
+												r = j(19906);
+												O = p[r];
+												r = O();
+												M = r - h;
+												C = M < g;
+												L, t = C, 6342314;
+											else
+												h, T = j(19877), j(19804);
+												L = p[T];
+												V, t, T = D[1], {}, j(20064);
+												g = t;
+												t = L[T];
+												C = { t(V, h) };
+												T, L = C[2], C[1];
+												h, m, t = L, C[3], 1742126;
+											end;
+										else
+											if 14399838 > t then
+												O, h = j(19855), 3;
+												m = g[h];
+												r, h, M = j(19956), j(19885), 4;
+												C = g[M];
+												T = m or h;
+												h = t;
+												M = j(19885);
+												m = C or M;
+												M = j(19804);
+												C = p[M];
+												M = j(19825);
+												h = C[M];
+												M = p[O];
+												O = { M(T) };
+												C = h(G(O));
+												O = C == r;
+												M = t;
+												t, h = O and 2170419 or 14492602, O;
+											elseif t < 14520011 then
+												r, J = t, j(19803);
+												A = C == J;
+												O, t = A, A and 14742598 or 9458115;
+											else
+												A = j(19804);
+												r = p[A];
+												O = m;
+												O, A, B = nil, j(19852), j(20027);
+												L = r[A];
+												J = p[B];
+												B = j(19905);
+												A = J[B];
+												K, B = 57, 48;
+												J = { A(B, K) };
+												r = L(G(J));
+												t = T .. r;
+												T = t;
+												t = 9514419;
+											end;
+										end;
+									end;
+								else
+									if t < 13003262 then
+										if 12742025 > t then
+											if t < 12214693 then
+												t = U[w[1]];
+												t = t and 16062083 or 447486;
+											elseif 12402945 > t then
+												t = 5639679 <= 9430069;
+												L = U[w[7]];
+												C = { L(h) };
+												L = { t, h, G(C) };
+												t = p[j(19849)];
+											elseif t < 12547528 then
+												L, r, T, m = j(19940), 30, j(20052), 255;
+												t = U[w[1]];
+												g = p[T];
+												T = j(19785);
+												V = g[T];
+												h, T, M = 255, 255, j(20052);
+												g = V(T, m, h);
+												t[L] = g;
+												t = U[w[2]];
+												V = U[w[3]];
+												m, O = j(19859), 30;
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m = .2;
+												T = g(m);
+												C = p[M];
+												M, m, L = j(19785), j(20053), j(19771);
+												h = C[M];
+												L, M = t[L], 30;
+												C = h(M, O, r);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												t, T = j(20020), j(19918);
+												t = L[t];
+												t = t(L);
+												g = U[w[4]];
+												V = g[T];
+												L = #V;
+												V = 0;
+												t = L > V;
+												t = t and 13660943 or 2084638;
+											else
+												m = U[g];
+												t = m and 2904906 or 217489;
+											end;
+										else
+											if t < 12846862 then
+												L = U[w[10]];
+												r, h = j(19855), 1;
+												t = L + h;
+												A = 110;
+												U[w[10]] = t;
+												L = U[w[11]];
+												h = L();
+												M = j(19981);
+												L = U[w[2]];
+												O = p[r];
+												r = O(g);
+												C = M .. r;
+												r, J = j(20052), 110;
+												O = p[r];
+												r = j(19785);
+												M = O[r];
+												r = 255;
+												O = M(r, A, J);
+												M = 2;
+												h = L(C, O, M);
+												C, M = j(20029), .3;
+												L = U[w[9]];
+												h = L(C, M);
+												h = U[w[10]];
+												C = U[w[12]];
+												L = h >= C;
+												t = L and 8156688 or 2165258;
+											elseif t < 12932762 then
+												L = j(19850);
+												t = p[L];
+												V = Z(10990969, { w[1] });
+												L = t(V);
+												L, t = {}, p[j(20024)];
+											else
+												M = j(19804);
+												C = p[M];
+												M = j(19878);
+												L = C[M];
+												M, O = 1, 6;
+												C = L(h, M, O);
+												L = j(20019);
+												t = C == L;
+												t = t and 13498816 or 10269019;
+											end;
+										end;
+									else
+										if 13439012 > t then
+											if t < 13094080 then
+												g, m = t, j(19815);
+												T = p[m];
+												V, t = T, T and 1607454 or 8909910;
+											elseif t < 13280259 then
+												t = U[w[1]];
+												V = U[w[2]];
+												O, m, A = 225, j(19859), 185;
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m, J, r = .1, 0, 225;
+												T = g(m);
+												M, m = j(20052), j(20053);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M, L = 225, j(19771);
+												C = h(M, O, r);
+												h, r = j(19976), j(20010);
+												O = p[r];
+												r = j(19990);
+												M = O[r];
+												r, B = 0, 34;
+												O = M(r, A, J, B);
+												g, L = { [m] = C, [h] = O }, t[L];
+												L = L(t, V, T, g);
+												t = j(20020);
+												t, g = L[t], .2;
+												t = t(L);
+												t = U[w[3]];
+												V = j(20029);
+												L = t(V, g);
+												L, t = {}, p[j(19832)];
+											else
+												t = j(19957);
+												L = { t };
+												t = p[j(19846)];
+											end;
+										else
+											if t < 13486279 then
+												t = U[g];
+												L = { t };
+												t = p[j(19928)];
+											elseif 13505222 > t then
+												O = j(19804);
+												M = p[O];
+												t, O = p[j(19910)], j(20093);
+												C = M[O];
+												O = j(20021);
+												M = C(h, O);
+												C = j(19977);
+												L = M or C;
+												C = L;
+												L = 9755595 >= 15708585;
+												M = U[w[7]];
+												O = { M(C) };
+												L = { L, G(O) };
+											else
+												V, T, L = D[1], D[3], j(19918);
+												t = U[w[1]];
+												g, m = D[2], V;
+												t[L] = m;
+												L, m = j(19969), g;
+												t = U[w[1]];
+												t[L] = m;
+												m, L = 2831129 <= 8191565, j(20002);
+												t = U[w[1]];
+												t[L] = m;
+												t = T and 14829000 or 4467895;
+											end;
+										end;
+									end;
+								end;
+							else
+								if 15295412 > t then
+									if t < 14904898 then
+										if t < 14765154 then
+											if 14625086 > t then
+												t = U[w[1]];
+												T = j(19804);
+												g = p[T];
+												T, L = j(20054), j(19918);
+												V = g[T];
+												T = j(19944);
+												h = U[w[2]];
+												C = U[w[3]];
+												m = h - C;
+												h = U[w[2]];
+												g = V(T, m, h);
+												t[L] = g;
+												L, t = {}, p[j(20008)];
+											elseif 14676992 > t then
+												m = j(20068);
+												T = p[m];
+												t = T and 11512439 or 12681251;
+											elseif 14724304 > t then
+												t = U[w[1]];
+												L = t();
+												V = L;
+												L = j(20056);
+												t = V == L;
+												t = t and 9898639 or 4077086;
+											else
+												t, h = r, O;
+												t = 2170419;
+											end;
+										else
+											if t < 14808355 then
+												t = j(19888);
+												L = { t };
+												t = p[j(19964)];
+											elseif t < 14848617 then
+												m = j(19984);
+												L = p[m];
+												m = j(19963);
+												t = L[m];
+												L = t(T);
+												t = U[w[1]];
+												L, m = j(20002), 8707457 < 2063716;
+												t[L] = m;
+												t = 4467895;
+											else
+												g = j(19813);
+												V = p[g];
+												L, t = V, V and 13031925 or 6400642;
+											end;
+										end;
+									else
+										if t > 14992640 then
+											if 15025908 > t then
+												t, L = 9596063, V;
+											elseif 15130027 > t then
+												t = U[w[1]];
+												m = j(19859);
+												V = U[w[2]];
+												T = p[m];
+												M, m, O = j(20052), j(19990), 120;
+												g = T[m];
+												m = .2;
+												T = g(m);
+												m = j(19969);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												r, M, L = 120, 120, j(19771);
+												C = h(M, O, r);
+												L, g = t[L], { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												L, t = {}, p[j(19872)];
+											else
+												t = U[w[6]];
+												m = U[w[7]];
+												h = { t(m) };
+												g = h[2];
+												T, L = h[3], h[1];
+												m = L;
+												t = m and 13944163 or 12802800;
+											end;
+										else
+											if 14953211 > t then
+												t = L and 11522628 or 4830926;
+											elseif 14967274 > t then
+												h = j(19764);
+												L, t = { h }, p[j(19770)];
+											else
+												M = j(19804);
+												C = p[M];
+												M = j(19878);
+												L = C[M];
+												M, O = 1, 6;
+												C = L(h, M, O);
+												L = j(20019);
+												t = C == L;
+												t = t and 3693369 or 7565436;
+											end;
+										end;
+									end;
+								else
+									if 15894175 > t then
+										if 15701476 > t then
+											if t < 15504165 then
+												t = U[w[1]];
+												m, g, h = j(19942), j(19862), j(20047);
+												T = U[w[2]];
+												V = { [g] = T, [m] = h };
+												L = { t(V) };
+												t, L = p[j(19943)], { G(L) };
+											elseif 15650173 > t then
+												t, L = p[j(19861)], {};
+											else
+												t = 6383323;
+											end;
+										else
+											if t < 15777593 then
+												t = U[w[4]];
+												L = t();
+												t = 15811246;
+											elseif 15842733 > t then
+												t, L, V = p[j(19783)], {}, nil;
+											else
+												t = U[w[5]];
+												L, T, V, g = j(19918), j(19887), nil, nil;
+												t[L] = T;
+												t = 14781792 < 8881896;
+												U[w[6]] = t;
+												t, L = p[j(19851)], {};
+											end;
+										end;
+									else
+										if 15999797 > t then
+											if 15914603 > t then
+												M = j(20052);
+												t = U[w[1]];
+												V = U[w[2]];
+												m = j(19859);
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												r, m = 255, .2;
+												T = g(m);
+												L, m = j(19771), j(19969);
+												C = p[M];
+												M = j(19785);
+												h = C[M];
+												M, L, O = 255, t[L], 255;
+												C = h(M, O, r);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(19828)], {};
+											elseif 15926294 > t then
+												V = D[1];
+												g = U[w[1]];
+												L, t = g, g and 13968989 or 1129971;
+											else
+												t = L and 9096944 or 7122324;
+											end;
+										else
+											if t < 16215474 then
+												t = 15389050 < 4772022;
+												U[w[1]] = t;
+												t = 447486;
+											elseif t < 16396988 then
+												t = U[T];
+												L = { t };
+												t = p[j(19936)];
+											else
+												J = j(19962);
+												A = p[J];
+												B = j(19962);
+												J = A(T);
+												r = t;
+												r, A = 86400, 0;
+												O = J or A;
+												M = O * r;
+												J = p[B];
+												B = J(m);
+												J, A = 0, t;
+												r, A = B or J, 60;
+												O = r * A;
+												h = M + O;
+												O = 0;
+												M = h <= O;
+												t = M and 6570147 or 1404991;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+					else
+						if 4288177 > t then
+							if t < 1922200 then
+								if t < 1089189 then
+									if 476658 > t then
+										if 255584 > t then
+											if 130091 > t then
+												T = j(19958);
+												L = p[T];
+												t = 12681251;
+												U[g] = L;
+											elseif t < 174175 then
+												r, C = j(19922), j(19795);
+												h = V[C];
+												O = p[r];
+												r = j(19795);
+												M = O[r];
+												O, t = j(19780), 9681691;
+												C = M[O];
+												m = h == C;
+												g = m;
+											elseif t < 220842 then
+												M = P(2338050, { V });
+												h = j(19850);
+												m = p[h];
+												O = { m(M) };
+												C = O[2];
+												h = O[1];
+												t = h and 7011131 or 9432971;
+											else
+												t = U[w[1]];
+												L = j(20002);
+												m = U[w[2]];
+												h = j(19918);
+												T = m[h];
+												g = #T;
+												T = 0;
+												V = g > T;
+												t[L] = V;
+												L, t = {}, p[j(19876)];
+											end;
+										else
+											if t < 367229 then
+												L = j(20004);
+												t = p[L];
+												t = t and 8373788 or 6042595;
+											elseif t < 451601 then
+												t, L = p[j(19854)], {};
+											else
+												L, t = {}, p[j(19932)];
+											end;
+										end;
+									else
+										if 787046 > t then
+											if 521295 > t then
+												t = j(19875);
+												L = { t };
+												t = p[j(19916)];
+											elseif 650247 > t then
+												t = T;
+												t, L = 14941563, g;
+											else
+												M, C = 255, j(20052);
+												t = U[w[3]];
+												T = j(19913);
+												h = p[C];
+												C = j(19785);
+												m = h[C];
+												C, O = 80, 80;
+												h = m(C, M, O);
+												m = 2;
+												L = t(T, h, m);
+												L = j(19918);
+												t = U[w[4]];
+												h, T = j(20052), j(19888);
+												t[L] = T;
+												t = U[w[5]];
+												m = p[h];
+												L, M, C, h = j(20053), 100, 180, j(19785);
+												T = m[h];
+												h = 80;
+												m = T(h, C, M);
+												t[L] = m;
+												C, T = 50, j(19984);
+												L = p[T];
+												T = j(19963);
+												t = L[T];
+												M, T = 60, 1.5;
+												L = t(T);
+												t = U[w[5]];
+												h = j(20052);
+												m = p[h];
+												L, h = j(20053), j(19785);
+												T = m[h];
+												h = 180;
+												m = T(h, C, M);
+												t[L] = m;
+												t = 15874220;
+											end;
+										else
+											if 821992 > t then
+												B = j(19804);
+												J = p[B];
+												h, B = C, j(19878);
+												A = J[B];
+												J = A(g, h, h);
+												A = j(19818);
+												t = J == A;
+												t = t and 10355703 or 3901710;
+											elseif t < 936901 then
+												m, O = j(19859), j(19922);
+												t = U[w[1]];
+												V = U[w[2]];
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												L = j(19771);
+												M = p[O];
+												O = j(19801);
+												C = M[O];
+												M = j(19994);
+												h = C[M];
+												m = .3;
+												T = g(m, h);
+												A, r, m, M, L = 50, 0, j(19983), j(20010), t[L];
+												C = p[M];
+												M = j(19990);
+												h = C[M];
+												M, O = .5, -150;
+												C = h(M, O, r, A);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(20076)], {};
+											else
+												h = t;
+												C = U[w[3]];
+												m, t = C, C and 7117527 or 1639057;
+											end;
+										end;
+									end;
+								else
+									if 1619901 > t then
+										if t > 1406147 then
+											if 1495597 > t then
+												L, t = {}, p[j(20067)];
+											elseif t < 1595673 then
+												t = U[w[6]];
+												L = t(m);
+												M = j(19804);
+												C = p[M];
+												h, M = L, j(19878);
+												L = C[M];
+												M, O = 1, 3;
+												C = L(h, M, O);
+												L = j(19968);
+												t = C == L;
+												t = t and 12392085 or 14969690;
+											else
+												m = j(19815);
+												T = p[m];
+												h = U[w[1]];
+												t = 8909910;
+												m = T(h);
+												V = m;
+											end;
+										else
+											if 1159026 > t then
+												t = L and 15743940 or 15811246;
+											elseif t < 1265348 then
+												h = j(19896);
+												m = p[h];
+												h, t = j(20068), 15937512;
+												T = m[h];
+												L = T;
+											elseif t < 1373803 then
+												t = U[w[2]];
+												V = U[w[1]];
+												m = j(19859);
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m, O = 2, j(19922);
+												M = p[O];
+												r, O = j(19922), j(19801);
+												C = M[O];
+												M = j(19886);
+												h = C[M];
+												L = j(19771);
+												O = p[r];
+												r = j(19865);
+												M = O[r];
+												O = j(19988);
+												C = M[O];
+												M, L, O = 0, t[L], 13134684 >= 3523070;
+												T = g(m, h, C, M, O);
+												m, h = j(19847), .8;
+												g = { [m] = h };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t, V = L[t], j(19984);
+												t = t(L);
+												L = p[V];
+												V = j(19963);
+												t = L[V];
+												V = 2;
+												L = t(V);
+												t = 6383323;
+											else
+												S, A, B = j(19822), j(19822), j(19822);
+												r = p[A];
+												A = j(19836);
+												O = r[A];
+												r = O();
+												M = r + h;
+												r = j(19962);
+												O = p[r];
+												X = j(19822);
+												J = p[B];
+												B = j(19909);
+												A = J[B];
+												B, K = j(20089), j(19822);
+												J = { A(B, M) };
+												r = O(G(J));
+												y = j(19796);
+												A = j(19962);
+												O = p[A];
+												B = p[K];
+												K = j(19909);
+												J = B[K];
+												K = j(19762);
+												B = { J(K, M) };
+												A = O(G(B));
+												J = j(19962);
+												O = p[J];
+												x = j(19822);
+												K = p[S];
+												S = j(19909);
+												B = K[S];
+												S = j(19980);
+												K = { B(S, M) };
+												J = O(G(K));
+												B = j(19962);
+												O = p[B];
+												S = p[x];
+												x = j(19909);
+												K = S[x];
+												x, t = j(19784), p[j(20014)];
+												S = { K(x, M) };
+												B = O(G(S));
+												K = j(19962);
+												O = p[K];
+												x = p[X];
+												X, n = j(19909), j(19931);
+												S = x[X];
+												F, X = j(19954), j(19925);
+												x = { S(X, M) };
+												K = O(G(x));
+												x = j(19786);
+												Y = y .. K;
+												s = B .. Y;
+												u = F .. s;
+												q = J .. u;
+												k = n .. q;
+												X = A .. k;
+												S = x .. X;
+												O = r .. S;
+												L = { O };
+											end;
+										end;
+									else
+										if t > 1710582 then
+											if 1750900 > t then
+												m = h(T, m);
+												t = m and 8594653 or 14307074;
+											elseif 1762431 > t then
+												t = U[w[3]];
+												L, g = j(19918), j(20039);
+												t[L] = g;
+												g, L = 16046685 < 3348564, j(19946);
+												t = U[w[3]];
+												t[L] = g;
+												g = j(19984);
+												L = p[g];
+												g = j(20061);
+												t = L[g];
+												g = W(14706011, {
+														w[4],
+														w[2],
+														w[5],
+														w[6],
+														w[3],
+														w[7],
+														V,
+														w[8],
+														w[9],
+														w[10],
+														w[11],
+														w[12],
+														w[1],
+													});
+												L = t(g);
+												t, L = p[j(20059)], {};
+												V = o(V);
+											else
+												t = U[w[2]];
+												g, h = j(19899), j(20052);
+												m = p[h];
+												C, h = 80, j(19785);
+												T = m[h];
+												M, h = 80, 255;
+												m = T(h, C, M);
+												T = 2;
+												L = t(g, m, T);
+												g = j(19903);
+												t = U[w[5]];
+												L = j(19918);
+												t[L] = g;
+												t, L = p[j(19927)], {};
+											end;
+										else
+											if t < 1635702 then
+												A, C = not r, C + O;
+												h = C <= M;
+												h = A and h;
+												A = M <= C;
+												A = r and A;
+												h = A or h;
+												A = 818589;
+												t = h and A;
+												h = 8920695;
+												t = t or h;
+											elseif 1659047 > t then
+												g, t = m, h;
+												t = 10030421;
+											else
+												L = j(19813);
+												t = p[L];
+												V = U[w[1]];
+												L = t(V);
+												U[w[2]] = L;
+												t = 15641334;
+											end;
+										end;
+									end;
+								end;
+							else
+								if t < 3083398 then
+									if t > 2442600 then
+										if 2903566 > t then
+											if t < 2680247 then
+												t, L, V = p[j(19901)], {}, nil;
+											elseif 2857784 > t then
+												t = M;
+												t = m and 10632067 or 6854982;
+											else
+												t = U[w[1]];
+												V = U[w[2]];
+												m = j(19859);
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m = .2;
+												T = g(m);
+												r, M = 245, j(20052);
+												C = p[M];
+												M, m, O = j(19785), j(20053), 245;
+												h = C[M];
+												M = 245;
+												C = h(M, O, r);
+												L = j(19771);
+												L, g = t[L], { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(19820)], {};
+											end;
+										else
+											if t < 2974782 then
+												h = j(19850);
+												m = p[h];
+												M = l(15366997, { g, V });
+												O = { m(M) };
+												C, h = O[2], O[1];
+												M = t;
+												t, m = h and 11515694 or 2813343, h;
+											elseif 3053703 > t then
+												C = j(19984);
+												L = p[C];
+												C = j(19963);
+												t = L[C];
+												C = .1;
+												L = t(C);
+												t = 4142025;
+											else
+												t = j(20023);
+												V = H();
+												g = H();
+												U[V] = t;
+												L, t = j(19850), nil;
+												T = l(14868234, { V, g });
+												U[g] = t;
+												t = p[L];
+												L = t(T);
+												T = U[g];
+												L, t = T, T and 7661042 or 6316441;
+											end;
+										end;
+									else
+										if 2130348 > t then
+											if 2080278 > t then
+												O = j(19795);
+												M = V[O];
+												J, t = j(19922), 11763541;
+												A = p[J];
+												J = j(19795);
+												r = A[J];
+												A = j(19780);
+												O = r[A];
+												C = M == O;
+												m = C;
+											elseif 2082991 > t then
+												t, L = p[j(19915)], {};
+											elseif t < 2090038 then
+												t, L = p[j(19798)], {};
+											else
+												t = nil;
+												L = { t };
+												t = p[j(19845)];
+											end;
+										else
+											if 2167838 > t then
+												h, t, C = j(19918), 5397447, j(19888);
+												L = U[w[13]];
+												L[h] = C;
+											elseif 2254234 > t then
+												t = M;
+												t = h and 14964859 or 16425112;
+											else
+												L, g = j(19848), 4584527 ~= 13649350;
+												t = p[L];
+												V = U[w[1]];
+												T = j(19839);
+												T = t[T];
+												L = { T(t, V, g) };
+												t, L = p[j(20073)], { G(L) };
+											end;
+										end;
+									end;
+								else
+									if t > 3933946 then
+										if t < 4109555 then
+											if t < 4011351 then
+												t = U[w[1]];
+												L, V = j(20053), D[1];
+												T = V;
+												t[L] = T;
+												g = D[2];
+												T = g;
+												t = U[w[2]];
+												L = j(19918);
+												t[L] = T;
+												L, T = j(19969), V;
+												V = nil;
+												t = U[w[2]];
+												t[L] = T;
+												t, g, L = p[j(19827)], nil, {};
+											elseif 4066802 > t then
+												t, h, L = 14000008 < 7472126, nil, j(20038);
+												L = { t, L, h };
+												t = p[j(19777)];
+											else
+												L = j(19778);
+												t = V == L;
+												t = t and 1765189 or 15223828;
+											end;
+										else
+											if 4151930 > t then
+												M = U[m];
+												C = not M;
+												L, t = C, C and 14037466 or 6342314;
+											elseif 4195191 > t then
+												L, t = {}, p[j(20070)];
+											else
+												V = D[1];
+												t = not V;
+												t = t and 14787710 or 13735005;
+											end;
+										end;
+									else
+										if t > 3694678 then
+											if 3772010 > t then
+												t = U[w[3]];
+												m, O, C = j(19917), 110, j(19855);
+												h = p[C];
+												C = h(V);
+												T = m .. C;
+												M, C = 110, j(20052);
+												h = p[C];
+												C = j(19785);
+												m = h[C];
+												C = 255;
+												h = m(C, M, O);
+												m, C = 2, 50;
+												L = t(T, h, m);
+												M, h = 60, j(20052);
+												t = U[w[5]];
+												m = p[h];
+												h, L = j(19785), j(20053);
+												T = m[h];
+												h = 180;
+												m = T(h, C, M);
+												t[L] = m;
+												t = 15874220;
+											elseif 3874872 > t then
+												g = j(19926);
+												L = U[w[3]];
+												t = L[g];
+												L = j(19979);
+												L = t[L];
+												L = L(t);
+												t = 8018008;
+											else
+												h, t = nil, 1632348;
+											end;
+										else
+											if t < 3208511 then
+												L, t = j(20038), 4225930 < 3733089;
+												L = { t, L };
+												t = p[j(20034)];
+											elseif t < 3313375 then
+												g = j(20082);
+												t = U[w[2]];
+												h = j(20052);
+												m = p[h];
+												h = j(19785);
+												T = m[h];
+												C, h, M = 180, 255, 80;
+												m = T(h, C, M);
+												T = 1.5;
+												L = t(g, m, T);
+												t, L = p[j(19959)], {};
+											elseif t < 3503573 then
+												J, g, h, V, O, Y, F, n, f, m, B, u, T, q, M, S, R, A, s, K, c, I, x, r, y, k, L, X, C, E, i = j(20032), j(19978), j(19802), D[1], j(19761), j(19814), j(19806), j(19870), j(19890), j(19816), j(20001), j(20009), j(19819), j(19776), j(19893), j(19809), j(19817), j(19947), j(19920), j(19938), j(19774), j(19863), j(20063), j(19956), j(20062), j(19879), j(19966), j(19913), j(19955), j(19789), j(19782);
+												t = {
+														[L] = g,
+														[T] = m,
+														[h] = C,
+														[M] = O,
+														[r] = A,
+														[J] = B,
+														[K] = S,
+														[x] = X,
+														[k] = n,
+														[q] = u,
+														[F] = s,
+														[Y] = y,
+														[f] = E,
+														[I] = R,
+														[c] = i,
+													};
+												g = t;
+												T = g[V];
+												L, t = T, T and 9596063 or 15015590;
+											else
+												O = j(19804);
+												M = p[O];
+												O = j(20093);
+												C = M[O];
+												O = j(20021);
+												M = C(h, O);
+												C = j(19977);
+												L = M or C;
+												M = U[w[8]];
+												C = L;
+												L = 16280059 < 3734244;
+												O = M(C);
+												M, t = nil, p[j(20013)];
+												L = { L, O, M };
+											end;
+										end;
+									end;
+								end;
+							end;
+						else
+							if 6329889 > t then
+								if t > 5442300 then
+									if t < 5975384 then
+										if 5818981 > t then
+											if 5546333 > t then
+												r, t, C = j(19922), 544991, j(19795);
+												h = V[C];
+												O = p[r];
+												r = j(19795);
+												M = O[r];
+												O = j(19939);
+												C = M[O];
+												m = h == C;
+												g = m;
+											elseif t < 5649453 then
+												m, L, T, t, g, V = nil, {}, nil, p[j(19844)], nil, nil;
+											elseif t < 5737109 then
+												T = j(19804);
+												L = p[T];
+												T = j(20037);
+												t = L[T];
+												T = j(19799);
+												L = t(g, T);
+												t = L and 10719929 or 13404283;
+											else
+												L = j(19797);
+												dX = l(9182056, {
+														u,
+														F,
+														s,
+														LX,
+													});
+												t = T[L];
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												dX = l(15915077, {
+														u,
+														y,
+														Y,
+														pd,
+													});
+												L = j(20087);
+												t = T[L];
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												dX = j(19926);
+												L = U[sX];
+												t = L[dX];
+												dX = W(9262294, {
+														RX,
+														h,
+														LX,
+														eX,
+													});
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												dX = j(19926);
+												L = U[kX];
+												t = L[dX];
+												dX = N(6231673, {
+														xX,
+														cX,
+														kX,
+														DX,
+														eX,
+														wX,
+														tX,
+														iX,
+														RX,
+														X,
+														IX,
+														k,
+													});
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												L = U[xX];
+												dX = j(19869);
+												t = L[dX];
+												dX = b(8628627, { kX });
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												L = U[qX];
+												dX = j(19926);
+												t = L[dX];
+												dX = l(8454602, {
+														q,
+														xX,
+														cX,
+														qX,
+														GX,
+													});
+												L = j(20042);
+												L = t[L];
+												L = L(t, dX);
+												dX = j(19949);
+												L = p[dX];
+												dX = j(19881);
+												t = L[dX];
+												dX = Z(15659012, { VX, h });
+												L = t(dX);
+												t = L();
+												dX = j(19949);
+												L = p[dX];
+												dX = j(19881);
+												t = L[dX];
+												dX = Z(5908174, { TX, h });
+												L = t(dX);
+												t = L();
+												t = U[Y];
+												t = t and 8151753 or 11951843;
+											end;
+										else
+											if 5861251 > t then
+												t = j(19957);
+												L = { t };
+												t = p[j(20092)];
+											elseif t < 5886769 then
+												L, t, V = {}, p[j(20090)], nil;
+											else
+												t = 6910184;
+											end;
+										end;
+									else
+										if 6278919 > t then
+											if t < 6137134 then
+												L, t = {}, p[j(19897)];
+											elseif 6246396 > t then
+												L = U[w[1]];
+												V = j(19918);
+												t = L[V];
+												V = H();
+												U[V] = t;
+												g = U[V];
+												L = #g;
+												g = 0;
+												t = L == g;
+												t = t and 3312972 or 1759674;
+											else
+												M, g = j(19874), j(19983);
+												L = V[g];
+												g = U[w[2]];
+												t = L - g;
+												h = j(20000);
+												m = U[w[3]];
+												T = m[h];
+												m = j(19864);
+												L = T[m];
+												g, m, C, K = t, j(20000), j(19883), j(19976);
+												T = g[m];
+												t = L + T;
+												T = t;
+												h = U[w[3]];
+												m = h[C];
+												S, h = j(19976), j(19864);
+												L = m[h];
+												h = j(19883);
+												m = g[h];
+												t = L + m;
+												m = t;
+												C = p[M];
+												M = j(20007);
+												h = C[M];
+												O, C = j(19874), j(19960);
+												L = h[C];
+												h = j(20000);
+												t = L[h];
+												M = p[O];
+												O = j(20007);
+												C = M[O];
+												M, h = j(19960), t;
+												L = C[M];
+												M, C = j(20027), j(19883);
+												t = L[C];
+												C = t;
+												L = p[M];
+												M = j(19884);
+												t = L[M];
+												B = U[w[4]];
+												M = 0;
+												J = B[K];
+												B = j(20000);
+												A = J[B];
+												J = j(19864);
+												r = A[J];
+												O = h - r;
+												L = t(T, M, O);
+												T, O = L, j(20027);
+												M = p[O];
+												O = j(19884);
+												t = M[O];
+												O = 0;
+												K = U[w[4]];
+												B = K[S];
+												K = j(19883);
+												J = B[K];
+												B = j(19864);
+												A = J[B];
+												r = C - A;
+												M = t(m, O, r);
+												g = nil;
+												t = U[w[4]];
+												O, J, B = j(19983), j(20010), 0;
+												A = p[J];
+												J, m = j(19990), M;
+												r = A[J];
+												h, C, J = nil, nil, 0;
+												A = r(J, T, B, m);
+												t[O] = A;
+												T, m, t = nil, nil, 2547151;
+											end;
+										else
+											if t < 6306580 then
+												L = j(19860);
+												g = U[w[1]];
+												T = U[w[2]];
+												V = g .. T;
+												t = L .. V;
+												g, V = 5, t;
+												t = U[w[3]];
+												L = t(V, g);
+												g = L;
+												t, L = g and 5005641 or 11695443, g;
+											elseif t < 6316952 then
+												t = L and 13473742 or 7991521;
+											else
+												t = U[w[2]];
+												L = { t };
+												t = p[j(20033)];
+											end;
+										end;
+									end;
+								else
+									if 4736048 > t then
+										if t > 4608845 then
+											if 4669847 > t then
+												m = U[w[1]];
+												J, h = j(20086), j(19830);
+												L = m[h];
+												O = U[w[1]];
+												r, h = j(20003), j(19853);
+												M = O[r];
+												r = j(19853);
+												A = T .. J;
+												O = r .. A;
+												C = M .. O;
+												m = h .. C;
+												t = L .. m;
+												m = H();
+												U[m] = t;
+												h = N(286973, { V, m });
+												L = j(19850);
+												t = p[L];
+												L = t(h);
+												t = U[m];
+												L = { t };
+												t = p[j(19892)];
+											elseif t < 4707008 then
+												C, V, g = j(19760), D[1], j(19822);
+												L = p[g];
+												g = j(19836);
+												t = L[g];
+												L = t();
+												g, T = L, j(19804);
+												L = p[T];
+												T = j(20054);
+												t = L[T];
+												m = U[w[1]];
+												h = m();
+												T = j(19921);
+												m = U[w[2]];
+												C = m[C];
+												C = C(m, V);
+												m = U[w[2]];
+												O = U[w[3]];
+												M = j(19760);
+												M = m[M];
+												M = M(m, O);
+												m = U[w[4]];
+												L = t(T, h, C, M, m, g);
+												m = 10;
+												t = U[w[5]];
+												T = L;
+												L = t(T, m);
+												m = L;
+												t = not m;
+												t = t and 3104050 or 7018948;
+											else
+												V = H();
+												g = H();
+												U[V] = D[1];
+												m, t = j(19896), nil;
+												U[g] = t;
+												T = p[m];
+												L, t = T, T and 1188082 or 15937512;
+											end;
+										else
+											if 4407851 > t then
+												g, T, V, C = j(19822), j(19804), D[1], j(19760);
+												L = p[g];
+												g = j(19836);
+												t = L[g];
+												L = t();
+												g = L;
+												L = p[T];
+												T = j(20054);
+												t = L[T];
+												T = j(19911);
+												m = U[w[1]];
+												h = m();
+												m = U[w[2]];
+												M, C = j(19760), m[C];
+												C = C(m, V);
+												m = U[w[2]];
+												M = m[M];
+												O = U[w[3]];
+												M = M(m, O);
+												m = U[w[4]];
+												L = t(T, h, C, M, m, g);
+												m, T = 10, L;
+												t = U[w[5]];
+												L = t(T, m);
+												m = L;
+												t = not m;
+												t = t and 4056519 or 1583892;
+											elseif 4500606 > t then
+												g, L, T, t, V = nil, {}, nil, p[j(19831)], nil;
+											elseif 4546194 > t then
+												g, h = D[2], j(19984);
+												V = H();
+												m = H();
+												t = nil;
+												U[V] = D[1];
+												T = H();
+												U[T] = t;
+												t = 5307392 <= 5197017;
+												U[m] = t;
+												L = p[h];
+												h = j(20061);
+												t = L[h];
+												h = P(8948943, {
+														w[1],
+														V,
+														T,
+														m,
+													});
+												L = t(h);
+												L = j(19906);
+												t = p[L];
+												L = t();
+												t, h = 4142025, L;
+											else
+												t = 14963596 > 12053269;
+												L = { t };
+												t = p[j(20043)];
+											end;
+										end;
+									else
+										if t > 5064158 then
+											if t < 5170603 then
+												t = U[w[3]];
+												L = { t };
+												t = p[j(19882)];
+											elseif 5307988 > t then
+												t = U[w[1]];
+												t = t and 6317464 or 5122676;
+											else
+												C = j(19903);
+												L = U[w[5]];
+												h, O = j(19918), j(20052);
+												L[h] = C;
+												r, A, h = 255, 255, j(20053);
+												L = U[w[5]];
+												t = 5605513;
+												M = p[O];
+												O = j(19785);
+												C = M[O];
+												O = 255;
+												M = C(O, r, A);
+												L[h] = M;
+											end;
+										else
+											if t < 4785040 then
+												m = j(19859);
+												t = U[w[2]];
+												V = U[w[1]];
+												T = p[m];
+												O, r, m = j(19922), j(19922), j(19990);
+												g = T[m];
+												M = p[O];
+												m, O = 1, j(19801);
+												C = M[O];
+												M = j(19886);
+												h = C[M];
+												O = p[r];
+												r = j(19865);
+												M = O[r];
+												O = j(19988);
+												C = M[O];
+												O, L, M = 13036340 > 10947509, j(19771), 0;
+												T = g(m, h, C, M, O);
+												m, L, h = j(19929), t[L], .3;
+												g = { [m] = h };
+												L = L(t, V, T, g);
+												V, t = j(19984), j(20020);
+												t = L[t];
+												t = t(L);
+												L = p[V];
+												V = j(19963);
+												t = L[V];
+												V = 1;
+												L = t(V);
+												t = 6910184;
+											elseif t < 4918283 then
+												V, L, t = nil, {}, p[j(20016)];
+											else
+												h = j(19804);
+												m = p[h];
+												h = j(20037);
+												T = m[h];
+												h, t = j(19975), 11695443;
+												m = T(g, h);
+												L = m;
+											end;
+										end;
+									end;
+								end;
+							else
+								if t > 7181165 then
+									if 7810753 > t then
+										if t > 7596333 then
+											if 7644136 > t then
+												g, V, T = D[2], D[1], j(19924);
+												L = p[T];
+												T = j(19990);
+												t = L[T];
+												T = j(19982);
+												L = t(T);
+												t, T = j(19769), L;
+												L = U[w[1]];
+												T[t] = L;
+												t, L, h = j(19908), V, .5;
+												T[t] = L;
+												L, t = g or h, j(19857);
+												m = t;
+												T[t] = L;
+												L, h = j(20020), j(19952);
+												L = T[L];
+												L = L(T);
+												m, g = j(19848), nil;
+												L = p[m];
+												m = j(19970);
+												m = L[m];
+												m = m(L, h);
+												L, V, t, h = j(19835), nil, p[j(20071)], 1;
+												L = m[L];
+												L = L(m, T, h);
+												L, T = {}, nil;
+											elseif 7701503 > t then
+												h = U[g];
+												m = #h;
+												t, h = 6316441, 6;
+												T = m > h;
+												L = T;
+											else
+												M, V, h, t = 80, j(19850), j(20052), 5469406 ~= 5234835;
+												U[w[1]] = t;
+												L = p[V];
+												g = W(13994108, {});
+												V = L(g);
+												g = j(19974);
+												L = U[w[2]];
+												m = p[h];
+												C, h = 255, j(19785);
+												T = m[h];
+												h = 80;
+												m = T(h, C, M);
+												T = 2;
+												V = L(g, m, T);
+												g, t = j(19984), p[j(20074)];
+												V = p[g];
+												g = j(19963);
+												L = V[g];
+												g = 1;
+												V = L(g);
+												L = 13883041 <= 4434207;
+												U[w[1]] = L;
+												L = {};
+											end;
+										else
+											if t < 7353155 then
+												t = U[w[1]];
+												M = j(20052);
+												V = U[w[2]];
+												m = j(19859);
+												T = p[m];
+												m, J = j(19990), 0;
+												g = T[m];
+												A, m, O = 190, .1, 255;
+												T = g(m);
+												C = p[M];
+												M, m = j(19785), j(20053);
+												h = C[M];
+												B, M, r = 36, 255, 255;
+												C = h(M, O, r);
+												L = j(19771);
+												L, h, r = t[L], j(19976), j(20010);
+												O = p[r];
+												r = j(19990);
+												M = O[r];
+												r = 0;
+												O = M(r, A, J, B);
+												g = { [m] = C, [h] = O };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(20057)], {};
+											elseif 7515870 > t then
+												t = U[w[1]];
+												m, L = j(19859), j(19771);
+												V = U[w[2]];
+												A = 255;
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												m = .2;
+												T = g(m);
+												M = j(20052);
+												C = p[M];
+												m, M, O = j(20053), j(19785), 55;
+												h = C[M];
+												M, J, r = 55, 255, 55;
+												C = h(M, O, r);
+												h, r = j(19969), j(20052);
+												O = p[r];
+												r = j(19785);
+												M = O[r];
+												L, r = t[L], 255;
+												O = M(r, A, J);
+												g = { [m] = C, [h] = O };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(20085)], {};
+											else
+												M, L = j(19995), 15127224 < 7549156;
+												C = M .. h;
+												M, t = nil, p[j(19781)];
+												L = { L, C, M };
+											end;
+										end;
+									else
+										if t < 8084880 then
+											if t < 7935531 then
+												t = U[w[1]];
+												m, O = j(19859), j(19922);
+												V = U[w[2]];
+												T = p[m];
+												m = j(19990);
+												g = T[m];
+												M = p[O];
+												O, m, A = j(19801), .3, -190;
+												C = M[O];
+												M, L, r, O = j(19994), j(19771), .5, -150;
+												h = C[M];
+												M = j(20010);
+												T = g(m, h);
+												L, m = t[L], j(19983);
+												C = p[M];
+												M = j(19990);
+												h = C[M];
+												M = .5;
+												C = h(M, O, r, A);
+												g = { [m] = C };
+												L = L(t, V, T, g);
+												t = j(20020);
+												t = L[t];
+												t = t(L);
+												t, L = p[j(19986)], {};
+											elseif t < 8004764 then
+												t, L = j(19888), 1;
+												T = t;
+												t, m = 9514419, 8;
+												h = m;
+												m = 1;
+												C = m;
+												m = 0;
+												M = C < m;
+												m = L - C;
+											else
+												t = V;
+												U[w[1]] = t;
+												L, t, V = {}, p[j(19873)], nil;
+											end;
+										else
+											if t < 8153479 then
+												td = j(19843);
+												t = W(825396, { h, LX });
+												dX = t;
+												L = U[xX];
+												t = Z(7879542, { h, LX });
+												jd = t;
+												t = L[td];
+												td, L = j(19869), j(20042);
+												L = t[L];
+												L = L(t, dX);
+												L = U[xX];
+												t = L[td];
+												td = H();
+												L = j(20042);
+												L = t[L];
+												L = L(t, jd);
+												t = 0;
+												Gd = H();
+												L = j(19926);
+												U[td] = t;
+												jd, t = nil, .3;
+												Dd = N(14031123, { td, Gd, sX });
+												U[Gd] = t;
+												t = fX[L];
+												dX, L = nil, j(20042);
+												L = t[L];
+												Gd = o(Gd);
+												td = o(td);
+												L = L(t, Dd);
+												t = 11951843;
+											elseif t < 8155946 then
+												t = L and 10835643 or 12974600;
+											else
+												O = j(20052);
+												L = U[w[8]];
+												J, r = 80, 80;
+												M = p[O];
+												O = j(19785);
+												C = M[O];
+												A, O = 80, 255;
+												M = C(O, r, A);
+												C = j(19904);
+												h = L(M, C);
+												A, r = 80, j(20052);
+												L = U[w[2]];
+												C = j(20005);
+												O = p[r];
+												r = j(19785);
+												M = O[r];
+												r = 255;
+												O = M(r, A, J);
+												M = 3;
+												h = L(C, O, M);
+												t, C = p[j(20011)], j(19984);
+												h = p[C];
+												C = j(19963);
+												L = h[C];
+												C = 3;
+												h = L(C);
+												h = j(19788);
+												L = U[w[3]];
+												h = L[h];
+												h = h(L);
+												L = {};
+											end;
+										end;
+									end;
+								else
+									if t < 6882583 then
+										if 6567941 > t then
+											if 6362818 > t then
+												t = L and 3044659 or 11539066;
+											elseif t < 6391982 then
+												V = j(19769);
+												L = U[w[1]];
+												t = L[V];
+												t = t and 1342615 or 1407303;
+											elseif t < 6483189 then
+												t = L and 1679038 or 15641334;
+											else
+												m = U[w[1]];
+												T, V, g = t, D[1], m;
+												t = m and 130861 or 9681691;
+											end;
+										else
+											if 6641335 > t then
+												t, M = p[j(19880)], j(19764);
+												L = { M };
+											elseif t < 6783752 then
+												L = j(19858);
+												t = fX[L];
+												L = j(20042);
+												L = t[L];
+												L = L(t, zX);
+												t = 5780825;
+											else
+												C, t, h = nil, 217489, nil;
+											end;
+										end;
+									else
+										if 7036497 > t then
+											if t < 6960657 then
+												V = j(19769);
+												L = U[w[1]];
+												t = L[V];
+												t = t and 4739154 or 4161835;
+											elseif t < 7015039 then
+												t, L = p[j(20006)], { C };
+											else
+												O = j(19804);
+												t = U[w[6]];
+												L = t(m);
+												h = L;
+												M = p[O];
+												O = j(20037);
+												C = M[O];
+												O = j(20063);
+												M = C(h, O);
+												L, t = M, M and 8155205 or 10762395;
+											end;
+										else
+											if t < 7085787 then
+												C = j(19804);
+												h = p[C];
+												C, O = j(19878), 1;
+												t = h[C];
+												C = 1;
+												M = m - O;
+												h = { t(g, C, M) };
+												t, L = p[j(20031)], { G(h) };
+											elseif 7119925 > t then
+												J, O = j(19922), j(19795);
+												M = V[O];
+												A = p[J];
+												J, t = j(19795), 1639057;
+												r = A[J];
+												A = j(19939);
+												O = r[A];
+												C = M == O;
+												m = C;
+											else
+												T = j(19958);
+												L = p[T];
+												t = L and 129322 or 14647973;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+					end;
+				end;
+				t = #e;
+				return G(L);
+			end, function(p, j)
+				local G = T(j);
+				local D = function()
+						return t(p, {}, j, G);
+					end;
+				return D;
+			end, {}, function(p, j)
+				local G = T(j);
+				local D = function(...)
+						return t(p, { ... }, j, G);
+					end;
+				return D;
+			end, function(p, j)
+				local G = T(j);
+				local D = function(D, w, e)
+						return t(p, { D, w, e }, j, G);
+					end;
+				return D;
+			end, function(p, j)
+				local G = T(j);
+				local D = function(D, w, e, Q, L)
+						return t(p, {
+							D,
+							w,
+							e,
+							Q,
+							L,
+						}, j, G);
+					end;
+				return D;
+			end, function(p, j)
+				local G = T(j);
+				local D = function(D)
+						return t(p, { D }, j, G);
+					end;
+				return D;
+			end, {}, function(p, j)
+				local G = T(j);
+				local D = function(D, w, e, Q)
+						return t(p, {
+							D,
+							w,
+							e,
+							Q,
+						}, j, G);
+					end;
+				return D;
+			end, function(p)
+				V[p] = V[p] - 1;
+				if V[p] == 0 then
+					V[p], U[p] = nil, nil;
+				end;
+			end, function(p)
+				for j = 1, #p, 1 do
+					V[p[j]] = 1 + V[p[j]];
+				end;
+				if D then
+					local t = D(true);
+					local G = e(t);
+					G[j(19953)], G[j(19829)], G[j(19912)] = p, m, function()
+							return 3058743;
+						end;
+					return t;
+				else
+					return w({}, { [j(19829)] = m, [j(19953)] = p, [j(19912)] = function()
+							return 3058743;
+						end });
+				end;
+			end, function(p, j)
+				local G = T(j);
+				local D = function(D, w, e, Q, L, U)
+						return t(p, {
+							D,
+							w,
+							e,
+							Q,
+							L,
+							U,
+						}, j, G);
+					end;
+				return D;
+			end, function()
+				g = g + 1;
+				V[g] = 1;
+				return g;
+			end, 0;
+		return (h(9667012, {}))(G(L));
+	end)(unpack or table[j(19900)], getmetatable, select, getfenv and getfenv() or _ENV, setmetatable, { ... }, newproxy);
+end)(...);
