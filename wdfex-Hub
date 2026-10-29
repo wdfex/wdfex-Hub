@@ -38,7 +38,7 @@ label.Font = Enum.Font.GothamBold
 label.TextSize = 15
 label.TextWrapped = true
 label.TextColor3 = Color3.fromRGB(240, 240, 245)
-label.Text = "当前链接已无法使用新的脚本链接也复制到你的剪贴板里面8秒后此弹窗将关闭"
+label.Text = "当前链接已无法使用新的脚本链接已复制到你的剪贴板里面8秒后此弹窗将关闭"
 label.Parent = frame
 
 task.delay(8, function()
